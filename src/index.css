@@ -1,10 +1,13 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 195 54% 96%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -13,16 +16,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 196 73% 53%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 196 52% 80%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 196 89% 42%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -32,22 +35,15 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
+    --sidebar-background: 195 61% 63%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 196 73% 53%;
+    --sidebar-accent: 196 52% 80%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 195 52% 70%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -79,14 +75,6 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -96,6 +84,79 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-teranga-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  .glass-card {
+    @apply bg-white bg-opacity-70 backdrop-blur-sm shadow-lg;
+  }
+
+  .glass-overlay {
+    @apply bg-white bg-opacity-30 backdrop-blur-md;
+  }
+
+  .stagger-animate > * {
+    opacity: 0;
+  }
+
+  .stagger-animate > *:nth-child(1) {
+    animation: fade-in-up 0.5s ease-out 0.1s forwards;
+  }
+
+  .stagger-animate > *:nth-child(2) {
+    animation: fade-in-up 0.5s ease-out 0.2s forwards;
+  }
+
+  .stagger-animate > *:nth-child(3) {
+    animation: fade-in-up 0.5s ease-out 0.3s forwards;
+  }
+
+  .stagger-animate > *:nth-child(4) {
+    animation: fade-in-up 0.5s ease-out 0.4s forwards;
+  }
+
+  .stagger-animate > *:nth-child(5) {
+    animation: fade-in-up 0.5s ease-out 0.5s forwards;
+  }
+
+  .stagger-animate > *:nth-child(6) {
+    animation: fade-in-up 0.5s ease-out 0.6s forwards;
+  }
+
+  .stagger-animate > *:nth-child(7) {
+    animation: fade-in-up 0.5s ease-out 0.7s forwards;
+  }
+
+  .module-card {
+    @apply relative rounded-xl p-5 flex flex-col items-center justify-center 
+           text-center gap-3 shadow-md overflow-hidden transition-all 
+           duration-300 bg-white hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .btn-primary {
+    @apply bg-teranga-blue text-white py-2 px-6 rounded-full font-medium
+           hover:bg-teranga-darkBlue transition-colors duration-300
+           shadow-sm hover:shadow-md;
+  }
+
+  .btn-outline {
+    @apply border border-teranga-blue text-teranga-blue py-2 px-6 rounded-full font-medium
+           hover:bg-teranga-blue hover:text-white transition-all duration-300;
   }
 }

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
-import { Menu, MessageCircle, Calendar, FileChart, BookOpen, Bell } from "lucide-react";
+import { Menu, MessageCircle, Calendar, FileBarChart, BookOpen, Bell } from "lucide-react";
 
 const ParentPortal = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,7 +21,7 @@ const ParentPortal = () => {
     {
       title: "Suivi des résultats",
       description: "Accès aux évaluations et bulletins scolaires",
-      icon: FileChart
+      icon: FileBarChart
     },
     {
       title: "Ressources pédagogiques",

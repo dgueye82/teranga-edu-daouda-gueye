@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import UserMenuButton from "./UserMenuButton";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -111,20 +112,25 @@ const Navbar = () => {
           >
             Portails parents
           </NavLink>
+          
+          <UserMenuButton />
         </nav>
 
         {/* Mobile Menu Button */}
-        <button
-          onClick={toggleMobileMenu}
-          className="lg:hidden text-gray-700 hover:text-teranga-blue focus:outline-none"
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </button>
+        <div className="lg:hidden flex items-center space-x-4">
+          <UserMenuButton />
+          <button
+            onClick={toggleMobileMenu}
+            className="text-gray-700 hover:text-teranga-blue focus:outline-none"
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}

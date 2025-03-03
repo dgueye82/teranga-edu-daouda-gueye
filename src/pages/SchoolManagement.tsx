@@ -1,122 +1,160 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { School, SchoolFormData } from "@/types/school";
+import { getSchools, createSchool, updateSchool, deleteSchool } from "@/services/schoolService";
+import SchoolForm from "@/components/schools/SchoolForm";
+import SchoolList from "@/components/schools/SchoolList";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
-import { Menu, School, Settings, FileText, Users, Calendar } from "lucide-react";
 
 const SchoolManagement = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  const features = [
-    {
-      title: "Gestion des établissements",
-      description: "Gérez les données de base et la structure de vos établissements scolaires",
-      icon: School
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingSchool, setEditingSchool] = useState<School | null>(null);
+
+  const { data: schools = [], isLoading } = useQuery({
+    queryKey: ["schools"],
+    queryFn: getSchools,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createSchool,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schools"] });
+      setIsDialogOpen(false);
+      toast({
+        title: "École créée",
+        description: "L'école a été créée avec succès",
+      });
     },
-    {
-      title: "Administration",
-      description: "Outils de gestion administrative pour le fonctionnement quotidien",
-      icon: Settings
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la création de l'école",
+      });
     },
-    {
-      title: "Documents administratifs",
-      description: "Génération et gestion des documents officiels et rapports",
-      icon: FileText
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: SchoolFormData }) => updateSchool(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schools"] });
+      setIsDialogOpen(false);
+      setEditingSchool(null);
+      toast({
+        title: "École mise à jour",
+        description: "L'école a été mise à jour avec succès",
+      });
     },
-    {
-      title: "Gestion des classes",
-      description: "Organisation et suivi des classes et des groupes d'élèves",
-      icon: Users
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error.message || "Une erreur est survenue lors de la mise à jour de l'école",
+      });
     },
-    {
-      title: "Calendrier scolaire",
-      description: "Planification de l'année scolaire, événements et congés",
-      icon: Calendar
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteSchool,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schools"] });
+      toast({
+        title: "École supprimée",
+        description: "L'école a été supprimée avec succès",
+      });
+    },
+  });
+
+  const handleSubmit = async (data: SchoolFormData) => {
+    if (editingSchool) {
+      await updateMutation.mutateAsync({ id: editingSchool.id, data });
+    } else {
+      await createMutation.mutateAsync(data);
     }
-  ];
+  };
+
+  const handleEdit = (school: School) => {
+    setEditingSchool(school);
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    await deleteMutation.mutateAsync(id);
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setEditingSchool(null);
+  };
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="flex w-full pt-16">
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        
-        {/* Mobile Sidebar Toggle */}
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="fixed z-50 bottom-6 left-6 p-3 rounded-full bg-teranga-blue text-white shadow-lg md:hidden"
-          aria-label="Toggle Sidebar"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-        
-        <main className="flex-1 bg-teranga-background transition-all duration-300">
-          <div className="container mx-auto px-4 py-12">
-            <div className="max-w-4xl mx-auto">
-              <div className="mb-12 animate-fade-in">
-                <h1 className="text-4xl font-bold text-gray-800 mb-6">Gérer l'école</h1>
-                <div className="h-1 w-20 bg-teranga-blue mb-8"></div>
-                <p className="text-lg text-gray-700">
-                  Notre module de gestion d'école vous permet de digitaliser et d'optimiser 
-                  l'administration de votre établissement scolaire. Centralisez toutes vos 
-                  données administratives et gagnez en efficacité.
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 stagger-animate">
-                {features.map((feature, index) => {
-                  const Icon = feature.icon;
-                  return (
-                    <div 
-                      key={index} 
-                      className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="p-3 bg-teranga-skyBlue rounded-lg">
-                          <Icon className="h-6 w-6 text-teranga-blue" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg text-gray-800 mb-2">
-                            {feature.title}
-                          </h3>
-                          <p className="text-gray-600">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              <div className="bg-white rounded-xl p-8 shadow-lg animate-fade-in-up">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Digitaliser la gestion administrative
-                </h2>
-                <p className="text-gray-700 mb-4">
-                  La transition vers une gestion numérique de votre établissement vous permet de:
-                </p>
-                <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-6">
-                  <li>Réduire les tâches administratives manuelles</li>
-                  <li>Centraliser et sécuriser vos données</li>
-                  <li>Faciliter la communication interne et externe</li>
-                  <li>Générer des rapports détaillés sur le fonctionnement de votre établissement</li>
-                  <li>Optimiser les ressources humaines et matérielles</li>
-                </ul>
-                <p className="text-gray-700">
-                  Avec Teranga EDU, la gestion administrative devient plus simple, plus rapide et plus efficace.
-                </p>
-              </div>
-            </div>
+      <div className="container mx-auto px-4 py-8 mt-16">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Gestion des écoles</h1>
+            <p className="text-gray-600 mt-1">
+              Ajouter, modifier ou supprimer des écoles dans le système
+            </p>
           </div>
-          
-          {/* Footer */}
-          <footer className="bg-white py-8 border-t border-gray-100">
-            <div className="container mx-auto px-4 text-center">
-              <p className="text-gray-600">&copy; {new Date().getFullYear()} TERANGA EDU. Tous droits réservés.</p>
-            </div>
-          </footer>
-        </main>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => setEditingSchool(null)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Ajouter une école
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingSchool ? "Modifier l'école" : "Ajouter une nouvelle école"}
+                </DialogTitle>
+                <DialogDescription>
+                  {editingSchool
+                    ? "Modifiez les informations de l'école ci-dessous."
+                    : "Remplissez les informations pour ajouter une nouvelle école."}
+                </DialogDescription>
+              </DialogHeader>
+              <SchoolForm
+                initialData={editingSchool || undefined}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        <Separator className="my-6" />
+
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
+          </div>
+        ) : (
+          <SchoolList
+            schools={schools}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        )}
       </div>
     </div>
   );

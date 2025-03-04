@@ -5,7 +5,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
 import { Menu } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/studentService";
+import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/student";
 import { getSchools } from "@/services/schoolService";
 import { Student, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";

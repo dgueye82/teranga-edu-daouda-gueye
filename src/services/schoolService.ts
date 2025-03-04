@@ -1,12 +1,13 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { School, SchoolFormData } from "@/types/school";
+import { PostgrestError } from "@supabase/supabase-js";
 
 export const getSchools = async (): Promise<School[]> => {
   const { data, error } = await supabase
     .from("schools")
     .select("*")
-    .order("name") as { data: School[] | null; error: any };
+    .order("name") as { data: School[] | null; error: PostgrestError | null };
 
   if (error) {
     console.error("Error fetching schools:", error);
@@ -21,7 +22,7 @@ export const getSchoolById = async (id: string): Promise<School | null> => {
     .from("schools")
     .select("*")
     .eq("id", id)
-    .single() as { data: School | null; error: any };
+    .single() as { data: School | null; error: PostgrestError | null };
 
   if (error) {
     if (error.code === "PGRST116") {
@@ -39,7 +40,7 @@ export const createSchool = async (school: SchoolFormData): Promise<School> => {
     .from("schools")
     .insert([school])
     .select()
-    .single() as { data: School | null; error: any };
+    .single() as { data: School | null; error: PostgrestError | null };
 
   if (error) {
     console.error("Error creating school:", error);
@@ -55,7 +56,7 @@ export const updateSchool = async (id: string, school: SchoolFormData): Promise<
     .update(school)
     .eq("id", id)
     .select()
-    .single() as { data: School | null; error: any };
+    .single() as { data: School | null; error: PostgrestError | null };
 
   if (error) {
     console.error("Error updating school:", error);
@@ -69,7 +70,7 @@ export const deleteSchool = async (id: string): Promise<void> => {
   const { error } = await supabase
     .from("schools")
     .delete()
-    .eq("id", id) as { error: any };
+    .eq("id", id) as { error: PostgrestError | null };
 
   if (error) {
     console.error("Error deleting school:", error);

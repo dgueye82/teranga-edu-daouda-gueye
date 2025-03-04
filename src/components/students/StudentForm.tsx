@@ -159,7 +159,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
                     <FormLabel>École</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
-                      defaultValue={field.value}
+                      defaultValue={field.value || undefined}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -201,7 +201,7 @@ const StudentForm: React.FC<StudentFormProps> = ({
                     <FormLabel>Statut</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
-                      defaultValue={field.value}
+                      defaultValue={field.value || "active"}
                     >
                       <FormControl>
                         <SelectTrigger>

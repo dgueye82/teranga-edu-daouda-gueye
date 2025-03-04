@@ -24,8 +24,8 @@ const StudentManagement = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState("");
-  const [schoolFilter, setSchoolFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [schoolFilter, setSchoolFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
   
   useEffect(() => {
@@ -114,8 +114,8 @@ const StudentManagement = () => {
       (student.email && student.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (student.phone && student.phone.includes(searchTerm));
       
-    const matchesSchool = !schoolFilter || student.school_id === schoolFilter;
-    const matchesStatus = !statusFilter || student.status === statusFilter;
+    const matchesSchool = schoolFilter === "all" || student.school_id === schoolFilter;
+    const matchesStatus = statusFilter === "all" || student.status === statusFilter;
     
     return matchesSearch && matchesSchool && matchesStatus;
   });

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Student, StudentFormData, StudentAttendance, StudentAttendanceFormData, StudentPerformance, StudentPerformanceFormData } from "@/types/student";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -64,34 +63,50 @@ export const getStudentById = async (id: string): Promise<Student | null> => {
 };
 
 export const createStudent = async (student: StudentFormData): Promise<Student> => {
+  // If school_id is empty string, set it to null
+  if (student.school_id === "") {
+    student.school_id = null;
+  }
+
   const { data, error } = await supabase
     .from("students")
     .insert([student])
-    .select()
-    .single() as { data: Student | null; error: PostgrestError | null };
+    .select("*, schools(name)")
+    .single() as { data: (Student & { schools: { name: string } }) | null; error: PostgrestError | null };
 
   if (error) {
     console.error("Error creating student:", error);
     throw new Error(error.message);
   }
 
-  return data as Student;
+  return {
+    ...data!,
+    school_name: data?.schools?.name,
+  } as Student;
 };
 
 export const updateStudent = async (id: string, student: StudentFormData): Promise<Student> => {
+  // If school_id is empty string, set it to null
+  if (student.school_id === "") {
+    student.school_id = null;
+  }
+  
   const { data, error } = await supabase
     .from("students")
     .update(student)
     .eq("id", id)
-    .select()
-    .single() as { data: Student | null; error: PostgrestError | null };
+    .select("*, schools(name)")
+    .single() as { data: (Student & { schools: { name: string } }) | null; error: PostgrestError | null };
 
   if (error) {
     console.error("Error updating student:", error);
     throw new Error(error.message);
   }
 
-  return data as Student;
+  return {
+    ...data!,
+    school_name: data?.schools?.name,
+  } as Student;
 };
 
 export const deleteStudent = async (id: string): Promise<void> => {

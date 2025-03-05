@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +19,9 @@ import OnlineTraining from "./pages/OnlineTraining";
 import Curriculum from "./pages/Curriculum";
 import ParentPortal from "./pages/ParentPortal";
 import HowItWorks from "./pages/HowItWorks";
+import StudentDetails from "./pages/StudentDetails";
+import StudentAttendance from "./pages/StudentAttendance";
+import StudentPerformance from "./pages/StudentPerformance";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +50,21 @@ const App = () => (
             <Route path="/student-management" element={
               <ProtectedRoute>
                 <StudentManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/student-management/details/:id" element={
+              <ProtectedRoute>
+                <StudentDetails />
+              </ProtectedRoute>
+            } />
+            <Route path="/student-management/attendance/:id" element={
+              <ProtectedRoute>
+                <StudentAttendance />
+              </ProtectedRoute>
+            } />
+            <Route path="/student-management/performance/:id" element={
+              <ProtectedRoute>
+                <StudentPerformance />
               </ProtectedRoute>
             } />
             <Route path="/staff-management" element={

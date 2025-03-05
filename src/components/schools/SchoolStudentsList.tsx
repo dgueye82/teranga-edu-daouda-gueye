@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getStudentsBySchool } from "@/services/student";
 import { School } from "@/types/school";
@@ -9,6 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface SchoolStudentsListProps {
   school: School;
@@ -16,11 +19,18 @@ interface SchoolStudentsListProps {
 
 const SchoolStudentsList: React.FC<SchoolStudentsListProps> = ({ school }) => {
   const navigate = useNavigate();
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   
-  const { data: students = [], isLoading } = useQuery({
+  const { data: students = [], isLoading, isError } = useQuery({
     queryKey: ["students", "school", school.id],
     queryFn: () => getStudentsBySchool(school.id),
   });
+
+  const filteredStudents = students.filter(student => 
+    `${student.first_name} ${student.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (student.email && student.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   function getStatusColor(status: string | undefined) {
     switch (status) {
@@ -45,6 +55,16 @@ const SchoolStudentsList: React.FC<SchoolStudentsListProps> = ({ school }) => {
     navigate(`/student-management/details/${id}`);
   }
 
+  function translateStatus(status: string | undefined) {
+    switch (status) {
+      case "active": return "Actif";
+      case "inactive": return "Inactif";
+      case "graduated": return "Diplômé";
+      case "suspended": return "Suspendu";
+      default: return "Non défini";
+    }
+  }
+
   if (isLoading) {
     return (
       <Card className="mb-8">
@@ -64,18 +84,17 @@ const SchoolStudentsList: React.FC<SchoolStudentsListProps> = ({ school }) => {
     );
   }
 
-  if (students.length === 0) {
+  if (isError) {
     return (
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="flex items-center">
             <span>{school.name}</span>
-            <Badge className="ml-2 bg-gray-200 text-gray-700">{students.length}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-gray-500 py-4">
-            Aucun élève inscrit dans cette école
+          <p className="text-center text-red-500 py-4">
+            Erreur lors du chargement des élèves. Veuillez réessayer.
           </p>
         </CardContent>
       </Card>
@@ -84,45 +103,84 @@ const SchoolStudentsList: React.FC<SchoolStudentsListProps> = ({ school }) => {
 
   return (
     <Card className="mb-8">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <span>{school.name}</span>
-          <Badge className="ml-2 bg-blue-100 text-blue-800">{students.length}</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {students.map((student) => (
-            <div
-              key={student.id}
-              className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-              onClick={() => navigateToStudentDetails(student.id)}
-            >
-              <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
-                <AvatarFallback className="bg-teranga-blue text-white">
-                  {getAvatarFallback(student.first_name, student.last_name)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">
-                  {student.first_name} {student.last_name}
-                </p>
-                <p className="text-sm text-gray-500 truncate">
-                  {student.email || "Pas d'email"}
-                </p>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center" onClick={() => setIsExpanded(!isExpanded)} style={{ cursor: 'pointer' }}>
+            <span>{school.name}</span>
+            <Badge className={`ml-2 ${students.length > 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-200 text-gray-700'}`}>
+              {students.length}
+            </Badge>
+            {isExpanded ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
+          </CardTitle>
+          <div className="flex-1 max-w-xs ml-4">
+            {isExpanded && students.length > 0 && (
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Rechercher un élève..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8 h-8 text-sm"
+                />
               </div>
-              <Badge className={`ml-2 ${getStatusColor(student.status)}`}>
-                {student.status === "active" && "Actif"}
-                {student.status === "inactive" && "Inactif"}
-                {student.status === "graduated" && "Diplômé"}
-                {student.status === "suspended" && "Suspendu"}
-                {!student.status && "Non défini"}
-              </Badge>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
-      </CardContent>
+      </CardHeader>
+      {isExpanded && (
+        <CardContent>
+          {students.length === 0 ? (
+            <p className="text-center text-gray-500 py-4">
+              Aucun élève inscrit dans cette école
+            </p>
+          ) : filteredStudents.length === 0 ? (
+            <p className="text-center text-gray-500 py-4">
+              Aucun élève ne correspond à votre recherche
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredStudents.map((student) => (
+                <div
+                  key={student.id}
+                  className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => navigateToStudentDetails(student.id)}
+                >
+                  <Avatar className="h-10 w-10 mr-3">
+                    <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
+                    <AvatarFallback className="bg-teranga-blue text-white">
+                      {getAvatarFallback(student.first_name, student.last_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">
+                      {student.first_name} {student.last_name}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {student.email || "Pas d'email"}
+                    </p>
+                  </div>
+                  <Badge className={`ml-2 ${getStatusColor(student.status)}`}>
+                    {translateStatus(student.status)}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {students.length > 0 && (
+            <div className="mt-4 flex justify-center">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate("/student-management")}
+                className="text-sm"
+              >
+                Voir tous les élèves
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      )}
     </Card>
   );
 };

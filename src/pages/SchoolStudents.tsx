@@ -5,7 +5,7 @@ import { getSchools } from "@/services/schoolService";
 import SchoolStudentsList from "@/components/schools/SchoolStudentsList";
 import Navbar from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,10 +13,18 @@ const SchoolStudents = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { data: schools = [], isLoading, error } = useQuery({
+  const { data: schools = [], isLoading, error, refetch } = useQuery({
     queryKey: ["schools"],
     queryFn: getSchools,
   });
+
+  const handleRefresh = () => {
+    refetch();
+    toast({
+      title: "Actualisation en cours",
+      description: "Les données sont en cours de rechargement",
+    });
+  };
 
   if (error) {
     toast({
@@ -30,22 +38,33 @@ const SchoolStudents = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="container mx-auto px-4 py-8 mt-16">
-        <div className="flex items-center mb-6">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate("/school-management")}
-            className="mr-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Élèves par école</h1>
-            <p className="text-gray-600 mt-1">
-              Visualisez les élèves inscrits dans chaque école
-            </p>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/school-management")}
+              className="mr-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Élèves par école</h1>
+              <p className="text-gray-600 mt-1">
+                Visualisez les élèves inscrits dans chaque école
+              </p>
+            </div>
           </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefresh}
+            className="flex items-center"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Actualiser
+          </Button>
         </div>
 
         {isLoading ? (

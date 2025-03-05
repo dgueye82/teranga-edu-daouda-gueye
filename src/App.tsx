@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
 import SchoolManagement from "./pages/SchoolManagement";
+import SchoolStudents from "./pages/SchoolStudents";
 import StudentManagement from "./pages/StudentManagement";
 import StaffManagement from "./pages/StaffManagement";
 import OnlineTraining from "./pages/OnlineTraining";
@@ -36,6 +36,11 @@ const App = () => (
             <Route path="/school-management" element={
               <ProtectedRoute>
                 <SchoolManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/school-students" element={
+              <ProtectedRoute>
+                <SchoolStudents />
               </ProtectedRoute>
             } />
             <Route path="/student-management" element={

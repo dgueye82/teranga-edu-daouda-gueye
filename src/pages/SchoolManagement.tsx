@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
@@ -18,12 +17,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Navbar from "@/components/layout/Navbar";
+import { useNavigate } from "react-router-dom";
 
 const SchoolManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
+  const navigate = useNavigate();
 
   const { data: schools = [], isLoading } = useQuery({
     queryKey: ["schools"],
@@ -115,31 +116,37 @@ const SchoolManagement = () => {
               Ajouter, modifier ou supprimer des écoles dans le système
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={() => setEditingSchool(null)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter une école
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingSchool ? "Modifier l'école" : "Ajouter une nouvelle école"}
-                </DialogTitle>
-                <DialogDescription>
-                  {editingSchool
-                    ? "Modifiez les informations de l'école ci-dessous."
-                    : "Remplissez les informations pour ajouter une nouvelle école."}
-                </DialogDescription>
-              </DialogHeader>
-              <SchoolForm
-                initialData={editingSchool || undefined}
-                onSubmit={handleSubmit}
-                isSubmitting={isSubmitting}
-              />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate("/school-students")}>
+              <Users className="h-4 w-4 mr-2" />
+              Voir les élèves par école
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={() => setEditingSchool(null)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter une école
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingSchool ? "Modifier l'école" : "Ajouter une nouvelle école"}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {editingSchool
+                      ? "Modifiez les informations de l'école ci-dessous."
+                      : "Remplissez les informations pour ajouter une nouvelle école."}
+                  </DialogDescription>
+                </DialogHeader>
+                <SchoolForm
+                  initialData={editingSchool || undefined}
+                  onSubmit={handleSubmit}
+                  isSubmitting={isSubmitting}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <Separator className="my-6" />

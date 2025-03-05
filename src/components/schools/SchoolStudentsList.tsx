@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { ChevronDown, ChevronUp, Search, UserCheck, LineChart, ClipboardList } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface SchoolStudentsListProps {
@@ -53,6 +53,16 @@ const SchoolStudentsList: React.FC<SchoolStudentsListProps> = ({ school }) => {
 
   function navigateToStudentDetails(id: string) {
     navigate(`/student-management/details/${id}`);
+  }
+
+  function navigateToAttendance(id: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    navigate(`/student-management/attendance/${id}`);
+  }
+
+  function navigateToPerformance(id: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    navigate(`/student-management/performance/${id}`);
   }
 
   function translateStatus(status: string | undefined) {
@@ -142,26 +152,59 @@ const SchoolStudentsList: React.FC<SchoolStudentsListProps> = ({ school }) => {
               {filteredStudents.map((student) => (
                 <div
                   key={student.id}
-                  className="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                  onClick={() => navigateToStudentDetails(student.id)}
+                  className="flex flex-col p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
                 >
-                  <Avatar className="h-10 w-10 mr-3">
-                    <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
-                    <AvatarFallback className="bg-teranga-blue text-white">
-                      {getAvatarFallback(student.first_name, student.last_name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">
-                      {student.first_name} {student.last_name}
-                    </p>
-                    <p className="text-sm text-gray-500 truncate">
-                      {student.email || "Pas d'email"}
-                    </p>
+                  <div 
+                    className="flex items-center mb-2"
+                    onClick={() => navigateToStudentDetails(student.id)}
+                  >
+                    <Avatar className="h-10 w-10 mr-3">
+                      <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
+                      <AvatarFallback className="bg-teranga-blue text-white">
+                        {getAvatarFallback(student.first_name, student.last_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">
+                        {student.first_name} {student.last_name}
+                      </p>
+                      <p className="text-sm text-gray-500 truncate">
+                        {student.email || "Pas d'email"}
+                      </p>
+                    </div>
+                    <Badge className={`ml-2 ${getStatusColor(student.status)}`}>
+                      {translateStatus(student.status)}
+                    </Badge>
                   </div>
-                  <Badge className={`ml-2 ${getStatusColor(student.status)}`}>
-                    {translateStatus(student.status)}
-                  </Badge>
+                  <div className="flex mt-2 space-x-2 justify-center border-t pt-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50 text-xs"
+                      onClick={() => navigateToStudentDetails(student.id)}
+                    >
+                      <ClipboardList className="h-3 w-3 mr-1" />
+                      Détails
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="text-green-600 border-green-200 hover:bg-green-50 text-xs" 
+                      onClick={(e) => navigateToAttendance(student.id, e)}
+                    >
+                      <UserCheck className="h-3 w-3 mr-1" />
+                      Présence
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="text-orange-600 border-orange-200 hover:bg-orange-50 text-xs" 
+                      onClick={(e) => navigateToPerformance(student.id, e)}
+                    >
+                      <LineChart className="h-3 w-3 mr-1" />
+                      Notes
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

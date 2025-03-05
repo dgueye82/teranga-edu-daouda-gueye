@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +13,7 @@ import { ArrowLeft, PlusCircle, LineChart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StudentPerformanceForm from "@/components/students/StudentPerformanceForm";
 
 const StudentPerformance = () => {
   const { id } = useParams<{ id: string }>();
@@ -83,6 +83,10 @@ const StudentPerformance = () => {
     if (percentage >= 60) return "text-blue-600";
     if (percentage >= 40) return "text-amber-600";
     return "text-red-600";
+  };
+
+  const handleSubmitPerformance = (data: StudentPerformanceFormData) => {
+    createPerformanceMutation.mutate(data);
   };
 
   if (isLoadingStudent) {
@@ -308,6 +312,14 @@ const StudentPerformance = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <StudentPerformanceForm
+          studentId={id!}
+          open={performanceFormOpen}
+          onOpenChange={setPerformanceFormOpen}
+          onSubmit={handleSubmitPerformance}
+          isSubmitting={createPerformanceMutation.isPending}
+        />
       </div>
     </div>
   );

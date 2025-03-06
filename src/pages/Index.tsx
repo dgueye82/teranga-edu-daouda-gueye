@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/ui/Hero";
@@ -63,7 +62,7 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-teranga-background">
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex w-full">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
@@ -129,11 +128,7 @@ const Index = () => {
                   </Link>
                 </div>
                 <div className="lg:w-1/2 glass-card rounded-xl overflow-hidden shadow-xl animate-float">
-                  <img 
-                    src="/lovable-uploads/bdefbc76-5b4e-49c8-b669-87f0b0682e51.png" 
-                    alt="Interface TERANGA EDU" 
-                    className="w-full h-auto rounded-xl"
-                  />
+                  
                 </div>
               </div>
             </div>

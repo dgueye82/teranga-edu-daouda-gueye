@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-teranga-background">
+    <div className="relative min-h-screen flex items-center justify-center bg-white">
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="max-w-4xl mx-auto text-center stagger-animate">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-teranga-blue">

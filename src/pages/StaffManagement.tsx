@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
-import { Menu, UserCog, ClipboardList, Calendar, Award, BarChart } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StaffDashboardTab from "@/components/staff/StaffDashboardTab";
 import StaffListTab from "@/components/staff/StaffListTab";
@@ -42,8 +42,12 @@ const StaffManagement = () => {
               className="w-full"
             >
               <TabsList className="grid w-full md:w-auto grid-cols-2 mb-8">
-                <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
-                <TabsTrigger value="staff-list">Liste du personnel</TabsTrigger>
+                <TabsTrigger value="dashboard" onClick={() => setActiveTab("dashboard")}>
+                  Tableau de bord
+                </TabsTrigger>
+                <TabsTrigger value="staff-list" onClick={() => setActiveTab("staff-list")}>
+                  Liste du personnel
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="dashboard" className="space-y-4">

@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { 
   BookOpen, 
   User, 
-  Users, 
   Video, 
   FileText, 
   Users as UsersIcon,
@@ -79,21 +78,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               >
                 <User className="h-5 w-5 mr-3" />
                 Gérer l'élève
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/staff-management"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-white text-teranga-blue"
-                      : "text-white hover:bg-teranga-lightBlue/20"
-                  }`
-                }
-              >
-                <Users className="h-5 w-5 mr-3" />
-                Gérer le personnel
               </NavLink>
             </li>
             <li>

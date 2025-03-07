@@ -15,6 +15,8 @@ import SchoolManagement from "./pages/SchoolManagement";
 import SchoolStudents from "./pages/SchoolStudents";
 import StudentManagement from "./pages/StudentManagement";
 import StaffManagement from "./pages/StaffManagement";
+import StaffDashboard from "./pages/StaffDashboard";
+import StaffList from "./pages/StaffList";
 import OnlineTraining from "./pages/OnlineTraining";
 import Curriculum from "./pages/Curriculum";
 import ParentPortal from "./pages/ParentPortal";
@@ -70,6 +72,16 @@ const App = () => (
             <Route path="/staff-management" element={
               <ProtectedRoute>
                 <StaffManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/staff-dashboard" element={
+              <ProtectedRoute>
+                <StaffDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/staff-list" element={
+              <ProtectedRoute>
+                <StaffList />
               </ProtectedRoute>
             } />
             <Route path="/online-training" element={

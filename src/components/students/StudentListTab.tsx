@@ -8,6 +8,7 @@ import StudentForm from "@/components/students/StudentForm";
 import StudentFilters from "@/components/students/StudentFilters";
 import { Student, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";
+import NavLink from "@/components/layout/navigation/NavLink";
 
 interface StudentListTabProps {
   students: Student[];
@@ -46,6 +47,17 @@ const StudentListTab: React.FC<StudentListTabProps> = ({
 }) => {
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+        <div className="flex space-x-2 mb-4">
+          <NavLink to="/student-management" variant="button">
+            Tous les élèves
+          </NavLink>
+          <NavLink to="/school-students" variant="button">
+            Élèves par école
+          </NavLink>
+        </div>
+      </div>
+      
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <StudentFilters 
           searchTerm={searchTerm}

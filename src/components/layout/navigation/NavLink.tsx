@@ -6,9 +6,34 @@ interface NavLinkProps {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
+  variant?: "default" | "button";
 }
 
-const NavLink = ({ to, children, onClick, className }: NavLinkProps) => {
+const NavLink = ({ 
+  to, 
+  children, 
+  onClick, 
+  className, 
+  variant = "default" 
+}: NavLinkProps) => {
+  if (variant === "button") {
+    return (
+      <RouterNavLink
+        to={to}
+        className={({ isActive }) =>
+          `${className || ""} px-4 py-2 rounded-md transition-colors ${
+            isActive 
+              ? "bg-teranga-blue text-white" 
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`
+        }
+        onClick={onClick}
+      >
+        {children}
+      </RouterNavLink>
+    );
+  }
+
   return (
     <RouterNavLink
       to={to}

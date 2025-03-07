@@ -3,38 +3,14 @@ import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import { Menu, UserCog, ClipboardList, Calendar, Award, BarChart } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StaffDashboardTab from "@/components/staff/StaffDashboardTab";
+import StaffListTab from "@/components/staff/StaffListTab";
 
 const StaffManagement = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
   
-  const features = [
-    {
-      title: "Gestion des profils",
-      description: "Administration des profils du personnel enseignant et administratif",
-      icon: UserCog
-    },
-    {
-      title: "Suivi des tâches",
-      description: "Attribution et suivi des responsabilités et des tâches",
-      icon: ClipboardList
-    },
-    {
-      title: "Emplois du temps",
-      description: "Gestion des horaires et des disponibilités du personnel",
-      icon: Calendar
-    },
-    {
-      title: "Évaluation des performances",
-      description: "Outils d'évaluation et de développement professionnel",
-      icon: Award
-    },
-    {
-      title: "Rapports et statistiques",
-      description: "Analyses des données pour optimiser la gestion des ressources humaines",
-      icon: BarChart
-    }
-  ];
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -51,63 +27,33 @@ const StaffManagement = () => {
         </button>
         
         <main className="flex-1 bg-teranga-background transition-all duration-300">
-          <div className="container mx-auto px-4 py-12">
-            <div className="max-w-4xl mx-auto">
-              <div className="mb-12 animate-fade-in">
-                <h1 className="text-4xl font-bold text-gray-800 mb-6">Gérer le personnel</h1>
-                <div className="h-1 w-20 bg-teranga-blue mb-8"></div>
-                <p className="text-lg text-gray-700">
-                  Notre module de gestion du personnel vous permet d'optimiser la gestion 
-                  des ressources humaines de votre établissement. Valorisez votre équipe 
-                  et améliorez l'efficacité collective.
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 stagger-animate">
-                {features.map((feature, index) => {
-                  const Icon = feature.icon;
-                  return (
-                    <div 
-                      key={index} 
-                      className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="p-3 bg-teranga-skyBlue rounded-lg">
-                          <Icon className="h-6 w-6 text-teranga-blue" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg text-gray-800 mb-2">
-                            {feature.title}
-                          </h3>
-                          <p className="text-gray-600">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              <div className="bg-white rounded-xl p-8 shadow-lg animate-fade-in-up">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Optimiser la gestion des ressources humaines
-                </h2>
-                <p className="text-gray-700 mb-4">
-                  Une gestion efficace du personnel permet de:
-                </p>
-                <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-6">
-                  <li>Simplifier les processus administratifs liés au personnel</li>
-                  <li>Améliorer la répartition des tâches et des responsabilités</li>
-                  <li>Faciliter le développement professionnel</li>
-                  <li>Renforcer la cohésion d'équipe</li>
-                  <li>Valoriser les compétences et l'engagement de chacun</li>
-                </ul>
-                <p className="text-gray-700">
-                  Avec Teranga EDU, la gestion du personnel devient un levier de performance pour votre établissement.
-                </p>
-              </div>
+          <div className="container mx-auto px-4 py-8">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-800">Gestion du Personnel</h1>
+              <p className="text-gray-600 mt-2">
+                Gérez efficacement le personnel de votre établissement
+              </p>
             </div>
+            
+            <Tabs
+              defaultValue="dashboard"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
+              <TabsList className="grid w-full md:w-auto grid-cols-2 mb-8">
+                <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
+                <TabsTrigger value="staff-list">Liste du personnel</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="dashboard" className="space-y-4">
+                <StaffDashboardTab />
+              </TabsContent>
+              
+              <TabsContent value="staff-list" className="space-y-4">
+                <StaffListTab />
+              </TabsContent>
+            </Tabs>
           </div>
           
           {/* Footer */}

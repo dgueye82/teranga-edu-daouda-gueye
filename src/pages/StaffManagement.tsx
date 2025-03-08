@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StaffListTab from "@/components/staff/StaffListTab";
 
 const StaffManagement = () => {
   const navigate = useNavigate();
@@ -20,53 +22,78 @@ const StaffManagement = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card className="shadow-md hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>Tableau de Bord</CardTitle>
-                <CardDescription>
-                  Accédez à une vue d'ensemble de la gestion de votre personnel
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Consultez les statistiques, les indicateurs de performance et les fonctionnalités clés
-                  pour une gestion efficace des ressources humaines.
-                </p>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate('/staff-dashboard')}
-                >
-                  Accéder au tableau de bord
-                </Button>
-              </CardFooter>
-            </Card>
+          <Tabs defaultValue="list" className="w-full">
+            <TabsList className="mb-6">
+              <TabsTrigger value="list">Liste du personnel</TabsTrigger>
+              <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
+              <TabsTrigger value="cards">Vue d'ensemble</TabsTrigger>
+            </TabsList>
             
-            <Card className="shadow-md hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle>Liste du Personnel</CardTitle>
-                <CardDescription>
-                  Consultez et gérez tous les membres du personnel
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+            <TabsContent value="list">
+              <StaffListTab />
+            </TabsContent>
+            
+            <TabsContent value="dashboard">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <h2 className="text-xl font-semibold mb-4">Tableau de bord du personnel</h2>
                 <p className="text-gray-600">
-                  Affichez, recherchez, ajoutez, modifiez et organisez les informations 
-                  relatives à chaque membre du personnel.
+                  Fonctionnalité en cours de développement. Consultez les statistiques, 
+                  les indicateurs de performance et les fonctionnalités clés pour une gestion 
+                  efficace des ressources humaines.
                 </p>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate('/staff-list')}
-                >
-                  Voir la liste du personnel
-                </Button>
-              </CardFooter>
-            </Card>
-          </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="cards">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Card className="shadow-md hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Tableau de Bord</CardTitle>
+                    <CardDescription>
+                      Accédez à une vue d'ensemble de la gestion de votre personnel
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">
+                      Consultez les statistiques, les indicateurs de performance et les fonctionnalités clés
+                      pour une gestion efficace des ressources humaines.
+                    </p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      className="w-full"
+                      onClick={() => navigate('/staff-dashboard')}
+                    >
+                      Accéder au tableau de bord
+                    </Button>
+                  </CardFooter>
+                </Card>
+                
+                <Card className="shadow-md hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Liste du Personnel</CardTitle>
+                    <CardDescription>
+                      Consultez et gérez tous les membres du personnel
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">
+                      Affichez, recherchez, ajoutez, modifiez et organisez les informations 
+                      relatives à chaque membre du personnel.
+                    </p>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      className="w-full"
+                      onClick={() => navigate('/staff-list')}
+                    >
+                      Voir la liste du personnel
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
         
         {/* Footer */}

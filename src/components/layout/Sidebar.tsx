@@ -2,10 +2,6 @@
 import { NavLink } from "react-router-dom";
 import { 
   BookOpen, 
-  User, 
-  Video, 
-  FileText, 
-  Users as UsersIcon,
   X
 } from "lucide-react";
 
@@ -35,96 +31,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
         <nav className="flex-grow">
           <ul className="space-y-2">
-            <li>
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-white text-teranga-blue"
-                      : "text-white hover:bg-teranga-lightBlue/20"
-                  }`
-                }
-              >
-                <BookOpen className="h-5 w-5 mr-3" />
-                À propos
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/school-management"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-white text-teranga-blue"
-                      : "text-white hover:bg-teranga-lightBlue/20"
-                  }`
-                }
-              >
-                <BookOpen className="h-5 w-5 mr-3" />
-                Gérer l'école
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/student-management"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-white text-teranga-blue"
-                      : "text-white hover:bg-teranga-lightBlue/20"
-                  }`
-                }
-              >
-                <User className="h-5 w-5 mr-3" />
-                Gérer l'élève
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/online-training"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-white text-teranga-blue"
-                      : "text-white hover:bg-teranga-lightBlue/20"
-                  }`
-                }
-              >
-                <Video className="h-5 w-5 mr-3" />
-                Formation en ligne
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/curriculum"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-white text-teranga-blue"
-                      : "text-white hover:bg-teranga-lightBlue/20"
-                  }`
-                }
-              >
-                <FileText className="h-5 w-5 mr-3" />
-                Programme d'études et évaluation
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/parent-portal"
-                className={({ isActive }) =>
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-white text-teranga-blue"
-                      : "text-white hover:bg-teranga-lightBlue/20"
-                  }`
-                }
-              >
-                <UsersIcon className="h-5 w-5 mr-3" />
-                Portails parents
-              </NavLink>
-            </li>
             <li>
               <NavLink
                 to="/how-it-works"

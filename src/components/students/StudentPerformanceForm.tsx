@@ -2,8 +2,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { StudentPerformanceFormData } from "@/types/student";
+import { StudentPerformanceFormData, StudentPerformance } from "@/types/student";
+import { studentPerformanceSchema } from "./studentFormSchema";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,22 +32,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const performanceSchema = z.object({
-  student_id: z.string(),
-  subject: z.string().min(1, "La matière est requise"),
-  evaluation_date: z.string().min(1, "La date d'évaluation est requise"),
-  grade: z.coerce.number().min(0, "La note doit être positive"),
-  max_grade: z.coerce.number().min(1, "Le maximum doit être au moins 1"),
-  evaluation_type: z.enum(["exam", "quiz", "homework", "project"]),
-  notes: z.string().optional(),
-});
-
 interface StudentPerformanceFormProps {
   studentId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: StudentPerformanceFormData) => void;
   isSubmitting: boolean;
+  initialData?: StudentPerformance | null;
+  mode?: "create" | "edit";
 }
 
 const StudentPerformanceForm: React.FC<StudentPerformanceFormProps> = ({
@@ -56,10 +48,20 @@ const StudentPerformanceForm: React.FC<StudentPerformanceFormProps> = ({
   onOpenChange,
   onSubmit,
   isSubmitting,
+  initialData = null,
+  mode = "create",
 }) => {
   const form = useForm<StudentPerformanceFormData>({
-    resolver: zodResolver(performanceSchema),
-    defaultValues: {
+    resolver: zodResolver(studentPerformanceSchema),
+    defaultValues: initialData ? {
+      student_id: initialData.student_id,
+      subject: initialData.subject,
+      evaluation_date: initialData.evaluation_date,
+      grade: initialData.grade,
+      max_grade: initialData.max_grade,
+      evaluation_type: initialData.evaluation_type,
+      notes: initialData.notes || "",
+    } : {
       student_id: studentId,
       subject: "",
       evaluation_date: new Date().toISOString().split("T")[0],
@@ -78,7 +80,9 @@ const StudentPerformanceForm: React.FC<StudentPerformanceFormProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Ajouter une évaluation</DialogTitle>
+          <DialogTitle>
+            {mode === "create" ? "Ajouter une évaluation" : "Modifier l'évaluation"}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -203,7 +207,7 @@ const StudentPerformanceForm: React.FC<StudentPerformanceFormProps> = ({
                 disabled={isSubmitting}
                 className="bg-orange-500 hover:bg-orange-600"
               >
-                {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+                {isSubmitting ? "Enregistrement..." : mode === "create" ? "Enregistrer" : "Mettre à jour"}
               </Button>
             </DialogFooter>
           </form>

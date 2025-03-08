@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudentById } from "@/services/student";
@@ -9,11 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, PlusCircle, LineChart } from "lucide-react";
+import { ArrowLeft, PlusCircle, LineChart, Pencil, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StudentPerformanceForm from "@/components/students/StudentPerformanceForm";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const StudentPerformance = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +23,7 @@ const StudentPerformance = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [performanceFormOpen, setPerformanceFormOpen] = useState(false);
+  const [editingPerformance, setEditingPerformance] = useState<StudentPerformanceType | null>(null);
 
   const { data: student, isLoading: isLoadingStudent } = useQuery({
     queryKey: ["student", id],
@@ -47,6 +50,7 @@ const StudentPerformance = () => {
         description: "La performance a été ajoutée avec succès",
       });
       setPerformanceFormOpen(false);
+      setEditingPerformance(null);
     },
   });
 
@@ -59,6 +63,8 @@ const StudentPerformance = () => {
         title: "Performance mise à jour",
         description: "La performance a été mise à jour avec succès",
       });
+      setPerformanceFormOpen(false);
+      setEditingPerformance(null);
     },
   });
 
@@ -73,6 +79,68 @@ const StudentPerformance = () => {
     },
   });
 
+  // Calculate subject averages
+  const subjectAverages = useMemo(() => {
+    const subjectMap = new Map<string, { totalGrade: number; totalMaxGrade: number; count: number }>();
+    
+    performances.forEach((performance) => {
+      const subject = performance.subject;
+      const grade = performance.grade;
+      const maxGrade = performance.max_grade;
+      
+      if (!subjectMap.has(subject)) {
+        subjectMap.set(subject, { totalGrade: 0, totalMaxGrade: 0, count: 0 });
+      }
+      
+      const current = subjectMap.get(subject)!;
+      subjectMap.set(subject, {
+        totalGrade: current.totalGrade + grade,
+        totalMaxGrade: current.totalMaxGrade + maxGrade,
+        count: current.count + 1,
+      });
+    });
+    
+    const result = Array.from(subjectMap.entries()).map(([subject, data]) => {
+      const averageGrade = data.totalGrade / data.count;
+      const averageMaxGrade = data.totalMaxGrade / data.count;
+      const percentage = (averageGrade / averageMaxGrade) * 100;
+      
+      return {
+        subject,
+        averageGrade: averageGrade.toFixed(2),
+        averageMaxGrade: averageMaxGrade.toFixed(2),
+        percentage: percentage.toFixed(2),
+        count: data.count,
+      };
+    });
+    
+    return result;
+  }, [performances]);
+  
+  // Calculate overall average
+  const overallAverage = useMemo(() => {
+    if (performances.length === 0) return { grade: 0, maxGrade: 0, percentage: 0 };
+    
+    const totalGrade = performances.reduce((sum, perf) => sum + perf.grade, 0);
+    const totalMaxGrade = performances.reduce((sum, perf) => sum + perf.max_grade, 0);
+    const percentage = totalMaxGrade > 0 ? (totalGrade / totalMaxGrade) * 100 : 0;
+    
+    return {
+      grade: (totalGrade / performances.length).toFixed(2),
+      maxGrade: (totalMaxGrade / performances.length).toFixed(2),
+      percentage: percentage.toFixed(2),
+    };
+  }, [performances]);
+
+  // Prepare chart data
+  const chartData = useMemo(() => {
+    return subjectAverages.map(subject => ({
+      name: subject.subject,
+      moyenne: parseFloat(subject.averageGrade),
+      percentage: parseFloat(subject.percentage),
+    }));
+  }, [subjectAverages]);
+
   const getAvatarFallback = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
@@ -85,8 +153,25 @@ const StudentPerformance = () => {
     return "text-red-600";
   };
 
+  const handleEditPerformance = (performance: StudentPerformanceType) => {
+    setEditingPerformance(performance);
+    setPerformanceFormOpen(true);
+  };
+
   const handleSubmitPerformance = (data: StudentPerformanceFormData) => {
-    createPerformanceMutation.mutate(data);
+    if (editingPerformance) {
+      updatePerformanceMutation.mutate({ 
+        id: editingPerformance.id, 
+        data 
+      });
+    } else {
+      createPerformanceMutation.mutate(data);
+    }
+  };
+
+  const handleAddNewPerformance = () => {
+    setEditingPerformance(null);
+    setPerformanceFormOpen(true);
   };
 
   if (isLoadingStudent) {
@@ -194,14 +279,57 @@ const StudentPerformance = () => {
           </div>
         </div>
 
+        {/* Summary Card */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Moyenne générale</CardTitle>
+            <CardDescription>Récapitulatif des performances scolaires</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="text-center mb-4 md:mb-0">
+                <h3 className="text-lg font-medium text-gray-500">Moyenne générale</h3>
+                <p className={`text-4xl font-bold ${
+                  parseFloat(overallAverage.percentage) >= 70 ? "text-green-600" :
+                  parseFloat(overallAverage.percentage) >= 50 ? "text-amber-600" :
+                  "text-red-600"
+                }`}>
+                  {overallAverage.grade} / {overallAverage.maxGrade}
+                </p>
+                <p className="text-gray-500 mt-1">{overallAverage.percentage}%</p>
+              </div>
+              
+              <div className="flex-1 max-w-xl">
+                <div className="bg-gray-100 h-4 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full ${
+                      parseFloat(overallAverage.percentage) >= 70 ? "bg-green-500" :
+                      parseFloat(overallAverage.percentage) >= 50 ? "bg-amber-500" :
+                      "bg-red-500"
+                    }`}
+                    style={{ width: `${Math.min(100, parseFloat(overallAverage.percentage))}%` }}
+                  ></div>
+                </div>
+                
+                <div className="grid grid-cols-3 text-center text-sm mt-2">
+                  <span className="text-red-500">Insuffisant (&lt;50%)</span>
+                  <span className="text-amber-500">Moyen (50-70%)</span>
+                  <span className="text-green-500">Bien (&gt;70%)</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Tabs defaultValue="list" className="space-y-4">
           <div className="flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="list">Liste des évaluations</TabsTrigger>
+              <TabsTrigger value="subjects">Par matière</TabsTrigger>
               <TabsTrigger value="chart">Graphiques</TabsTrigger>
             </TabsList>
             <Button 
-              onClick={() => setPerformanceFormOpen(true)}
+              onClick={handleAddNewPerformance}
               size="sm" 
               className="bg-orange-500 hover:bg-orange-600"
             >
@@ -231,7 +359,7 @@ const StudentPerformance = () => {
                   <div className="text-center py-8">
                     <p className="text-gray-500">Aucune évaluation enregistrée pour cet élève</p>
                     <Button 
-                      onClick={() => setPerformanceFormOpen(true)}
+                      onClick={handleAddNewPerformance}
                       variant="outline" 
                       size="sm" 
                       className="mt-4"
@@ -257,7 +385,14 @@ const StudentPerformance = () => {
                           <tr key={performance.id} className="border-b hover:bg-gray-50">
                             <td className="px-4 py-3">{new Date(performance.evaluation_date).toLocaleDateString()}</td>
                             <td className="px-4 py-3">{performance.subject}</td>
-                            <td className="px-4 py-3">{performance.evaluation_type}</td>
+                            <td className="px-4 py-3">
+                              <Badge variant="outline">
+                                {performance.evaluation_type === "exam" && "Examen"}
+                                {performance.evaluation_type === "quiz" && "Quiz"}
+                                {performance.evaluation_type === "homework" && "Devoir"}
+                                {performance.evaluation_type === "project" && "Projet"}
+                              </Badge>
+                            </td>
                             <td className="px-4 py-3">
                               <span className={getPerformanceColor(performance.grade, performance.max_grade)}>
                                 {performance.grade} / {performance.max_grade}
@@ -265,17 +400,94 @@ const StudentPerformance = () => {
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex space-x-2">
-                                <Button variant="ghost" size="sm">Modifier</Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleEditPerformance(performance)}
+                                >
+                                  <Pencil className="h-4 w-4 mr-1" />
+                                  Modifier
+                                </Button>
                                 <Button 
                                   variant="ghost" 
                                   size="sm"
                                   className="text-red-500 hover:text-red-700"
                                   onClick={() => deletePerformanceMutation.mutate(performance.id)}
                                 >
+                                  <Trash2 className="h-4 w-4 mr-1" />
                                   Supprimer
                                 </Button>
                               </div>
                             </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subjects">
+            <Card>
+              <CardHeader>
+                <CardTitle>Moyennes par matière</CardTitle>
+                <CardDescription>
+                  Performance de l'élève par matière
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingPerformances ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
+                  </div>
+                ) : subjectAverages.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">Aucune donnée disponible pour calculer les moyennes</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">Matière</th>
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">Moyenne</th>
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">Pourcentage</th>
+                          <th className="px-4 py-3 text-left font-medium text-gray-500">Évaluations</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {subjectAverages.map((subject, index) => (
+                          <tr key={index} className="border-b hover:bg-gray-50">
+                            <td className="px-4 py-3 font-medium">{subject.subject}</td>
+                            <td className="px-4 py-3">
+                              <span className={
+                                parseFloat(subject.percentage) >= 80 ? "text-green-600" :
+                                parseFloat(subject.percentage) >= 60 ? "text-blue-600" :
+                                parseFloat(subject.percentage) >= 40 ? "text-amber-600" :
+                                "text-red-600"
+                              }>
+                                {subject.averageGrade} / {subject.averageMaxGrade}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center">
+                                <div className="w-full max-w-xs bg-gray-200 rounded-full h-2.5 mr-2">
+                                  <div 
+                                    className={`h-2.5 rounded-full ${
+                                      parseFloat(subject.percentage) >= 80 ? "bg-green-600" :
+                                      parseFloat(subject.percentage) >= 60 ? "bg-blue-600" :
+                                      parseFloat(subject.percentage) >= 40 ? "bg-amber-600" :
+                                      "bg-red-600"
+                                    }`}
+                                    style={{ width: `${subject.percentage}%` }}
+                                  ></div>
+                                </div>
+                                <span>{subject.percentage}%</span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">{subject.count}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -299,14 +511,31 @@ const StudentPerformance = () => {
                   <div className="flex justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
                   </div>
-                ) : performances.length === 0 ? (
+                ) : chartData.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-500">Aucune donnée disponible pour afficher les graphiques</p>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-gray-500">Les graphiques seront disponibles dans une prochaine mise à jour</p>
-                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={chartData}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+                      <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                      <Tooltip />
+                      <Legend />
+                      <Bar yAxisId="left" dataKey="moyenne" name="Moyenne" fill="#8884d8" />
+                      <Bar yAxisId="right" dataKey="percentage" name="Pourcentage (%)" fill="#82ca9d" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 )}
               </CardContent>
             </Card>
@@ -318,7 +547,9 @@ const StudentPerformance = () => {
           open={performanceFormOpen}
           onOpenChange={setPerformanceFormOpen}
           onSubmit={handleSubmitPerformance}
-          isSubmitting={createPerformanceMutation.isPending}
+          isSubmitting={createPerformanceMutation.isPending || updatePerformanceMutation.isPending}
+          initialData={editingPerformance}
+          mode={editingPerformance ? "edit" : "create"}
         />
       </div>
     </div>

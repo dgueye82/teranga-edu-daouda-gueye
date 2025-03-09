@@ -6,16 +6,18 @@ import { getStudentById } from "@/services/student";
 import { getStudentPerformances, createStudentPerformance, updateStudentPerformance, deleteStudentPerformance } from "@/services/student/performanceService";
 import { StudentPerformance as StudentPerformanceType, StudentPerformanceFormData } from "@/types/student";
 import Navbar from "@/components/layout/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, PlusCircle, LineChart, Pencil, Trash2 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { PlusCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StudentPerformanceForm from "@/components/students/StudentPerformanceForm";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+
+// Import refactored components
+import StudentPerformanceHeader from "@/components/students/performance/StudentPerformanceHeader";
+import PerformanceSummaryCard from "@/components/students/performance/PerformanceSummaryCard";
+import PerformanceListTab from "@/components/students/performance/PerformanceListTab";
+import SubjectsTab from "@/components/students/performance/SubjectsTab";
+import PerformanceChartTab from "@/components/students/performance/PerformanceChartTab";
 
 const StudentPerformance = () => {
   const { id } = useParams<{ id: string }>();
@@ -119,7 +121,7 @@ const StudentPerformance = () => {
   
   // Calculate overall average
   const overallAverage = useMemo(() => {
-    if (performances.length === 0) return { grade: 0, maxGrade: 0, percentage: 0 };
+    if (performances.length === 0) return { grade: "0", maxGrade: "0", percentage: "0" };
     
     const totalGrade = performances.reduce((sum, perf) => sum + perf.grade, 0);
     const totalMaxGrade = performances.reduce((sum, perf) => sum + perf.max_grade, 0);
@@ -140,18 +142,6 @@ const StudentPerformance = () => {
       percentage: parseFloat(subject.percentage),
     }));
   }, [subjectAverages]);
-
-  const getAvatarFallback = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
-
-  const getPerformanceColor = (grade: number, maxGrade: number) => {
-    const percentage = (grade / maxGrade) * 100;
-    if (percentage >= 80) return "text-green-600";
-    if (percentage >= 60) return "text-blue-600";
-    if (percentage >= 40) return "text-amber-600";
-    return "text-red-600";
-  };
 
   const handleEditPerformance = (performance: StudentPerformanceType) => {
     setEditingPerformance(performance);
@@ -210,116 +200,8 @@ const StudentPerformance = () => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="container mx-auto px-4 py-8 mt-16">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
-          <div className="flex items-center mb-4 md:mb-0">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/student-management")}
-              className="mr-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
-            </Button>
-            <div className="flex items-center">
-              <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
-                <AvatarFallback className="bg-teranga-blue text-white">
-                  {getAvatarFallback(student.first_name, student.last_name)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{student.first_name} {student.last_name}</h1>
-                <div className="flex items-center">
-                  <p className="text-gray-600 mr-2">
-                    {student.school_name || "Aucune école assignée"}
-                  </p>
-                  <Badge className={`ml-2 ${
-                    student.status === "active" ? "bg-green-100 text-green-800" :
-                    student.status === "inactive" ? "bg-gray-100 text-gray-800" :
-                    student.status === "graduated" ? "bg-blue-100 text-blue-800" :
-                    student.status === "suspended" ? "bg-red-100 text-red-800" :
-                    "bg-gray-100 text-gray-800"
-                  }`}>
-                    {student.status === "active" && "Actif"}
-                    {student.status === "inactive" && "Inactif"}
-                    {student.status === "graduated" && "Diplômé"}
-                    {student.status === "suspended" && "Suspendu"}
-                    {!student.status && "Non défini"}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => navigate(`/student-management/details/${id}`)}
-              variant="outline"
-              size="sm"
-              className="text-gray-600"
-            >
-              Détails
-            </Button>
-            <Button
-              onClick={() => navigate(`/student-management/attendance/${id}`)}
-              variant="outline"
-              size="sm"
-              className="text-green-600"
-            >
-              Présence
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className="bg-orange-500 hover:bg-orange-600"
-            >
-              <LineChart className="h-4 w-4 mr-2" />
-              Notes
-            </Button>
-          </div>
-        </div>
-
-        {/* Summary Card */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Moyenne générale</CardTitle>
-            <CardDescription>Récapitulatif des performances scolaires</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="text-center mb-4 md:mb-0">
-                <h3 className="text-lg font-medium text-gray-500">Moyenne générale</h3>
-                <p className={`text-4xl font-bold ${
-                  parseFloat(overallAverage.percentage) >= 70 ? "text-green-600" :
-                  parseFloat(overallAverage.percentage) >= 50 ? "text-amber-600" :
-                  "text-red-600"
-                }`}>
-                  {overallAverage.grade} / {overallAverage.maxGrade}
-                </p>
-                <p className="text-gray-500 mt-1">{overallAverage.percentage}%</p>
-              </div>
-              
-              <div className="flex-1 max-w-xl">
-                <div className="bg-gray-100 h-4 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full ${
-                      parseFloat(overallAverage.percentage) >= 70 ? "bg-green-500" :
-                      parseFloat(overallAverage.percentage) >= 50 ? "bg-amber-500" :
-                      "bg-red-500"
-                    }`}
-                    style={{ width: `${Math.min(100, parseFloat(overallAverage.percentage))}%` }}
-                  ></div>
-                </div>
-                
-                <div className="grid grid-cols-3 text-center text-sm mt-2">
-                  <span className="text-red-500">Insuffisant (&lt;50%)</span>
-                  <span className="text-amber-500">Moyen (50-70%)</span>
-                  <span className="text-green-500">Bien (&gt;70%)</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StudentPerformanceHeader student={student} id={id!} />
+        <PerformanceSummaryCard overallAverage={overallAverage} />
 
         <Tabs defaultValue="list" className="space-y-4">
           <div className="flex items-center justify-between">
@@ -339,206 +221,28 @@ const StudentPerformance = () => {
           </div>
 
           <TabsContent value="list" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Performances scolaires</CardTitle>
-                <CardDescription>
-                  Historique des évaluations et notes de l'élève
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoadingPerformances ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
-                  </div>
-                ) : isPerformancesError ? (
-                  <div className="text-center py-8">
-                    <p className="text-red-500">Une erreur s'est produite lors du chargement des données</p>
-                  </div>
-                ) : performances.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">Aucune évaluation enregistrée pour cet élève</p>
-                    <Button 
-                      onClick={handleAddNewPerformance}
-                      variant="outline" 
-                      size="sm" 
-                      className="mt-4"
-                    >
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Ajouter une évaluation
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="px-4 py-2 text-left font-medium text-gray-500">Date</th>
-                          <th className="px-4 py-2 text-left font-medium text-gray-500">Matière</th>
-                          <th className="px-4 py-2 text-left font-medium text-gray-500">Type</th>
-                          <th className="px-4 py-2 text-left font-medium text-gray-500">Note</th>
-                          <th className="px-4 py-2 text-left font-medium text-gray-500">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {performances.map((performance) => (
-                          <tr key={performance.id} className="border-b hover:bg-gray-50">
-                            <td className="px-4 py-3">{new Date(performance.evaluation_date).toLocaleDateString()}</td>
-                            <td className="px-4 py-3">{performance.subject}</td>
-                            <td className="px-4 py-3">
-                              <Badge variant="outline">
-                                {performance.evaluation_type === "exam" && "Examen"}
-                                {performance.evaluation_type === "quiz" && "Quiz"}
-                                {performance.evaluation_type === "homework" && "Devoir"}
-                                {performance.evaluation_type === "project" && "Projet"}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className={getPerformanceColor(performance.grade, performance.max_grade)}>
-                                {performance.grade} / {performance.max_grade}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex space-x-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => handleEditPerformance(performance)}
-                                >
-                                  <Pencil className="h-4 w-4 mr-1" />
-                                  Modifier
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  className="text-red-500 hover:text-red-700"
-                                  onClick={() => deletePerformanceMutation.mutate(performance.id)}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-1" />
-                                  Supprimer
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <PerformanceListTab 
+              performances={performances}
+              isLoadingPerformances={isLoadingPerformances}
+              isPerformancesError={isPerformancesError}
+              handleEditPerformance={handleEditPerformance}
+              handleAddNewPerformance={handleAddNewPerformance}
+              deletePerformanceMutation={deletePerformanceMutation}
+            />
           </TabsContent>
 
           <TabsContent value="subjects">
-            <Card>
-              <CardHeader>
-                <CardTitle>Moyennes par matière</CardTitle>
-                <CardDescription>
-                  Performance de l'élève par matière
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoadingPerformances ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
-                  </div>
-                ) : subjectAverages.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">Aucune donnée disponible pour calculer les moyennes</p>
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="px-4 py-3 text-left font-medium text-gray-500">Matière</th>
-                          <th className="px-4 py-3 text-left font-medium text-gray-500">Moyenne</th>
-                          <th className="px-4 py-3 text-left font-medium text-gray-500">Pourcentage</th>
-                          <th className="px-4 py-3 text-left font-medium text-gray-500">Évaluations</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {subjectAverages.map((subject, index) => (
-                          <tr key={index} className="border-b hover:bg-gray-50">
-                            <td className="px-4 py-3 font-medium">{subject.subject}</td>
-                            <td className="px-4 py-3">
-                              <span className={
-                                parseFloat(subject.percentage) >= 80 ? "text-green-600" :
-                                parseFloat(subject.percentage) >= 60 ? "text-blue-600" :
-                                parseFloat(subject.percentage) >= 40 ? "text-amber-600" :
-                                "text-red-600"
-                              }>
-                                {subject.averageGrade} / {subject.averageMaxGrade}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center">
-                                <div className="w-full max-w-xs bg-gray-200 rounded-full h-2.5 mr-2">
-                                  <div 
-                                    className={`h-2.5 rounded-full ${
-                                      parseFloat(subject.percentage) >= 80 ? "bg-green-600" :
-                                      parseFloat(subject.percentage) >= 60 ? "bg-blue-600" :
-                                      parseFloat(subject.percentage) >= 40 ? "bg-amber-600" :
-                                      "bg-red-600"
-                                    }`}
-                                    style={{ width: `${subject.percentage}%` }}
-                                  ></div>
-                                </div>
-                                <span>{subject.percentage}%</span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3">{subject.count}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <SubjectsTab 
+              subjectAverages={subjectAverages}
+              isLoadingPerformances={isLoadingPerformances}
+            />
           </TabsContent>
 
           <TabsContent value="chart">
-            <Card>
-              <CardHeader>
-                <CardTitle>Graphiques de performances</CardTitle>
-                <CardDescription>
-                  Visualisation des performances scolaires
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-80">
-                {isLoadingPerformances ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
-                  </div>
-                ) : chartData.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">Aucune donnée disponible pour afficher les graphiques</p>
-                  </div>
-                ) : (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={chartData}
-                      margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                      <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                      <Tooltip />
-                      <Legend />
-                      <Bar yAxisId="left" dataKey="moyenne" name="Moyenne" fill="#8884d8" />
-                      <Bar yAxisId="right" dataKey="percentage" name="Pourcentage (%)" fill="#82ca9d" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-              </CardContent>
-            </Card>
+            <PerformanceChartTab 
+              chartData={chartData}
+              isLoadingPerformances={isLoadingPerformances}
+            />
           </TabsContent>
         </Tabs>
 

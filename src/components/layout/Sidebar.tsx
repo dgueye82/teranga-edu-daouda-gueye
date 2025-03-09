@@ -1,5 +1,6 @@
 
-import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { 
   BookOpen, 
   X
@@ -11,6 +12,15 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+  const location = useLocation();
+
+  // Ferme automatiquement la barre latérale lors d'un changement de route
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 768) {
+      onClose();
+    }
+  }, [location.pathname, isOpen, onClose]);
+
   return (
     <aside
       className={`fixed inset-y-0 left-0 z-40 w-64 bg-sidebar transition-transform duration-300 ease-in-out transform ${
@@ -41,6 +51,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                       : "text-white hover:bg-teranga-lightBlue/20"
                   }`
                 }
+                onClick={onClose}
               >
                 <BookOpen className="h-5 w-5 mr-3" />
                 Comment ça marche

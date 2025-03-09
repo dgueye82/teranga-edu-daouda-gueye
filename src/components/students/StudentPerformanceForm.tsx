@@ -11,19 +11,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Form } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -31,6 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+// Import form section components
+import SubjectDateFields from "./performance/form-sections/SubjectDateFields";
+import GradeFields from "./performance/form-sections/GradeFields";
+import NotesField from "./performance/form-sections/NotesField";
+import FormFooter from "./performance/form-sections/FormFooter";
 
 interface StudentPerformanceFormProps {
   studentId: string;
@@ -86,130 +81,14 @@ const StudentPerformanceForm: React.FC<StudentPerformanceFormProps> = ({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="subject"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Matière</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Mathématiques" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            <SubjectDateFields form={form} />
+            <GradeFields form={form} />
+            <NotesField form={form} />
+            <FormFooter 
+              isSubmitting={isSubmitting} 
+              onCancel={() => onOpenChange(false)} 
+              mode={mode} 
             />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="evaluation_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date d'évaluation</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="evaluation_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type d'évaluation</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner le type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="exam">Examen</SelectItem>
-                        <SelectItem value="quiz">Quiz</SelectItem>
-                        <SelectItem value="homework">Devoir</SelectItem>
-                        <SelectItem value="project">Projet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="grade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Note obtenue</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="max_grade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Note maximale</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Commentaires</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Commentaires sur la performance de l'élève..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Facultatif: ajoutez des remarques sur cette évaluation
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="bg-orange-500 hover:bg-orange-600"
-              >
-                {isSubmitting ? "Enregistrement..." : mode === "create" ? "Enregistrer" : "Mettre à jour"}
-              </Button>
-            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

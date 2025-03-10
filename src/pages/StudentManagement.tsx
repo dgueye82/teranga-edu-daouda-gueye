@@ -1,158 +1,142 @@
-
-import { useState, useEffect } from "react";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/student";
-import { getSchools } from "@/services/schoolService";
-import { Student, StudentFormData } from "@/types/student";
+import { getSchools } from "@/services/school";
+import { Student as StudentType, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";
-import { useToast } from "@/components/ui/use-toast";
-import StudentListTab from "@/components/students/StudentListTab";
-import StudentDashboard from "@/components/students/StudentDashboard";
-import { filterStudents } from "@/utils/studentFilters";
+import Navbar from "@/components/layout/Navbar";
+import StudentTable from "@/components/students/StudentTable";
+import StudentForm from "@/components/students/StudentForm";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { confirm } from "@/components/ui/confirm";
+
+// Ajouter l'import pour le nouveau composant
+import { PlusCircle, FileText, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const StudentManagement = () => {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [schools, setSchools] = useState<School[]>([]);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | undefined>(undefined);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [schoolFilter, setSchoolFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [fetchedStudents, fetchedSchools] = await Promise.all([
-          getStudents(),
-          getSchools()
-        ]);
-        setStudents(fetchedStudents);
-        setSchools(fetchedSchools);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les données",
-          variant: "destructive"
-        });
-      }
-    };
-    
-    fetchData();
-  }, [toast]);
+  const queryClient = useQueryClient();
+  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [studentToEdit, setStudentToEdit] = useState<StudentType | null>(null);
 
-  const handleAddStudent = () => {
-    setSelectedStudent(undefined);
-    setIsFormOpen(true);
-  };
+  const {
+    data: students = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["students"],
+    queryFn: getStudents,
+  });
 
-  const handleEditStudent = (student: Student) => {
-    setSelectedStudent(student);
-    setIsFormOpen(true);
-  };
+  const { data: schools = [] } = useQuery({
+    queryKey: ["schools"],
+    queryFn: getSchools,
+  });
 
-  const handleDeleteStudent = async (id: string) => {
-    try {
-      await deleteStudent(id);
-      setStudents(students.filter(student => student.id !== id));
+  const createStudentMutation = useMutation({
+    mutationFn: createStudent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["students"] });
       toast({
-        title: "Succès",
+        title: "Étudiant ajouté",
+        description: "L'étudiant a été ajouté avec succès",
+      });
+      setIsAddStudentOpen(false);
+    },
+  });
+
+  const updateStudentMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: StudentFormData }) =>
+      updateStudent(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({
+        title: "Étudiant mis à jour",
+        description: "Les informations de l'étudiant ont été mises à jour avec succès",
+      });
+      setIsAddStudentOpen(false);
+      setStudentToEdit(null);
+    },
+  });
+
+  const deleteStudentMutation = useMutation({
+    mutationFn: deleteStudent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({
+        title: "Étudiant supprimé",
         description: "L'étudiant a été supprimé avec succès",
       });
-    } catch (error) {
-      console.error("Error deleting student:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'étudiant",
-        variant: "destructive"
-      });
+    },
+  });
+
+  const handleEditStudent = (student: StudentType) => {
+    setStudentToEdit(student);
+    setIsAddStudentOpen(true);
+  };
+
+  const handleDeleteStudent = async (studentId: string) => {
+    const confirmed = await confirm({
+      title: "Supprimer l'élève",
+      description: "Êtes-vous sûr de vouloir supprimer cet élève ? Cette action est irréversible.",
+    });
+
+    if (confirmed) {
+      deleteStudentMutation.mutate(studentId);
     }
   };
 
-  const handleFormSubmit = async (data: StudentFormData) => {
-    try {
-      if (selectedStudent) {
-        const updatedStudent = await updateStudent(selectedStudent.id, data);
-        setStudents(students.map(student => 
-          student.id === selectedStudent.id ? updatedStudent : student
-        ));
-        toast({
-          title: "Succès",
-          description: "L'étudiant a été mis à jour avec succès",
-        });
-      } else {
-        const newStudent = await createStudent(data);
-        setStudents([...students, newStudent]);
-        toast({
-          title: "Succès",
-          description: "L'étudiant a été ajouté avec succès",
-        });
-      }
-      setIsFormOpen(false);
-    } catch (error) {
-      console.error("Error saving student:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder l'étudiant",
-        variant: "destructive"
-      });
+  const onSubmit = (data: StudentFormData) => {
+    if (studentToEdit) {
+      updateStudentMutation.mutate({ id: studentToEdit.id, data });
+    } else {
+      createStudentMutation.mutate(data);
     }
+    refetch();
   };
-
-  const filteredStudents = filterStudents(students, searchTerm, schoolFilter, statusFilter);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="flex-1 bg-teranga-background transition-all duration-300 pt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-800">Gestion des élèves</h1>
-            <p className="text-gray-600 mt-2">
-              Gérez vos étudiants, suivez leur présence et leurs performances
-            </p>
+      <div className="container mx-auto px-4 py-8 mt-16">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <h1 className="text-2xl font-bold mb-4 md:mb-0">Gestion des élèves</h1>
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+            <Link to="/bulk-performance">
+              <Button variant="outline" className="w-full sm:w-auto">
+                <FileText className="mr-2 h-4 w-4" />
+                Évaluations en masse
+              </Button>
+            </Link>
+            <Button
+              onClick={() => setIsAddStudentOpen(true)}
+              className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Ajouter un élève
+            </Button>
           </div>
-          
-          <Tabs defaultValue="list" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="list">Liste des élèves</TabsTrigger>
-              <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="list">
-              <StudentListTab
-                students={filteredStudents}
-                schools={schools}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-                schoolFilter={schoolFilter}
-                setSchoolFilter={setSchoolFilter}
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                handleAddStudent={handleAddStudent}
-                handleEditStudent={handleEditStudent}
-                handleDeleteStudent={handleDeleteStudent}
-                handleFormSubmit={handleFormSubmit}
-                selectedStudent={selectedStudent}
-                isFormOpen={isFormOpen}
-                setIsFormOpen={setIsFormOpen}
-              />
-            </TabsContent>
-            
-            <TabsContent value="dashboard">
-              <StudentDashboard 
-                students={students}
-                schools={schools}
-              />
-            </TabsContent>
-          </Tabs>
         </div>
-        
-        <Footer />
-      </main>
+
+        <StudentTable
+          students={students}
+          isLoading={isLoading}
+          isError={isError}
+          onEdit={handleEditStudent}
+          onDelete={handleDeleteStudent}
+        />
+
+        <StudentForm
+          student={studentToEdit || undefined}
+          schools={schools}
+          onSubmit={onSubmit}
+          isOpen={isAddStudentOpen}
+          onOpenChange={setIsAddStudentOpen}
+        />
+      </div>
     </div>
   );
 };

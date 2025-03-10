@@ -1,14 +1,13 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { StudentPerformance, StudentPerformanceFormData } from "@/types/student";
-import { PostgrestError } from "@supabase/supabase-js";
 
 export const getStudentPerformances = async (studentId: string): Promise<StudentPerformance[]> => {
   const { data, error } = await supabase
     .from("student_performances")
     .select("*")
     .eq("student_id", studentId)
-    .order("evaluation_date", { ascending: false }) as { data: StudentPerformance[] | null; error: PostgrestError | null };
+    .order("evaluation_date", { ascending: false });
 
   if (error) {
     console.error("Error fetching student performances:", error);
@@ -23,14 +22,14 @@ export const createStudentPerformance = async (performance: StudentPerformanceFo
     .from("student_performances")
     .insert([performance])
     .select()
-    .single() as { data: StudentPerformance | null; error: PostgrestError | null };
+    .single();
 
   if (error) {
     console.error("Error creating student performance:", error);
     throw new Error(error.message);
   }
 
-  return data as StudentPerformance;
+  return data;
 };
 
 export const updateStudentPerformance = async (id: string, performance: Partial<StudentPerformanceFormData>): Promise<StudentPerformance> => {
@@ -39,24 +38,47 @@ export const updateStudentPerformance = async (id: string, performance: Partial<
     .update(performance)
     .eq("id", id)
     .select()
-    .single() as { data: StudentPerformance | null; error: PostgrestError | null };
+    .single();
 
   if (error) {
     console.error("Error updating student performance:", error);
     throw new Error(error.message);
   }
 
-  return data as StudentPerformance;
+  return data;
 };
 
 export const deleteStudentPerformance = async (id: string): Promise<void> => {
   const { error } = await supabase
     .from("student_performances")
     .delete()
-    .eq("id", id) as { error: PostgrestError | null };
+    .eq("id", id);
 
   if (error) {
     console.error("Error deleting student performance:", error);
     throw new Error(error.message);
   }
+};
+
+export const createBulkPerformances = async (
+  studentIds: string[],
+  performanceTemplate: Omit<StudentPerformanceFormData, 'student_id'>
+): Promise<StudentPerformance[]> => {
+  // Préparer les données pour une insertion en masse
+  const performancesToInsert = studentIds.map(studentId => ({
+    student_id: studentId,
+    ...performanceTemplate
+  }));
+
+  const { data, error } = await supabase
+    .from("student_performances")
+    .insert(performancesToInsert)
+    .select();
+
+  if (error) {
+    console.error("Error creating bulk performances:", error);
+    throw new Error(error.message);
+  }
+
+  return data || [];
 };

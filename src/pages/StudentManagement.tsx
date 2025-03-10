@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/student";
 import { getSchools } from "@/services/school";
@@ -12,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { confirm } from "@/components/ui/confirm";
 
 // Ajouter l'import pour le nouveau composant
-import { PlusCircle, FileText, Users } from "lucide-react";
+import { PlusCircle, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const StudentManagement = () => {
@@ -31,7 +32,7 @@ const StudentManagement = () => {
     queryFn: getStudents,
   });
 
-  const { data: schools = [] } = useQuery({
+  const { data: schools = [] as School[] } = useQuery({
     queryKey: ["schools"],
     queryFn: getSchools,
   });

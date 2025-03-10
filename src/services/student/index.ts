@@ -1,5 +1,5 @@
 
-// This file exports all student-related services for easier imports
+// Re-export student services
 export * from './studentService';
-export * from './attendanceService';
 export * from './performanceService';
+export * from './attendanceService';

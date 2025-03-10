@@ -31,4 +31,8 @@ export const studentPerformanceSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const bulkPerformanceSchema = studentPerformanceSchema.omit({ student_id: true });
+
 export type StudentPerformanceSchema = z.infer<typeof studentPerformanceSchema>;
+export type BulkPerformanceSchema = z.infer<typeof bulkPerformanceSchema>;
+

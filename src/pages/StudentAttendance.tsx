@@ -1,14 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
-import { Menu, ArrowLeft, Plus, Edit, Trash2, Calendar } from "lucide-react";
+import { ArrowLeft, Plus, Edit, Trash2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -32,7 +30,6 @@ const attendanceSchema = z.object({
 
 const StudentAttendancePage = () => {
   const { id } = useParams<{ id: string }>();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [student, setStudent] = useState<Student | null>(null);
   const [attendance, setAttendance] = useState<StudentAttendance[]>([]);
   const [loading, setLoading] = useState(true);
@@ -172,12 +169,9 @@ const StudentAttendancePage = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex w-full pt-16">
-          <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-          <main className="flex-1 bg-teranga-background transition-all duration-300 flex items-center justify-center">
-            <p>Chargement...</p>
-          </main>
-        </div>
+        <main className="flex-1 bg-teranga-background pt-16 flex items-center justify-center">
+          <p>Chargement...</p>
+        </main>
       </div>
     );
   }
@@ -186,16 +180,13 @@ const StudentAttendancePage = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex w-full pt-16">
-          <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-          <main className="flex-1 bg-teranga-background transition-all duration-300 flex flex-col items-center justify-center p-4">
-            <h1 className="text-xl font-bold mb-4">Étudiant non trouvé</h1>
-            <Button onClick={() => navigate("/student-management")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour à la liste des étudiants
-            </Button>
-          </main>
-        </div>
+        <main className="flex-1 bg-teranga-background pt-16 flex flex-col items-center justify-center p-4">
+          <h1 className="text-xl font-bold mb-4">Étudiant non trouvé</h1>
+          <Button onClick={() => navigate("/student-management")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour à la liste des étudiants
+          </Button>
+        </main>
       </div>
     );
   }
@@ -203,34 +194,23 @@ const StudentAttendancePage = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex w-full pt-16">
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        
-        {/* Mobile Sidebar Toggle */}
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="fixed z-50 bottom-6 left-6 p-3 rounded-full bg-teranga-blue text-white shadow-lg md:hidden"
-          aria-label="Toggle Sidebar"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-        
-        <main className="flex-1 bg-teranga-background transition-all duration-300">
-          <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-              <div className="flex items-center gap-4">
-                <Button variant="outline" onClick={() => navigate(`/student-management/details/${id}`)}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour
-                </Button>
-                <h1 className="text-2xl font-bold text-gray-800">Suivi des présences</h1>
-              </div>
-              <Button onClick={() => handleOpenForm()}>
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter une présence
+      <main className="flex-1 bg-teranga-background pt-16">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <Button variant="outline" onClick={() => navigate(`/student-management/details/${id}`)}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
               </Button>
+              <h1 className="text-2xl font-bold text-gray-800">Suivi des présences</h1>
             </div>
-            
+            <Button onClick={() => handleOpenForm()}>
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter une présence
+            </Button>
+          </div>
+          
+          
             <Card className="mb-6">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-start">
@@ -425,7 +405,6 @@ const StudentAttendancePage = () => {
                 )}
               </CardContent>
             </Card>
-          </div>
           
           {/* Footer */}
           <footer className="bg-white py-8 border-t border-gray-100 mt-auto">
@@ -433,8 +412,8 @@ const StudentAttendancePage = () => {
               <p className="text-gray-600">&copy; {new Date().getFullYear()} TERANGA EDU. Tous droits réservés.</p>
             </div>
           </footer>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 };

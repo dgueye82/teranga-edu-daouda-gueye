@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PlusCircle, Users } from "lucide-react";
 import BulkPerformanceForm, { BulkPerformanceFormData } from "@/components/students/performance/BulkPerformanceForm";
 import { useNavigate } from "react-router-dom";
+import { StudentPerformanceFormData } from "@/types/student";
 
 const BulkPerformance = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const BulkPerformance = () => {
 
   // Mutation pour ajouter des performances à tous les élèves
   const bulkCreateMutation = useMutation({
-    mutationFn: ({ studentIds, template }: { studentIds: string[], template: Omit<BulkPerformanceFormData, 'student_id'> }) => 
+    mutationFn: ({ studentIds, template }: { studentIds: string[], template: Omit<StudentPerformanceFormData, 'student_id'> }) => 
       createBulkPerformances(studentIds, template),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["studentPerformances"] });
@@ -39,9 +40,20 @@ const BulkPerformance = () => {
 
   const handleAddBulkPerformance = (data: BulkPerformanceFormData) => {
     const studentIds = students.map(student => student.id);
+    
+    // Convert BulkPerformanceFormData to StudentPerformanceFormData
+    const performanceTemplate: Omit<StudentPerformanceFormData, 'student_id'> = {
+      subject: data.subject,
+      evaluation_date: data.evaluation_date,
+      grade: data.grade,
+      max_grade: data.max_grade,
+      evaluation_type: data.evaluation_type,
+      notes: data.notes,
+    };
+    
     bulkCreateMutation.mutate({ 
       studentIds, 
-      template: data 
+      template: performanceTemplate 
     });
   };
 

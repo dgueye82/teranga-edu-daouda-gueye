@@ -14,7 +14,11 @@ export const getStudentPerformances = async (studentId: string): Promise<Student
     throw new Error(error.message);
   }
 
-  return data || [];
+  // Ensure evaluation_type matches the expected type
+  return (data || []).map(item => ({
+    ...item,
+    evaluation_type: item.evaluation_type as "exam" | "quiz" | "homework" | "project"
+  }));
 };
 
 export const createStudentPerformance = async (performance: StudentPerformanceFormData): Promise<StudentPerformance> => {
@@ -29,7 +33,10 @@ export const createStudentPerformance = async (performance: StudentPerformanceFo
     throw new Error(error.message);
   }
 
-  return data;
+  return {
+    ...data,
+    evaluation_type: data.evaluation_type as "exam" | "quiz" | "homework" | "project"
+  };
 };
 
 export const updateStudentPerformance = async (id: string, performance: Partial<StudentPerformanceFormData>): Promise<StudentPerformance> => {
@@ -45,7 +52,10 @@ export const updateStudentPerformance = async (id: string, performance: Partial<
     throw new Error(error.message);
   }
 
-  return data;
+  return {
+    ...data,
+    evaluation_type: data.evaluation_type as "exam" | "quiz" | "homework" | "project"
+  };
 };
 
 export const deleteStudentPerformance = async (id: string): Promise<void> => {
@@ -80,5 +90,9 @@ export const createBulkPerformances = async (
     throw new Error(error.message);
   }
 
-  return data || [];
+  // Ensure evaluation_type matches the expected type
+  return (data || []).map(item => ({
+    ...item,
+    evaluation_type: item.evaluation_type as "exam" | "quiz" | "homework" | "project"
+  }));
 };

@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { PlusCircle, Users } from "lucide-react";
-import BulkPerformanceForm, { BulkPerformanceFormData } from "@/components/students/performance/BulkPerformanceForm";
+import BulkPerformanceForm from "@/components/students/performance/BulkPerformanceForm";
 import { useNavigate } from "react-router-dom";
 import { StudentPerformanceFormData } from "@/types/student";
 
@@ -38,10 +38,10 @@ const BulkPerformance = () => {
     },
   });
 
-  const handleAddBulkPerformance = (data: BulkPerformanceFormData) => {
+  const handleAddBulkPerformance = (data: any) => {
     const studentIds = students.map(student => student.id);
     
-    // Convert BulkPerformanceFormData to StudentPerformanceFormData
+    // Convert BulkPerformanceFormData to StudentPerformanceFormData template
     const performanceTemplate: Omit<StudentPerformanceFormData, 'student_id'> = {
       subject: data.subject,
       evaluation_date: data.evaluation_date,

@@ -2,6 +2,7 @@
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import {
   Dialog,
@@ -17,12 +18,23 @@ import { useToast } from "@/hooks/use-toast";
 import SubjectDateFields from "./form-sections/SubjectDateFields";
 import GradeFields from "./form-sections/GradeFields";
 import NotesField from "./form-sections/NotesField";
-import { bulkPerformanceSchema, type BulkPerformanceSchema } from "../../studentFormSchema";
+
+// Schéma pour la validation du formulaire d'évaluation en masse
+const bulkPerformanceSchema = z.object({
+  subject: z.string().min(1, "La matière est requise"),
+  evaluation_date: z.string().min(1, "La date d'évaluation est requise"),
+  grade: z.coerce.number().min(0, "La note doit être positive"),
+  max_grade: z.coerce.number().min(1, "Le maximum doit être au moins 1"),
+  evaluation_type: z.enum(["exam", "quiz", "homework", "project"]),
+  notes: z.string().optional(),
+});
+
+export type BulkPerformanceFormData = z.infer<typeof bulkPerformanceSchema>;
 
 interface BulkPerformanceFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: BulkPerformanceSchema) => void;
+  onSubmit: (data: BulkPerformanceFormData) => void;
   isSubmitting: boolean;
 }
 
@@ -34,7 +46,7 @@ const BulkPerformanceForm: React.FC<BulkPerformanceFormProps> = ({
 }) => {
   const { toast } = useToast();
 
-  const form = useForm<BulkPerformanceSchema>({
+  const form = useForm<BulkPerformanceFormData>({
     resolver: zodResolver(bulkPerformanceSchema),
     defaultValues: {
       subject: "",
@@ -55,7 +67,7 @@ const BulkPerformanceForm: React.FC<BulkPerformanceFormProps> = ({
     return percentage.toFixed(1);
   };
 
-  const handleSubmit = async (data: BulkPerformanceSchema) => {
+  const handleSubmit = async (data: BulkPerformanceFormData) => {
     try {
       await onSubmit(data);
       form.reset();

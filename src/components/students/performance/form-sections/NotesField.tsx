@@ -6,7 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { StudentPerformanceFormData } from "@/types/student";
 
 interface NotesFieldProps {
-  form: UseFormReturn<StudentPerformanceFormData>;
+  form: UseFormReturn<StudentPerformanceFormData> | UseFormReturn<Omit<StudentPerformanceFormData, 'student_id'>>;
 }
 
 const NotesField: React.FC<NotesFieldProps> = ({ form }) => {

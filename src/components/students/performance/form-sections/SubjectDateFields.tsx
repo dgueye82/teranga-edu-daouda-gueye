@@ -13,7 +13,7 @@ import { UseFormReturn } from "react-hook-form";
 import { StudentPerformanceFormData } from "@/types/student";
 
 interface SubjectDateFieldsProps {
-  form: UseFormReturn<StudentPerformanceFormData>;
+  form: UseFormReturn<StudentPerformanceFormData> | UseFormReturn<Omit<StudentPerformanceFormData, 'student_id'>>;
 }
 
 const SubjectDateFields: React.FC<SubjectDateFieldsProps> = ({ form }) => {

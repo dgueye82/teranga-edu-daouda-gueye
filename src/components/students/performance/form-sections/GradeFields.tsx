@@ -6,7 +6,7 @@ import { UseFormReturn, useWatch } from "react-hook-form";
 import { StudentPerformanceFormData } from "@/types/student";
 
 interface GradeFieldsProps {
-  form: UseFormReturn<StudentPerformanceFormData>;
+  form: UseFormReturn<StudentPerformanceFormData> | UseFormReturn<Omit<StudentPerformanceFormData, 'student_id'>>;
   calculatePercentage?: () => string;
 }
 

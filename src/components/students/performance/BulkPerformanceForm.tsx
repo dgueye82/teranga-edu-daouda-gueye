@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import SubjectDateFields from "./form-sections/SubjectDateFields";
 import GradeFields from "./form-sections/GradeFields";
 import NotesField from "./form-sections/NotesField";
-import { studentPerformanceSchema } from "../../studentFormSchema";
+import { studentPerformanceSchema } from "@/components/students/studentFormSchema";
 import { StudentPerformanceFormData } from "@/types/student";
 
 interface BulkPerformanceFormProps {

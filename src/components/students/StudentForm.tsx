@@ -31,30 +31,90 @@ const StudentForm: React.FC<StudentFormProps> = ({
   isOpen,
   onOpenChange,
 }) => {
+  // Initialize the form with student data or default values
   const form = useForm<StudentFormData>({
     resolver: zodResolver(studentSchema),
-    defaultValues: student || {
-      first_name: "",
-      last_name: "",
-      birth_date: "",
-      gender: "",
-      address: "",
-      email: "",
-      phone: "",
-      parent_name: "",
-      parent_phone: "",
-      parent_email: "",
-      enrollment_date: new Date().toISOString().split("T")[0],
-      status: "active",
-      school_id: "",
-      photo_url: "",
-      notes: "",
-    },
+    defaultValues: student
+      ? {
+          first_name: student.first_name,
+          last_name: student.last_name,
+          birth_date: student.birth_date || "",
+          gender: student.gender || "",
+          address: student.address || "",
+          email: student.email || "",
+          phone: student.phone || "",
+          parent_name: student.parent_name || "",
+          parent_phone: student.parent_phone || "",
+          parent_email: student.parent_email || "",
+          enrollment_date: student.enrollment_date || new Date().toISOString().split("T")[0],
+          status: student.status || "active",
+          school_id: student.school_id || "",
+          photo_url: student.photo_url || "",
+          notes: student.notes || "",
+        }
+      : {
+          first_name: "",
+          last_name: "",
+          birth_date: "",
+          gender: "",
+          address: "",
+          email: "",
+          phone: "",
+          parent_name: "",
+          parent_phone: "",
+          parent_email: "",
+          enrollment_date: new Date().toISOString().split("T")[0],
+          status: "active",
+          school_id: "",
+          photo_url: "",
+          notes: "",
+        },
   });
+
+  // Reset form values when student changes
+  React.useEffect(() => {
+    if (student && isOpen) {
+      form.reset({
+        first_name: student.first_name,
+        last_name: student.last_name,
+        birth_date: student.birth_date || "",
+        gender: student.gender || "",
+        address: student.address || "",
+        email: student.email || "",
+        phone: student.phone || "",
+        parent_name: student.parent_name || "",
+        parent_phone: student.parent_phone || "",
+        parent_email: student.parent_email || "",
+        enrollment_date: student.enrollment_date || new Date().toISOString().split("T")[0],
+        status: student.status || "active",
+        school_id: student.school_id || "",
+        photo_url: student.photo_url || "",
+        notes: student.notes || "",
+      });
+    } else if (!student && isOpen) {
+      form.reset({
+        first_name: "",
+        last_name: "",
+        birth_date: "",
+        gender: "",
+        address: "",
+        email: "",
+        phone: "",
+        parent_name: "",
+        parent_phone: "",
+        parent_email: "",
+        enrollment_date: new Date().toISOString().split("T")[0],
+        status: "active",
+        school_id: "",
+        photo_url: "",
+        notes: "",
+      });
+    }
+  }, [student, isOpen, form]);
 
   const handleSubmit = (data: StudentFormData) => {
     onSubmit(data);
-    form.reset();
+    // Don't reset the form here, as it will be reset when the dialog closes
   };
 
   return (

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StudentPerformanceFormData, StudentPerformance } from "@/types/student";
@@ -44,6 +44,31 @@ export const usePerformanceForm = ({
           notes: "",
         },
   });
+
+  // Reset form when initialData changes (important for editing different performances)
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        student_id: initialData.student_id,
+        subject: initialData.subject,
+        evaluation_date: initialData.evaluation_date,
+        grade: initialData.grade,
+        max_grade: initialData.max_grade,
+        evaluation_type: initialData.evaluation_type,
+        notes: initialData.notes || "",
+      });
+    } else {
+      form.reset({
+        student_id: studentId,
+        subject: "",
+        evaluation_date: new Date().toISOString().split("T")[0],
+        grade: 0,
+        max_grade: 20,
+        evaluation_type: "exam",
+        notes: "",
+      });
+    }
+  }, [initialData, studentId, form]);
 
   const calculatePercentage = (): string => {
     const grade = form.watch("grade");

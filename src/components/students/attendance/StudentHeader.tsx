@@ -17,7 +17,7 @@ const StudentHeader = ({ student }: StudentHeaderProps) => {
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12">
+            <Avatar className="h-12 w-12 border border-gray-200">
               <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
               <AvatarFallback className="bg-teranga-blue text-white">
                 {getAvatarFallback(student.first_name, student.last_name)}

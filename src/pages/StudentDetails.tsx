@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
-import { Menu, ArrowLeft, Edit, Mail, Phone, School, Calendar, UserCheck, MapPin } from "lucide-react";
+import { Menu, ArrowLeft, Edit, Mail, Phone, School, Calendar, UserCheck, MapPin, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +14,7 @@ import { getStudentAttendance } from "@/services/studentService";
 import { getStudentPerformances } from "@/services/studentService";
 import { Student, StudentAttendance, StudentPerformance } from "@/types/student";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const StudentDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +23,7 @@ const StudentDetails = () => {
   const [attendance, setAttendance] = useState<StudentAttendance[]>([]);
   const [performances, setPerformances] = useState<StudentPerformance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -55,6 +56,65 @@ const StudentDetails = () => {
     
     fetchData();
   }, [id, toast]);
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!student || !event.target.files || event.target.files.length === 0) {
+        return;
+      }
+      
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${id}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      
+      setUploading(true);
+      
+      // Upload the file to Supabase Storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('student-photos')
+        .upload(filePath, file);
+        
+      if (uploadError) {
+        throw uploadError;
+      }
+      
+      // Get the public URL of the uploaded file
+      const { data: { publicUrl } } = supabase.storage
+        .from('student-photos')
+        .getPublicUrl(filePath);
+        
+      // Update the student record with the new photo URL
+      const { error: updateError } = await supabase
+        .from('students')
+        .update({ photo_url: publicUrl })
+        .eq('id', student.id);
+        
+      if (updateError) {
+        throw updateError;
+      }
+      
+      // Update the local state
+      setStudent({
+        ...student,
+        photo_url: publicUrl
+      });
+      
+      toast({
+        title: "Succès",
+        description: "La photo de l'élève a été mise à jour",
+      });
+      
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger la photo",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   function handleEditStudent() {
     // Navigate to edit page or open edit modal
@@ -162,12 +222,35 @@ const StudentDetails = () => {
             <div className="bg-white rounded-xl shadow overflow-hidden">
               <div className="p-6 pb-0">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
-                    <AvatarFallback className="bg-teranga-blue text-white text-2xl">
-                      {getAvatarFallback(student.first_name, student.last_name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative group">
+                    <Avatar className="h-24 w-24 border-2 border-gray-200">
+                      <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
+                      <AvatarFallback className="bg-teranga-blue text-white text-2xl">
+                        {getAvatarFallback(student.first_name, student.last_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-90 transition-opacity">
+                      <input
+                        type="file"
+                        id="photo-upload"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handlePhotoUpload}
+                        disabled={uploading}
+                      />
+                      <label
+                        htmlFor="photo-upload"
+                        className="flex items-center justify-center bg-black bg-opacity-50 rounded-full w-24 h-24 cursor-pointer"
+                      >
+                        {uploading ? (
+                          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Upload className="w-6 h-6 text-white" />
+                        )}
+                      </label>
+                    </div>
+                  </div>
                   
                   <div className="flex-1">
                     <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">

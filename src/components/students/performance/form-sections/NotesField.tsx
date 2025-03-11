@@ -12,7 +12,7 @@ interface NotesFieldProps {
 const NotesField: React.FC<NotesFieldProps> = ({ form }) => {
   return (
     <FormField
-      control={form.control}
+      control={form.control as any}
       name="notes"
       render={({ field }) => (
         <FormItem>

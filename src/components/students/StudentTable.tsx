@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface StudentTableProps {
   students: Student[];
@@ -53,6 +54,10 @@ const StudentTable: React.FC<StudentTableProps> = ({
     );
   }
 
+  function getAvatarFallback(firstName: string, lastName: string) {
+    return firstName && lastName ? `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() : "?";
+  }
+
   return (
     <Table>
       <TableCaption>Liste des élèves</TableCaption>
@@ -69,7 +74,15 @@ const StudentTable: React.FC<StudentTableProps> = ({
         {students.map((student) => (
           <TableRow key={student.id}>
             <TableCell className="font-medium">
-              {student.first_name} {student.last_name}
+              <div className="flex items-center space-x-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
+                  <AvatarFallback className="bg-teranga-blue text-white">
+                    {getAvatarFallback(student.first_name, student.last_name)}
+                  </AvatarFallback>
+                </Avatar>
+                <span>{student.first_name} {student.last_name}</span>
+              </div>
             </TableCell>
             <TableCell>{student.school_name || "-"}</TableCell>
             <TableCell>{student.parent_name || "-"}</TableCell>

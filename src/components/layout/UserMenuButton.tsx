@@ -8,12 +8,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, ShieldCheck, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 const UserMenuButton = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, userProfile, isAdmin, isTeacher } = useAuth();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -43,15 +45,61 @@ const UserMenuButton = () => {
     );
   }
 
+  const getRoleBadge = () => {
+    if (isAdmin) {
+      return <Badge className="ml-2 bg-purple-500">Admin</Badge>;
+    } else if (isTeacher) {
+      return <Badge className="ml-2 bg-blue-500">Enseignant</Badge>;
+    }
+    return null;
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
           <User className="h-4 w-4" />
-          <span>{user.email?.split('@')[0] || 'Utilisateur'}</span>
+          <span>{userProfile?.first_name || user.email?.split('@')[0] || 'Utilisateur'}</span>
+          {getRoleBadge()}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuLabel>
+          {userProfile?.email || user.email}
+          {getRoleBadge()}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        
+        {isAdmin && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/school-management">
+                <ShieldCheck className="h-4 w-4 mr-2" />
+                Administration
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        
+        {isTeacher && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/student-management">
+                <User className="h-4 w-4 mr-2" />
+                Gestion des élèves
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/courses">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Cours et exercices
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        
         <DropdownMenuItem asChild>
           <Link to="/profile">Mon profil</Link>
         </DropdownMenuItem>

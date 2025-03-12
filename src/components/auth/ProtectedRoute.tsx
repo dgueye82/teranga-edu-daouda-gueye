@@ -3,8 +3,12 @@ import React from "react";
 import { Navigate, useLocation, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-const ProtectedRoute = () => {
-  const { user, isLoading } = useAuth();
+interface ProtectedRouteProps {
+  allowedRoles?: ("admin" | "teacher")[];
+}
+
+const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
+  const { user, isLoading, userProfile } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -15,8 +19,17 @@ const ProtectedRoute = () => {
     );
   }
 
+  // If user is not authenticated, redirect to login
   if (!user) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // If specific roles are required and user doesn't have the right role
+  if (allowedRoles && allowedRoles.length > 0) {
+    const userRole = userProfile?.role;
+    if (!userRole || !allowedRoles.includes(userRole as any)) {
+      return <Navigate to="/unauthorized" replace />;
+    }
   }
 
   return <Outlet />;

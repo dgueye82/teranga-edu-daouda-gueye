@@ -15,6 +15,7 @@ import Auth from '@/pages/Auth';
 import ParentPortal from '@/pages/ParentPortal';
 import Curriculum from '@/pages/Curriculum';
 import NotFound from '@/pages/NotFound';
+import Unauthorized from '@/pages/Unauthorized';
 
 // Pages protégées
 import SchoolManagement from '@/pages/SchoolManagement';
@@ -44,17 +45,22 @@ function App() {
             <Route path="/auth" element={<Auth />} />
             <Route path="/parent-portal" element={<ParentPortal />} />
             <Route path="/curriculum" element={<Curriculum />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
             
-            {/* Routes protégées */}
-            <Route element={<ProtectedRoute />}>
+            {/* Admin-only routes */}
+            <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
               <Route path="/school-management" element={<SchoolManagement />} />
+              <Route path="/staff-management" element={<StaffManagement />} />
+            </Route>
+            
+            {/* Teacher and Admin routes */}
+            <Route element={<ProtectedRoute allowedRoles={["admin", "teacher"]} />}>
               <Route path="/school/:id/students" element={<SchoolStudents />} />
               <Route path="/student-management" element={<StudentManagement />} />
               <Route path="/student/:id" element={<StudentDetails />} />
               <Route path="/student/:id/attendance" element={<StudentAttendance />} />
               <Route path="/student/:id/performance" element={<StudentPerformance />} />
               <Route path="/bulk-performance" element={<BulkPerformance />} />
-              <Route path="/staff-management" element={<StaffManagement />} />
               <Route path="/staff-dashboard" element={<StaffDashboard />} />
               <Route path="/staff-list" element={<StaffList />} />
             </Route>

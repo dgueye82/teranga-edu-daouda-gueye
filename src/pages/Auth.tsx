@@ -15,17 +15,27 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      setAuthError(null);
+      
+      console.log("Tentative de connexion avec:", email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur de connexion:", error);
+        throw error;
+      }
+      
+      console.log("Connexion réussie:", data);
       
       toast({
         title: "Connexion réussie",
@@ -34,6 +44,9 @@ const Auth = () => {
       
       navigate("/");
     } catch (error: any) {
+      console.error("Erreur complète:", error);
+      setAuthError(error.message || "Erreur de connexion");
+      
       toast({
         variant: "destructive",
         title: "Erreur de connexion",
@@ -48,7 +61,11 @@ const Auth = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signUp({
+      setAuthError(null);
+      
+      console.log("Tentative d'inscription avec:", email, firstName, lastName);
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -59,13 +76,21 @@ const Auth = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erreur d'inscription:", error);
+        throw error;
+      }
+      
+      console.log("Inscription réussie:", data);
       
       toast({
         title: "Inscription réussie",
         description: "Veuillez vérifier votre email pour confirmer votre compte",
       });
     } catch (error: any) {
+      console.error("Erreur complète:", error);
+      setAuthError(error.message || "Erreur d'inscription");
+      
       toast({
         variant: "destructive",
         title: "Erreur d'inscription",
@@ -85,6 +110,12 @@ const Auth = () => {
         </div>
         
         <div className="bg-white rounded-xl shadow-lg p-8">
+          {authError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+              {authError}
+            </div>
+          )}
+          
           <Tabs defaultValue="signin">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="signin">Connexion</TabsTrigger>

@@ -43,6 +43,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log("Récupération du profil utilisateur pour:", userId);
+      
       const { data, error } = await supabase
         .from("user_profiles")
         .select("*")
@@ -50,13 +52,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .single();
 
       if (error) {
-        console.error("Error fetching user profile:", error);
+        console.error("Erreur lors de la récupération du profil utilisateur:", error);
         return null;
       }
 
+      console.log("Profil utilisateur récupéré:", data);
       return data as UserProfile;
     } catch (error) {
-      console.error("Unexpected error fetching user profile:", error);
+      console.error("Erreur inattendue lors de la récupération du profil utilisateur:", error);
       return null;
     }
   };
@@ -65,19 +68,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Récupérer la session actuelle
     const getSession = async () => {
       try {
+        console.log("Récupération de la session en cours...");
+        
         const { data } = await supabase.auth.getSession();
+        console.log("Données de session:", data);
+        
         setSession(data.session);
         
         if (data.session?.user) {
+          console.log("Utilisateur trouvé dans la session:", data.session.user);
           setUser(data.session.user);
+          
           const profile = await fetchUserProfile(data.session.user.id);
+          console.log("Profil récupéré:", profile);
+          
           setUserProfile(profile);
         } else {
+          console.log("Aucun utilisateur dans la session");
           setUser(null);
           setUserProfile(null);
         }
       } catch (error) {
-        console.error("Error getting session:", error);
+        console.error("Erreur lors de la récupération de la session:", error);
       } finally {
         setIsLoading(false);
       }
@@ -87,14 +99,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
+      async (event, newSession) => {
+        console.log("Changement d'état d'authentification:", event, newSession?.user?.id);
+        
         setSession(newSession);
         
         if (newSession?.user) {
+          console.log("Nouvel utilisateur authentifié:", newSession.user);
           setUser(newSession.user);
+          
           const profile = await fetchUserProfile(newSession.user.id);
+          console.log("Nouveau profil récupéré:", profile);
+          
           setUserProfile(profile);
         } else {
+          console.log("Utilisateur déconnecté");
           setUser(null);
           setUserProfile(null);
         }
@@ -109,12 +128,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
+    console.log("Tentative de déconnexion");
     await supabase.auth.signOut();
+    console.log("Déconnexion réussie");
   };
 
   // Helper properties to check user roles
   const isAdmin = userProfile?.role === "admin";
   const isTeacher = userProfile?.role === "teacher";
+
+  console.log("État actuel du contexte d'authentification:", { 
+    user: user?.id, 
+    isLoading, 
+    role: userProfile?.role,
+    isAdmin,
+    isTeacher 
+  });
 
   return (
     <AuthContext.Provider value={{ 

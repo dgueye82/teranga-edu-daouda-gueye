@@ -17,14 +17,14 @@ const StudentHeader = ({ student }: StudentHeaderProps) => {
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center space-x-3">
-            <Avatar className="h-12 w-12 border border-gray-200">
+            <Avatar className="h-16 w-16 border-2 border-gray-200">
               <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
-              <AvatarFallback className="bg-teranga-blue text-white">
+              <AvatarFallback className="bg-teranga-blue text-white text-lg">
                 {getAvatarFallback(student.first_name, student.last_name)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-base md:text-lg">
+              <CardTitle className="text-xl">
                 {student.first_name} {student.last_name}
               </CardTitle>
               <p className="text-sm text-gray-500">

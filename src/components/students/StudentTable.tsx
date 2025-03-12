@@ -75,7 +75,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
           <TableRow key={student.id}>
             <TableCell className="font-medium">
               <div className="flex items-center space-x-3">
-                <Avatar className="h-8 w-8 border border-gray-100">
+                <Avatar className="h-10 w-10 border border-gray-100">
                   <AvatarImage src={student.photo_url} alt={`${student.first_name} ${student.last_name}`} />
                   <AvatarFallback className="bg-teranga-blue text-white">
                     {getAvatarFallback(student.first_name, student.last_name)}

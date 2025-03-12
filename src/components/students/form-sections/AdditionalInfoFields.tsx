@@ -1,7 +1,6 @@
 
 import React, { useState } from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UseFormReturn } from "react-hook-form";
 import { StudentFormData } from "@/types/student";
@@ -17,6 +16,22 @@ interface AdditionalInfoFieldsProps {
 const AdditionalInfoFields: React.FC<AdditionalInfoFieldsProps> = ({ form }) => {
   const [uploading, setUploading] = useState(false);
   const photoUrl = form.watch("photo_url");
+
+  // Generate generic photo URL if none exists
+  React.useEffect(() => {
+    if (!photoUrl) {
+      // Array of generic student photos
+      const genericPhotos = [
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=300&h=300",
+        "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=300&h=300",
+        "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=300&h=300"
+      ];
+      
+      // Select a random photo
+      const randomPhoto = genericPhotos[Math.floor(Math.random() * genericPhotos.length)];
+      form.setValue("photo_url", randomPhoto);
+    }
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -65,65 +80,6 @@ const AdditionalInfoFields: React.FC<AdditionalInfoFieldsProps> = ({ form }) => 
       <div className="grid grid-cols-1 gap-4">
         <FormField
           control={form.control}
-          name="photo_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Photo de l'étudiant</FormLabel>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={field.value} alt="Photo de l'étudiant" />
-                  <AvatarFallback className="bg-teranga-blue text-white">
-                    {getAvatarFallback(form.getValues())}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <FormControl>
-                    <div className="flex flex-col">
-                      <Input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleFileUpload}
-                        disabled={uploading}
-                        className="hidden"
-                        id="photo-upload"
-                      />
-                      <label htmlFor="photo-upload">
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          disabled={uploading}
-                          className="mb-2"
-                          asChild
-                        >
-                          <span>
-                            <Upload className="mr-2 h-4 w-4" />
-                            {uploading ? "Téléchargement..." : "Télécharger une photo"}
-                          </span>
-                        </Button>
-                      </label>
-                      {field.value && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => form.setValue("photo_url", "")}
-                          className="text-red-500 hover:text-red-700 text-sm"
-                        >
-                          Supprimer la photo
-                        </Button>
-                      )}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </div>
-            </FormItem>
-          )}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-4">
-        <FormField
-          control={form.control}
           name="notes"
           render={({ field }) => (
             <FormItem>
@@ -141,3 +97,4 @@ const AdditionalInfoFields: React.FC<AdditionalInfoFieldsProps> = ({ form }) => 
 };
 
 export default AdditionalInfoFields;
+

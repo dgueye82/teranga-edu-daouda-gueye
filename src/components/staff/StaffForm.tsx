@@ -2,27 +2,14 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { StaffFormData } from "@/types/staff";
 import PersonalInfoFields from "./form-sections/PersonalInfoFields";
 import EmploymentInfoFields from "./form-sections/EmploymentInfoFields";
 import ContactInfoFields from "./form-sections/ContactInfoFields";
-import { FormFooterButtons } from "@/components/students/form-sections/FormFooterButtons";
-
-const staffFormSchema = z.object({
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  role: z.string().min(2, "La fonction est requise"),
-  department: z.string().min(2, "Le département est requis"),
-  joinDate: z.string().min(1, "La date d'entrée est requise"),
-  status: z.string().min(1, "Le statut est requis"),
-  email: z.string().email("Adresse email invalide").or(z.string().length(0)),
-  phone: z.string().optional(),
-  address: z.string().optional(),
-});
-
-type StaffFormValues = z.infer<typeof staffFormSchema>;
+import FormFooterButtons from "@/components/students/form-sections/FormFooterButtons";
+import { staffFormSchema, StaffFormValues, getDefaultValues } from "./staffFormSchema";
 
 interface StaffFormProps {
   isOpen: boolean;
@@ -44,16 +31,7 @@ interface StaffFormProps {
 const StaffForm: React.FC<StaffFormProps> = ({ isOpen, onClose, onSubmit, staffMember }) => {
   const form = useForm<StaffFormValues>({
     resolver: zodResolver(staffFormSchema),
-    defaultValues: staffMember || {
-      name: "",
-      role: "",
-      department: "",
-      joinDate: "",
-      status: "Actif",
-      email: "",
-      phone: "",
-      address: ""
-    }
+    defaultValues: getDefaultValues(staffMember)
   });
 
   const handleSubmit = (data: StaffFormValues) => {

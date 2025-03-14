@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft } from "lucide-react";
 
 const schoolSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit comporter au moins 2 caractères" }),
@@ -30,9 +30,10 @@ interface SchoolFormProps {
   initialData?: SchoolFormData;
   onSubmit: (data: SchoolFormData) => Promise<void>;
   isSubmitting: boolean;
+  onCancel?: () => void;
 }
 
-const SchoolForm = ({ initialData, onSubmit, isSubmitting }: SchoolFormProps) => {
+const SchoolForm = ({ initialData, onSubmit, isSubmitting, onCancel }: SchoolFormProps) => {
   const { toast } = useToast();
   const form = useForm<SchoolFormData>({
     resolver: zodResolver(schoolSchema),
@@ -62,6 +63,18 @@ const SchoolForm = ({ initialData, onSubmit, isSubmitting }: SchoolFormProps) =>
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {onCancel && (
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel} 
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+        )}
+
         <FormField
           control={form.control}
           name="name"
@@ -150,7 +163,12 @@ const SchoolForm = ({ initialData, onSubmit, isSubmitting }: SchoolFormProps) =>
           />
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end space-x-2">
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Annuler
+            </Button>
+          )}
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Enregistrement..." : "Enregistrer"}
           </Button>

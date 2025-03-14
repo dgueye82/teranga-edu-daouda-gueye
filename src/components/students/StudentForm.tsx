@@ -4,11 +4,11 @@ import { Student, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { studentSchema } from "./studentFormSchema";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Upload } from "lucide-react";
+import { Upload, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // Import form section components
@@ -33,7 +33,6 @@ const StudentForm: React.FC<StudentFormProps> = ({
   isOpen,
   onOpenChange,
 }) => {
-  // Initialize the form with student data or default values
   const form = useForm<StudentFormData>({
     resolver: zodResolver(studentSchema),
     defaultValues: student
@@ -76,17 +75,14 @@ const StudentForm: React.FC<StudentFormProps> = ({
   const [uploading, setUploading] = useState(false);
   const photoUrl = form.watch("photo_url");
 
-  // Generate generic photo URL if none exists
   React.useEffect(() => {
     if (!photoUrl && isOpen) {
-      // Array of generic student photos
       const genericPhotos = [
         "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=300&h=300",
         "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=300&h=300",
         "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?auto=format&fit=crop&w=300&h=300"
       ];
       
-      // Select a random photo
       const randomPhoto = genericPhotos[Math.floor(Math.random() * genericPhotos.length)];
       form.setValue("photo_url", randomPhoto);
     }
@@ -104,7 +100,6 @@ const StudentForm: React.FC<StudentFormProps> = ({
       
       setUploading(true);
       
-      // Upload the file to Supabase Storage
       const { error: uploadError, data } = await supabase.storage
         .from('student-photos')
         .upload(filePath, file);
@@ -113,12 +108,10 @@ const StudentForm: React.FC<StudentFormProps> = ({
         throw uploadError;
       }
       
-      // Get the public URL of the uploaded file
       const { data: { publicUrl } } = supabase.storage
         .from('student-photos')
         .getPublicUrl(filePath);
         
-      // Update the form with the public URL
       form.setValue("photo_url", publicUrl);
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -134,7 +127,6 @@ const StudentForm: React.FC<StudentFormProps> = ({
       : "?";
   }
 
-  // Reset form values when student changes
   React.useEffect(() => {
     if (student && isOpen) {
       form.reset({
@@ -177,7 +169,6 @@ const StudentForm: React.FC<StudentFormProps> = ({
 
   const handleSubmit = (data: StudentFormData) => {
     onSubmit(data);
-    // Don't reset the form here, as it will be reset when the dialog closes
   };
 
   return (
@@ -191,7 +182,6 @@ const StudentForm: React.FC<StudentFormProps> = ({
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
-            {/* Student Photo Section */}
             <div className="flex justify-center mb-6">
               <div className="text-center">
                 <Avatar className="h-24 w-24 mx-auto mb-2 border-2 border-gray-200">
@@ -229,33 +219,40 @@ const StudentForm: React.FC<StudentFormProps> = ({
               </div>
             </div>
             
-            {/* Section: Personal Information */}
             <PersonalInfoFields form={form} />
             
-            {/* Section: School Information */}
             <SchoolInfoFields form={form} schools={schools} />
             
-            {/* Section: Contact Information */}
             <ContactInfoFields form={form} />
             
-            {/* Section: Parent Information */}
             <ParentInfoFields form={form} />
             
-            {/* Section: Additional Information */}
             <AdditionalInfoFields form={form} />
 
-            <div className="flex justify-end space-x-2 pt-4">
+            <DialogFooter className="flex justify-between pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="mr-auto"
               >
-                Annuler
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
               </Button>
-              <Button type="submit">
-                {student ? "Mettre à jour" : "Ajouter"}
-              </Button>
-            </div>
+              <div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="mr-2"
+                >
+                  Annuler
+                </Button>
+                <Button type="submit">
+                  {student ? "Mettre à jour" : "Ajouter"}
+                </Button>
+              </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

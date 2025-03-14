@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -228,7 +229,8 @@ const Auth = () => {
         </div>
         
         <div className="mt-4 text-center">
-          <Button variant="link" onClick={() => navigate("/")}>
+          <Button variant="outline" onClick={() => navigate("/")} className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
             Retour à l'accueil
           </Button>
         </div>

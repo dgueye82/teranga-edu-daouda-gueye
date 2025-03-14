@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,13 +10,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, ShieldCheck, BookOpen } from "lucide-react";
+import { User, LogOut, ShieldCheck, BookOpen, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 const UserMenuButton = () => {
   const { user, signOut, userProfile, isAdmin, isTeacher } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
@@ -25,6 +26,7 @@ const UserMenuButton = () => {
         title: "Déconnexion réussie",
         description: "À bientôt sur Teranga EDU !",
       });
+      navigate('/');
     } catch (error: any) {
       toast({
         variant: "destructive",

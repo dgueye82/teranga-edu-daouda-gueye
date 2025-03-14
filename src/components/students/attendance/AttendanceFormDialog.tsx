@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { StudentAttendance, StudentAttendanceFormData } from "@/types/student";
+import { ArrowLeft } from "lucide-react";
 
 const attendanceSchema = z.object({
   student_id: z.string(),
@@ -115,14 +115,30 @@ const AttendanceFormDialog = ({
               )}
             />
 
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                Annuler
+            <DialogFooter className="flex justify-between pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsOpen(false)}
+                className="mr-auto"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
               </Button>
-              <Button type="submit">
-                {selectedAttendance ? "Mettre à jour" : "Ajouter"}
-              </Button>
-            </div>
+              <div>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsOpen(false)}
+                  className="mr-2"
+                >
+                  Annuler
+                </Button>
+                <Button type="submit">
+                  {selectedAttendance ? "Mettre à jour" : "Ajouter"}
+                </Button>
+              </div>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +7,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft } from "lucide-react";
 
 const staffFormSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -197,13 +197,19 @@ const StaffForm: React.FC<StaffFormProps> = ({ isOpen, onClose, onSubmit, staffM
               )}
             />
             
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
-                Annuler
+            <DialogFooter className="flex justify-between">
+              <Button type="button" variant="outline" onClick={onClose} className="mr-auto">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
               </Button>
-              <Button type="submit">
-                {staffMember ? "Mettre à jour" : "Ajouter"}
-              </Button>
+              <div>
+                <Button type="button" variant="outline" onClick={onClose} className="mr-2">
+                  Annuler
+                </Button>
+                <Button type="submit">
+                  {staffMember ? "Mettre à jour" : "Ajouter"}
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </Form>

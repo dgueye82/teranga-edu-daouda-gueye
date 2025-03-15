@@ -14,6 +14,14 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         isOpen ? "translate-x-0" : "translate-x-full"
       }`}
     >
+      <button
+        onClick={onClose}
+        className="absolute top-5 right-5"
+        aria-label="Fermer le menu"
+      >
+        <X className="h-6 w-6" />
+      </button>
+      
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
         <NavLink to="/about" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
           À propos

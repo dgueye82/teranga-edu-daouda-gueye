@@ -36,9 +36,6 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <NavLink to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
           Portails parents
         </NavLink>
-        <NavLink to="/how-it-works" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
-          Comment ça marche
-        </NavLink>
       </div>
     </div>
   );

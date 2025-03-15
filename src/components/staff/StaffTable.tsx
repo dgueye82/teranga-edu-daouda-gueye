@@ -4,17 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Edit, Eye } from "lucide-react";
 import { Staff } from "@/types/staff";
+import StaffPagination from "./StaffPagination";
 
 interface StaffTableProps {
   filteredStaff: Staff[];
   onViewStaff: (staff: Staff) => void;
   onEditStaff: (staff: Staff) => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 const StaffTable: React.FC<StaffTableProps> = ({ 
   filteredStaff,
   onViewStaff,
-  onEditStaff 
+  onEditStaff,
+  currentPage,
+  totalPages,
+  onPageChange
 }) => {
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -78,6 +85,14 @@ const StaffTable: React.FC<StaffTableProps> = ({
             Aucun membre du personnel trouvé
           </div>
         )}
+      </div>
+      
+      <div className="px-6 py-3 border-t border-gray-200">
+        <StaffPagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
       </div>
     </div>
   );

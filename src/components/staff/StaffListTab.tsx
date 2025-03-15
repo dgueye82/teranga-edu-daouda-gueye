@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import StaffForm from "./StaffForm";
@@ -7,20 +8,33 @@ import StaffFilters from "./StaffFilters";
 import StaffActionBar from "./StaffActionBar";
 import StaffTable from "./StaffTable";
 import { Staff, StaffFormData } from "@/types/staff";
-import { getStaffMembers, addStaffMember, updateStaffMember } from "@/services/staff";
+import { getPaginatedStaffMembers, addStaffMember, updateStaffMember } from "@/services/staff";
 
 const StaffListTab = () => {
+  const [searchParams] = useSearchParams();
+  const departmentFilter = searchParams.get("department");
+  
   const [searchTerm, setSearchTerm] = useState("");
-  const [staffMembers, setStaffMembers] = useState<Staff[]>(getStaffMembers());
+  const [staffData, setStaffData] = useState<{ data: Staff[], total: number }>({ data: [], total: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(5);
   const { toast } = useToast();
 
-  const filteredStaff = staffMembers.filter(staff => 
-    staff.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    staff.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    staff.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Calculate total pages
+  const totalPages = Math.ceil(staffData.total / pageSize);
+
+  // Load staff data with pagination
+  useEffect(() => {
+    const result = getPaginatedStaffMembers(currentPage, pageSize, searchTerm, departmentFilter || undefined);
+    setStaffData(result);
+  }, [currentPage, pageSize, searchTerm, departmentFilter]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, departmentFilter]);
 
   const handleAddStaff = () => {
     setSelectedStaff(undefined);
@@ -41,7 +55,6 @@ const StaffListTab = () => {
     if (selectedStaff) {
       // Edit existing staff
       updateStaffMember(selectedStaff.id, data);
-      setStaffMembers(getStaffMembers());
       toast({
         title: "Membre du personnel mis à jour",
         description: `${data.name} a été mis à jour avec succès.`
@@ -49,12 +62,23 @@ const StaffListTab = () => {
     } else {
       // Add new staff
       addStaffMember(data);
-      setStaffMembers(getStaffMembers());
       toast({
         title: "Membre du personnel ajouté",
         description: `${data.name} a été ajouté avec succès.`
       });
     }
+    
+    // Refresh data
+    const result = getPaginatedStaffMembers(currentPage, pageSize, searchTerm, departmentFilter || undefined);
+    setStaffData(result);
+    
+    // Close form
+    setIsFormOpen(false);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -70,9 +94,12 @@ const StaffListTab = () => {
       <Separator className="my-6" />
       
       <StaffTable 
-        filteredStaff={filteredStaff}
+        filteredStaff={staffData.data}
         onViewStaff={handleViewStaff}
         onEditStaff={handleEditStaff}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
       />
 
       <StaffForm 

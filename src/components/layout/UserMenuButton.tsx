@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, ShieldCheck, BookOpen, ArrowLeft } from "lucide-react";
+import { User, LogOut, ShieldCheck, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -21,6 +21,7 @@ const UserMenuButton = () => {
 
   const handleSignOut = async () => {
     try {
+      console.log("Déconnexion desktop en cours...");
       await signOut();
       toast({
         title: "Déconnexion réussie",
@@ -28,10 +29,11 @@ const UserMenuButton = () => {
       });
       navigate('/');
     } catch (error: any) {
+      console.error("Erreur de déconnexion desktop:", error);
       toast({
         variant: "destructive",
         title: "Erreur de déconnexion",
-        description: error.message,
+        description: error.message || "Une erreur est survenue lors de la déconnexion",
       });
     }
   };
@@ -62,6 +64,7 @@ const UserMenuButton = () => {
         onClick={handleSignOut} 
         variant="outline" 
         className="flex items-center gap-2 border-red-300 text-red-500 hover:bg-red-50"
+        type="button"
       >
         <LogOut className="h-4 w-4" />
         <span>Déconnexion</span>
@@ -116,7 +119,10 @@ const UserMenuButton = () => {
             <Link to="/profile">Mon profil</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSignOut} className="text-red-500 cursor-pointer">
+          <DropdownMenuItem 
+            onClick={handleSignOut} 
+            className="text-red-500 cursor-pointer"
+          >
             <LogOut className="h-4 w-4 mr-2" />
             Déconnexion
           </DropdownMenuItem>

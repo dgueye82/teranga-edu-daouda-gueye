@@ -18,6 +18,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
   const handleSignOut = async () => {
     try {
+      console.log("Déconnexion mobile en cours...");
       await signOut();
       toast({
         title: "Déconnexion réussie",
@@ -26,10 +27,11 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       navigate('/');
       onClose();
     } catch (error: any) {
+      console.error("Erreur de déconnexion mobile:", error);
       toast({
         variant: "destructive",
         title: "Erreur de déconnexion",
-        description: error.message,
+        description: error.message || "Une erreur est survenue lors de la déconnexion",
       });
     }
   };
@@ -49,7 +51,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       </button>
       
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
-        <NavLink to="/about" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
+        <NavLink to="/about" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
           À propos
         </NavLink>
         <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
@@ -61,13 +63,13 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Gérer le personnel
         </Link>
-        <NavLink to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
+        <NavLink to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
           Formation en ligne
         </NavLink>
-        <NavLink to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
+        <NavLink to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
           Programme d'études et évaluation
         </NavLink>
-        <NavLink to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
+        <NavLink to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
           Portails parents
         </NavLink>
         
@@ -75,6 +77,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           <button 
             onClick={handleSignOut}
             className="flex items-center py-2 text-lg font-medium border-b border-gray-100 text-red-500"
+            type="button"
           >
             <LogOut className="h-5 w-5 mr-2" />
             Déconnexion

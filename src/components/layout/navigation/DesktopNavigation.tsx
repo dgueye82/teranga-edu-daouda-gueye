@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 const DesktopNavigation = () => {
   return (
     <nav className="hidden lg:flex items-center space-x-8">
-      <NavLink to="/about" exact>
+      <NavLink to="/about">
         À propos
       </NavLink>
       <Link to="/school-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
@@ -18,13 +18,13 @@ const DesktopNavigation = () => {
       <Link to="/staff-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
         Gérer le personnel
       </Link>
-      <NavLink to="/online-training" exact>
+      <NavLink to="/online-training">
         Formation en ligne
       </NavLink>
-      <NavLink to="/curriculum" exact>
+      <NavLink to="/curriculum">
         Programme d'études et évaluation
       </NavLink>
-      <NavLink to="/parent-portal" exact>
+      <NavLink to="/parent-portal">
         Portails parents
       </NavLink>
       

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -51,9 +52,9 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       </button>
       
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
-        <NavLink to="/about" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <Link to="/about" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           À propos
-        </NavLink>
+        </Link>
         <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Gérer l'école
         </Link>
@@ -63,25 +64,26 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Gérer le personnel
         </Link>
-        <NavLink to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Formation en ligne
-        </NavLink>
-        <NavLink to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        </Link>
+        <Link to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Programme d'études et évaluation
-        </NavLink>
-        <NavLink to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        </Link>
+        <Link to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Portails parents
-        </NavLink>
+        </Link>
         
         {user && (
-          <button 
+          <Button 
             onClick={handleSignOut}
-            className="flex items-center py-2 text-lg font-medium border-b border-gray-100 text-red-500"
+            className="flex items-center py-2 gap-2 text-lg font-medium text-red-500 justify-start"
+            variant="outline"
             type="button"
           >
-            <LogOut className="h-5 w-5 mr-2" />
+            <LogOut className="h-5 w-5" />
             Déconnexion
-          </button>
+          </Button>
         )}
       </div>
     </div>

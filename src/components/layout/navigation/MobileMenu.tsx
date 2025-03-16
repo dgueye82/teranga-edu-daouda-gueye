@@ -1,6 +1,5 @@
 
 import { X } from "lucide-react";
-import { Link } from "react-router-dom";
 import NavLink from "./NavLink";
 
 interface MobileMenuProps {
@@ -24,25 +23,25 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       </button>
       
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
-        <NavLink to="/about" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <NavLink to="/about" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           À propos
         </NavLink>
-        <NavLink to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <NavLink to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Gérer l'école
         </NavLink>
-        <NavLink to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <NavLink to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Gérer l'élève
         </NavLink>
-        <NavLink to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <NavLink to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Gérer le personnel
         </NavLink>
-        <NavLink to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <NavLink to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Formation en ligne
         </NavLink>
-        <NavLink to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <NavLink to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Programme d'études et évaluation
         </NavLink>
-        <NavLink to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose}>
+        <NavLink to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Portails parents
         </NavLink>
       </div>

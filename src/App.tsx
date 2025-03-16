@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -63,8 +63,10 @@ function App() {
               <Route path="/bulk-performance" element={<BulkPerformance />} />
               <Route path="/staff-dashboard" element={<StaffDashboard />} />
               <Route path="/staff-list" element={<StaffList />} />
+              <Route path="/school-students" element={<SchoolStudents />} />
             </Route>
             
+            {/* Catch all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

@@ -8,7 +8,7 @@ import StudentForm from "@/components/students/StudentForm";
 import StudentFilters from "@/components/students/StudentFilters";
 import { Student, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";
-import NavLink from "@/components/layout/navigation/NavLink";
+import { Link, useLocation } from "react-router-dom";
 
 interface StudentListTabProps {
   students: Student[];
@@ -45,16 +45,24 @@ const StudentListTab: React.FC<StudentListTabProps> = ({
   isFormOpen,
   setIsFormOpen
 }) => {
+  const location = useLocation();
+  const isStudentManagementActive = location.pathname === "/student-management";
+  const isSchoolStudentsActive = location.pathname === "/school-students";
+
   return (
     <div className="space-y-6">
       <div className="mb-6">
         <div className="flex space-x-2 mb-4">
-          <NavLink to="/student-management" variant="button">
-            Tous les élèves
-          </NavLink>
-          <NavLink to="/school-students" variant="button">
-            Élèves par école
-          </NavLink>
+          <Link to="/student-management">
+            <Button variant={isStudentManagementActive ? "default" : "outline"}>
+              Tous les élèves
+            </Button>
+          </Link>
+          <Link to="/school-students">
+            <Button variant={isSchoolStudentsActive ? "default" : "outline"}>
+              Élèves par école
+            </Button>
+          </Link>
         </div>
       </div>
       

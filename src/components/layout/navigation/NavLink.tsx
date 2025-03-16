@@ -7,6 +7,7 @@ interface NavLinkProps {
   onClick?: () => void;
   className?: string;
   variant?: "default" | "button";
+  exact?: boolean;
 }
 
 const NavLink = ({ 
@@ -14,7 +15,8 @@ const NavLink = ({
   children, 
   onClick, 
   className, 
-  variant = "default" 
+  variant = "default",
+  exact = false
 }: NavLinkProps) => {
   // Ensure the path is properly formatted
   const formattedPath = to.startsWith("/") ? to : `/${to}`;
@@ -31,6 +33,7 @@ const NavLink = ({
           }`
         }
         onClick={onClick}
+        end={exact}
       >
         {children}
       </RouterNavLink>
@@ -46,6 +49,7 @@ const NavLink = ({
         }`
       }
       onClick={onClick}
+      end={exact}
     >
       {children}
     </RouterNavLink>

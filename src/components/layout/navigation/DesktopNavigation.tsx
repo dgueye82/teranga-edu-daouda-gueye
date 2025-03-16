@@ -1,6 +1,7 @@
 
 import NavLink from "./NavLink";
 import UserMenuButton from "../UserMenuButton";
+import { Link } from "react-router-dom";
 
 const DesktopNavigation = () => {
   return (
@@ -8,15 +9,15 @@ const DesktopNavigation = () => {
       <NavLink to="/about" exact>
         À propos
       </NavLink>
-      <NavLink to="/school-management" exact>
+      <Link to="/school-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
         Gérer l'école
-      </NavLink>
-      <NavLink to="/student-management" exact>
+      </Link>
+      <Link to="/student-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
         Gérer l'élève
-      </NavLink>
-      <NavLink to="/staff-management" exact>
+      </Link>
+      <Link to="/staff-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
         Gérer le personnel
-      </NavLink>
+      </Link>
       <NavLink to="/online-training" exact>
         Formation en ligne
       </NavLink>

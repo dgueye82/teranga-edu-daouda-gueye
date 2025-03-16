@@ -1,6 +1,10 @@
 
-import { X } from "lucide-react";
+import { X, LogOut } from "lucide-react";
 import NavLink from "./NavLink";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -8,6 +12,28 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Déconnexion réussie",
+        description: "À bientôt sur Teranga EDU !",
+      });
+      navigate('/');
+      onClose();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erreur de déconnexion",
+        description: error.message,
+      });
+    }
+  };
+
   return (
     <div
       className={`fixed inset-0 lg:hidden bg-white z-40 transform transition-transform duration-300 ease-in-out ${
@@ -26,15 +52,15 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <NavLink to="/about" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           À propos
         </NavLink>
-        <NavLink to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
+        <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Gérer l'école
-        </NavLink>
-        <NavLink to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
+        </Link>
+        <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Gérer l'élève
-        </NavLink>
-        <NavLink to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
+        </Link>
+        <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Gérer le personnel
-        </NavLink>
+        </Link>
         <NavLink to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Formation en ligne
         </NavLink>
@@ -44,6 +70,16 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <NavLink to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100" onClick={onClose} exact>
           Portails parents
         </NavLink>
+        
+        {user && (
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center py-2 text-lg font-medium border-b border-gray-100 text-red-500"
+          >
+            <LogOut className="h-5 w-5 mr-2" />
+            Déconnexion
+          </button>
+        )}
       </div>
     </div>
   );

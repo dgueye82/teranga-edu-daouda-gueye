@@ -57,61 +57,72 @@ const UserMenuButton = () => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
-          <User className="h-4 w-4" />
-          <span>{userProfile?.first_name || user.email?.split('@')[0] || 'Utilisateur'}</span>
-          {getRoleBadge()}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>
-          {userProfile?.email || user.email}
-          {getRoleBadge()}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        
-        {isAdmin && (
-          <>
-            <DropdownMenuItem asChild>
-              <Link to="/school-management">
-                <ShieldCheck className="h-4 w-4 mr-2" />
-                Administration
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
-        )}
-        
-        {isTeacher && (
-          <>
-            <DropdownMenuItem asChild>
-              <Link to="/student-management">
-                <User className="h-4 w-4 mr-2" />
-                Gestion des élèves
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/courses">
-                <BookOpen className="h-4 w-4 mr-2" />
-                Cours et exercices
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </>
-        )}
-        
-        <DropdownMenuItem asChild>
-          <Link to="/profile">Mon profil</Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="text-red-500 cursor-pointer">
-          <LogOut className="h-4 w-4 mr-2" />
-          Déconnexion
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center gap-3">
+      <Button 
+        onClick={handleSignOut} 
+        variant="outline" 
+        className="flex items-center gap-2 border-red-300 text-red-500 hover:bg-red-50"
+      >
+        <LogOut className="h-4 w-4" />
+        <span>Déconnexion</span>
+      </Button>
+      
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            <span>{userProfile?.first_name || user.email?.split('@')[0] || 'Utilisateur'}</span>
+            {getRoleBadge()}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>
+            {userProfile?.email || user.email}
+            {getRoleBadge()}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          
+          {isAdmin && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link to="/school-management">
+                  <ShieldCheck className="h-4 w-4 mr-2" />
+                  Administration
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          
+          {isTeacher && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link to="/student-management">
+                  <User className="h-4 w-4 mr-2" />
+                  Gestion des élèves
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/courses">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Cours et exercices
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+          
+          <DropdownMenuItem asChild>
+            <Link to="/profile">Mon profil</Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleSignOut} className="text-red-500 cursor-pointer">
+            <LogOut className="h-4 w-4 mr-2" />
+            Déconnexion
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };
 

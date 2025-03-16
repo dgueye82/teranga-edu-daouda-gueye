@@ -31,7 +31,6 @@ const NavLink = ({
           }`
         }
         onClick={onClick}
-        end
       >
         {children}
       </RouterNavLink>
@@ -47,7 +46,6 @@ const NavLink = ({
         }`
       }
       onClick={onClick}
-      end
     >
       {children}
     </RouterNavLink>

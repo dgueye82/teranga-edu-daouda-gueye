@@ -1,20 +1,27 @@
 
 import React from "react";
-import NavLink from "@/components/layout/navigation/NavLink";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const StaffFilters: React.FC = () => {
   return (
     <div className="mb-6">
       <div className="flex space-x-2 mb-4">
-        <NavLink to="/staff-management" variant="button">
-          Tout le personnel
-        </NavLink>
-        <NavLink to="/staff-management?department=teaching" variant="button">
-          Personnel enseignant
-        </NavLink>
-        <NavLink to="/staff-management?department=administrative" variant="button">
-          Personnel administratif
-        </NavLink>
+        <Link to="/staff-management">
+          <Button variant={window.location.pathname === "/staff-management" && !window.location.search ? "default" : "outline"}>
+            Tout le personnel
+          </Button>
+        </Link>
+        <Link to="/staff-management?department=teaching">
+          <Button variant={window.location.search === "?department=teaching" ? "default" : "outline"}>
+            Personnel enseignant
+          </Button>
+        </Link>
+        <Link to="/staff-management?department=administrative">
+          <Button variant={window.location.search === "?department=administrative" ? "default" : "outline"}>
+            Personnel administratif
+          </Button>
+        </Link>
       </div>
     </div>
   );

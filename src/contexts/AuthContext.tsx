@@ -196,15 +196,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signOut = async () => {
-    console.log("Tentative de déconnexion");
-    await supabase.auth.signOut();
-    setUser(null);
-    setUserProfile(null);
-    setSession(null);
-    console.log("Déconnexion réussie");
-
-    // Rediriger vers la page d'accueil après la déconnexion
-    window.location.href = "/";
+    try {
+      console.log("Tentative de déconnexion");
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Erreur lors de la déconnexion:", error);
+        throw error;
+      }
+      
+      // Nettoyage explicite de l'état local
+      setUser(null);
+      setUserProfile(null);
+      setSession(null);
+      
+      console.log("Déconnexion réussie");
+      
+      // Force une redirection vers la page d'accueil
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Erreur critique lors de la déconnexion:", error);
+      throw error;
+    }
   };
 
   // Helper properties to check user roles

@@ -24,7 +24,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         title: "Déconnexion réussie",
         description: "À bientôt sur Teranga EDU !",
       });
-      navigate('/');
+      // Ne pas utiliser navigate ici, la redirection est gérée dans signOut
       onClose();
     } catch (error: any) {
       console.error("Erreur de déconnexion mobile:", error);

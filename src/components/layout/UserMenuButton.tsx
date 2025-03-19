@@ -18,8 +18,7 @@ const UserMenuButton = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSignOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const handleSignOut = async () => {
     try {
       console.log("Déconnexion en cours...");
       await signOut();
@@ -27,7 +26,7 @@ const UserMenuButton = () => {
         title: "Déconnexion réussie",
         description: "À bientôt sur Teranga EDU !",
       });
-      navigate('/');
+      // Ne pas utiliser navigate ici, la redirection est gérée dans signOut
     } catch (error: any) {
       console.error("Erreur de déconnexion:", error);
       toast({
@@ -97,7 +96,7 @@ const UserMenuButton = () => {
           </DropdownMenuItem>
         )}
         <DropdownMenuItem 
-          onSelect={(e) => { e.preventDefault(); handleSignOut(e as any); }}
+          onClick={handleSignOut}
           className="text-red-600 cursor-pointer"
         >
           <LogOut className="mr-2 h-4 w-4" />

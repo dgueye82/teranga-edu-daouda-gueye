@@ -47,6 +47,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         onClick={onClose}
         className="absolute top-5 right-5"
         aria-label="Fermer le menu"
+        type="button"
       >
         <X className="h-6 w-6" />
       </button>

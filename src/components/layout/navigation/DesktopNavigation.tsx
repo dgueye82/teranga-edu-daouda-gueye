@@ -5,9 +5,13 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const DesktopNavigation = () => {
-  const { userProfile } = useAuth();
-  const isAdmin = userProfile?.role === "admin";
-  const isTeacher = userProfile?.role === "teacher";
+  const { userProfile, isAdmin, isTeacher } = useAuth();
+  console.log("DesktopNavigation - User Profile:", { 
+    userProfile, 
+    isAdmin, 
+    isTeacher, 
+    role: userProfile?.role 
+  });
   
   return (
     <nav className="hidden lg:flex items-center space-x-6">

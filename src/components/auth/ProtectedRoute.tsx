@@ -9,24 +9,29 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
-  const { user, isLoading, userProfile, createUserProfileIfMissing } = useAuth();
+  const { user, isLoading, userProfile, createUserProfileIfMissing, isAdmin, isTeacher } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
     console.log("ProtectedRoute - État d'authentification:", { 
       user: user?.id, 
+      email: user?.email,
       isLoading, 
       userProfile,
+      role: userProfile?.role,
+      isAdmin,
+      isTeacher,
       allowedRoles,
       currentPath: location.pathname
     });
 
     // Si l'utilisateur est authentifié mais n'a pas de profil, essayer de créer un profil
     if (user && !userProfile && !isLoading) {
+      console.log("Tentative de création de profil pour:", user.email);
       createUserProfileIfMissing();
     }
-  }, [user, isLoading, userProfile, allowedRoles, location.pathname, createUserProfileIfMissing]);
+  }, [user, isLoading, userProfile, allowedRoles, location.pathname, createUserProfileIfMissing, isAdmin, isTeacher]);
 
   if (isLoading) {
     return (
@@ -62,10 +67,15 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
   // If specific roles are required and user doesn't have the right role
   if (allowedRoles && allowedRoles.length > 0) {
     const userRole = userProfile?.role;
-    console.log("Vérification des rôles:", { userRole, allowedRoles });
+    console.log("Vérification des rôles:", { 
+      userEmail: user.email,
+      userRole, 
+      allowedRoles,
+      hasAccess: userRole && allowedRoles.includes(userRole as any)
+    });
     
     if (!userRole || !allowedRoles.includes(userRole as any)) {
-      console.log("Rôle non autorisé, redirection vers /unauthorized");
+      console.log(`Rôle non autorisé (${userRole}), redirection vers /unauthorized`);
       toast({
         title: "Accès non autorisé",
         description: `Vous n'avez pas les permissions nécessaires pour accéder à cette page. Rôle requis: ${allowedRoles.join(' ou ')}`,
@@ -75,7 +85,7 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
     }
   }
 
-  console.log("Accès autorisé à la route protégée");
+  console.log(`Accès autorisé à la route protégée pour ${user.email} avec rôle ${userProfile.role}`);
   return <Outlet />;
 };
 

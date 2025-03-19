@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,7 +7,15 @@ import { Shield, Home, UserCog } from 'lucide-react';
 
 const Unauthorized = () => {
   const navigate = useNavigate();
-  const { userProfile, createUserProfileIfMissing } = useAuth();
+  const { userProfile, user, createUserProfileIfMissing } = useAuth();
+
+  useEffect(() => {
+    console.log("Unauthorized Page - User state:", {
+      email: user?.email,
+      profile: userProfile,
+      role: userProfile?.role
+    });
+  }, [user, userProfile]);
 
   const handleCreateProfile = async () => {
     await createUserProfileIfMissing();
@@ -23,7 +31,7 @@ const Unauthorized = () => {
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Accès non autorisé</h1>
           <p className="mt-2 text-gray-600">
-            Votre compte ({userProfile?.role || 'sans rôle'}) n'a pas les permissions nécessaires pour accéder à cette page.
+            Votre compte ({user?.email || 'non connecté'}) avec le rôle ({userProfile?.role || 'sans rôle'}) n'a pas les permissions nécessaires pour accéder à cette page.
           </p>
         </div>
         

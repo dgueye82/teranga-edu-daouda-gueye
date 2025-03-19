@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const UserMenuButton = () => {
-  const { user, userProfile, signOut, createUserProfileIfMissing } = useAuth();
+  const { user, userProfile, signOut, createUserProfileIfMissing, isAdmin, isTeacher } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -45,6 +45,13 @@ const UserMenuButton = () => {
       description: "Votre profil utilisateur a été vérifié.",
     });
   };
+
+  console.log("UserMenuButton - Auth state:", { 
+    userEmail: user?.email,
+    userProfile,
+    isAdmin,
+    isTeacher
+  });
 
   if (!user) {
     return (

@@ -12,7 +12,7 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const { user, signOut, userProfile } = useAuth();
+  const { user, signOut, isAdmin, isTeacher } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -35,6 +35,8 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       });
     }
   };
+
+  console.log("MobileMenu - Auth state:", { isAdmin, isTeacher });
 
   return (
     <div
@@ -59,7 +61,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           À propos
         </Link>
         
-        {userProfile?.role === "admin" && (
+        {isAdmin && (
           <>
             <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
               Gérer l'école
@@ -70,7 +72,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           </>
         )}
         
-        {(userProfile?.role === "admin" || userProfile?.role === "teacher") && (
+        {(isAdmin || isTeacher) && (
           <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
             Gérer l'élève
           </Link>

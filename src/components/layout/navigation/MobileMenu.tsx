@@ -1,6 +1,5 @@
 
 import { X, LogOut } from "lucide-react";
-import NavLink from "./NavLink";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +12,7 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, userProfile } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -53,18 +52,30 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       </button>
       
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
+        <Link to="/" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Accueil
+        </Link>
         <Link to="/about" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           À propos
         </Link>
-        <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer l'école
-        </Link>
-        <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer l'élève
-        </Link>
-        <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer le personnel
-        </Link>
+        
+        {userProfile?.role === "admin" && (
+          <>
+            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer l'école
+            </Link>
+            <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer le personnel
+            </Link>
+          </>
+        )}
+        
+        {(userProfile?.role === "admin" || userProfile?.role === "teacher") && (
+          <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+            Gérer l'élève
+          </Link>
+        )}
+        
         <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Formation en ligne
         </Link>
@@ -75,7 +86,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           Portails parents
         </Link>
         
-        {user && (
+        {user ? (
           <Button 
             onClick={handleSignOut}
             className="flex items-center py-2 gap-2 text-lg font-medium text-red-500 justify-start"
@@ -85,6 +96,10 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             <LogOut className="h-5 w-5" />
             Déconnexion
           </Button>
+        ) : (
+          <Link to="/auth" className="py-2 text-lg font-medium border-b border-gray-100 text-blue-600" onClick={onClose}>
+            Se connecter
+          </Link>
         )}
       </div>
     </div>

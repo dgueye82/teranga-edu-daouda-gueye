@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 
 export type UserRole = "admin" | "teacher" | "student" | "parent";
 
@@ -21,6 +22,7 @@ interface AuthContextProps {
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isTeacher: boolean;
+  createUserProfileIfMissing: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -31,6 +33,7 @@ const AuthContext = createContext<AuthContextProps>({
   signOut: async () => {},
   isAdmin: false,
   isTeacher: false,
+  createUserProfileIfMissing: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -40,6 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -61,6 +65,70 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error("Erreur inattendue lors de la récupération du profil utilisateur:", error);
       return null;
+    }
+  };
+
+  const createUserProfile = async (userId: string, email: string, role: UserRole = "teacher") => {
+    try {
+      console.log("Création d'un nouveau profil utilisateur pour:", userId);
+      
+      const { data, error } = await supabase
+        .from("user_profiles")
+        .insert([
+          { id: userId, email, role }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Erreur lors de la création du profil utilisateur:", error);
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de créer votre profil utilisateur. Veuillez contacter l'administrateur.",
+        });
+        return null;
+      }
+
+      console.log("Nouveau profil utilisateur créé:", data);
+      toast({
+        title: "Profil créé",
+        description: "Votre profil utilisateur a été créé avec succès.",
+      });
+      return data as UserProfile;
+    } catch (error) {
+      console.error("Erreur inattendue lors de la création du profil utilisateur:", error);
+      return null;
+    }
+  };
+
+  const createUserProfileIfMissing = async () => {
+    if (!user) {
+      console.log("Aucun utilisateur authentifié, impossible de créer un profil");
+      return;
+    }
+    
+    if (userProfile) {
+      console.log("L'utilisateur a déjà un profil");
+      return;
+    }
+
+    // Vérifier si le profil existe déjà
+    const profile = await fetchUserProfile(user.id);
+    
+    if (profile) {
+      setUserProfile(profile);
+      console.log("Profil existant récupéré:", profile);
+      return;
+    }
+
+    // Si le profil n'existe pas, le créer avec le rôle admin pour le compte spécifique
+    // ou teacher pour les autres comptes
+    const defaultRole: UserRole = user.email === "dagueye82@gmail.com" ? "admin" : "teacher";
+    const newProfile = await createUserProfile(user.id, user.email || "", defaultRole);
+    
+    if (newProfile) {
+      setUserProfile(newProfile);
     }
   };
 
@@ -134,6 +202,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUserProfile(null);
     setSession(null);
     console.log("Déconnexion réussie");
+
+    // Rediriger vers la page d'accueil après la déconnexion
+    window.location.href = "/";
   };
 
   // Helper properties to check user roles
@@ -156,7 +227,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       isLoading, 
       signOut,
       isAdmin,
-      isTeacher
+      isTeacher,
+      createUserProfileIfMissing
     }}>
       {children}
     </AuthContext.Provider>

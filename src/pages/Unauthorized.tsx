@@ -3,11 +3,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Shield, Home } from 'lucide-react';
+import { Shield, Home, UserCog } from 'lucide-react';
 
 const Unauthorized = () => {
   const navigate = useNavigate();
-  const { userProfile } = useAuth();
+  const { userProfile, createUserProfileIfMissing } = useAuth();
+
+  const handleCreateProfile = async () => {
+    await createUserProfileIfMissing();
+    navigate('/');
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
@@ -18,14 +23,25 @@ const Unauthorized = () => {
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Accès non autorisé</h1>
           <p className="mt-2 text-gray-600">
-            Votre compte ({userProfile?.role || 'utilisateur'}) n'a pas les permissions nécessaires pour accéder à cette page.
+            Votre compte ({userProfile?.role || 'sans rôle'}) n'a pas les permissions nécessaires pour accéder à cette page.
           </p>
         </div>
         
         <div className="flex flex-col space-y-3">
+          {!userProfile && (
+            <Button
+              onClick={handleCreateProfile}
+              className="w-full"
+              variant="default"
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Créer mon profil utilisateur
+            </Button>
+          )}
           <Button
             onClick={() => navigate('/')}
             className="w-full"
+            variant={userProfile ? "default" : "outline"}
           >
             <Home className="mr-2 h-4 w-4" />
             Retour à l'accueil

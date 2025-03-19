@@ -1,27 +1,27 @@
 
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { LogOut, User, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, ShieldCheck, BookOpen } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
 
 const UserMenuButton = () => {
-  const { user, signOut, userProfile, isAdmin, isTeacher } = useAuth();
+  const { user, userProfile, signOut, createUserProfileIfMissing } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     try {
-      console.log("Déconnexion desktop en cours...");
+      console.log("Déconnexion en cours...");
       await signOut();
       toast({
         title: "Déconnexion réussie",
@@ -29,7 +29,7 @@ const UserMenuButton = () => {
       });
       navigate('/');
     } catch (error: any) {
-      console.error("Erreur de déconnexion desktop:", error);
+      console.error("Erreur de déconnexion:", error);
       toast({
         variant: "destructive",
         title: "Erreur de déconnexion",
@@ -38,97 +38,66 @@ const UserMenuButton = () => {
     }
   };
 
+  const handleCreateProfile = async () => {
+    await createUserProfileIfMissing();
+    toast({
+      title: "Vérification du profil",
+      description: "Votre profil utilisateur a été vérifié.",
+    });
+  };
+
   if (!user) {
     return (
-      <Button asChild variant="outline" className="flex items-center gap-2">
-        <Link to="/auth">
-          <User className="h-4 w-4" />
-          <span>Se connecter</span>
-        </Link>
+      <Button 
+        onClick={() => navigate('/auth')}
+        className="ml-4"
+        variant="default"
+      >
+        Se connecter
       </Button>
     );
   }
 
-  const getRoleBadge = () => {
-    if (isAdmin) {
-      return <Badge className="ml-2 bg-purple-500">Admin</Badge>;
-    } else if (isTeacher) {
-      return <Badge className="ml-2 bg-blue-500">Enseignant</Badge>;
-    }
-    return null;
-  };
-
   return (
-    <div className="flex items-center gap-3">
-      <Button 
-        onClick={handleSignOut} 
-        variant="outline" 
-        className="flex items-center gap-2 border-red-300 text-red-500 hover:bg-red-50"
-        type="button"
-      >
-        <LogOut className="h-4 w-4" />
-        <span>Déconnexion</span>
-      </Button>
-      
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            <span>{userProfile?.first_name || user.email?.split('@')[0] || 'Utilisateur'}</span>
-            {getRoleBadge()}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>
-            {userProfile?.email || user.email}
-            {getRoleBadge()}
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          
-          {isAdmin && (
-            <>
-              <DropdownMenuItem asChild>
-                <Link to="/school-management">
-                  <ShieldCheck className="h-4 w-4 mr-2" />
-                  Administration
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-            </>
-          )}
-          
-          {isTeacher && (
-            <>
-              <DropdownMenuItem asChild>
-                <Link to="/student-management">
-                  <User className="h-4 w-4 mr-2" />
-                  Gestion des élèves
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/courses">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Cours et exercices
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-            </>
-          )}
-          
-          <DropdownMenuItem asChild>
-            <Link to="/profile">Mon profil</Link>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="h-10 w-10 rounded-full"
+          aria-label="User menu"
+        >
+          <User className="h-5 w-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="flex flex-col items-start">
+          <span className="font-medium">{userProfile?.first_name || user.email}</span>
+          <span className="text-xs text-muted-foreground">{user.email}</span>
+          <span className="text-xs text-muted-foreground mt-1 bg-slate-100 px-2 py-0.5 rounded-full">
+            Rôle: {userProfile?.role || "Non défini"}
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {!userProfile && (
           <DropdownMenuItem 
-            onClick={handleSignOut} 
-            className="text-red-500 cursor-pointer"
+            onSelect={(e) => { e.preventDefault(); handleCreateProfile(); }}
+            className="text-yellow-600 cursor-pointer"
           >
-            <LogOut className="h-4 w-4 mr-2" />
-            Déconnexion
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Créer mon profil</span>
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        )}
+        <DropdownMenuItem 
+          onSelect={(e) => { e.preventDefault(); handleSignOut(e as any); }}
+          className="text-red-600 cursor-pointer"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Déconnexion</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

@@ -22,10 +22,6 @@ const UserMenuButton = () => {
     try {
       console.log("Déconnexion en cours...");
       await signOut();
-      toast({
-        title: "Déconnexion réussie",
-        description: "À bientôt sur Teranga EDU !",
-      });
       // Ne pas utiliser navigate ici, la redirection est gérée dans signOut
     } catch (error: any) {
       console.error("Erreur de déconnexion:", error);

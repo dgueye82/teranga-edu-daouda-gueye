@@ -65,9 +65,6 @@ export const signOutUser = async (): Promise<void> => {
     }
     
     console.log("Déconnexion réussie");
-    
-    // Force une redirection vers la page d'accueil
-    window.location.href = "/";
   } catch (error) {
     console.error("Erreur critique lors de la déconnexion:", error);
     throw error;

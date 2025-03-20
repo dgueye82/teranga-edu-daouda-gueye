@@ -14,7 +14,35 @@ export const useAuthState = () => {
   useEffect(() => {
     let mounted = true;
     
-    // Récupérer la session actuelle
+    // Configurer le listener d'authentification AVANT de vérifier la session existante
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, newSession) => {
+        console.log("Changement d'état d'authentification:", event, newSession?.user?.id);
+        
+        if (!mounted) return;
+        
+        setSession(newSession);
+        
+        if (newSession?.user) {
+          console.log("Nouvel utilisateur authentifié:", newSession.user);
+          setUser(newSession.user);
+          
+          const profile = await fetchUserProfile(newSession.user.id);
+          console.log("Nouveau profil récupéré:", profile);
+          
+          if (!mounted) return;
+          setUserProfile(profile);
+        } else {
+          console.log("Utilisateur déconnecté");
+          setUser(null);
+          setUserProfile(null);
+        }
+        
+        setIsLoading(false);
+      }
+    );
+
+    // Vérifier ensuite s'il y a une session existante
     const getSession = async () => {
       try {
         console.log("Récupération de la session en cours...");
@@ -50,34 +78,6 @@ export const useAuthState = () => {
     };
 
     getSession();
-
-    // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        console.log("Changement d'état d'authentification:", event, newSession?.user?.id);
-        
-        if (!mounted) return;
-        
-        setSession(newSession);
-        
-        if (newSession?.user) {
-          console.log("Nouvel utilisateur authentifié:", newSession.user);
-          setUser(newSession.user);
-          
-          const profile = await fetchUserProfile(newSession.user.id);
-          console.log("Nouveau profil récupéré:", profile);
-          
-          if (!mounted) return;
-          setUserProfile(profile);
-        } else {
-          console.log("Utilisateur déconnecté");
-          setUser(null);
-          setUserProfile(null);
-        }
-        
-        setIsLoading(false);
-      }
-    );
 
     return () => {
       mounted = false;

@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextProps>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user, session, userProfile, isLoading, setUserProfile, setUser, setSession } = useAuthState();
+  const { user, session, userProfile, isLoading, setUserProfile } = useAuthState();
   const { toast } = useToast();
 
   const createUserProfileIfMissing = async () => {
@@ -66,15 +66,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await signOutUser();
       
-      // Nettoyage explicite de l'état local
-      setUser(null);
-      setUserProfile(null);
-      setSession(null);
+      // La mise à jour de l'état est gérée par le listener onAuthStateChange
+      // dans useAuthState.ts
       
       toast({
         title: "Déconnexion réussie",
         description: "À bientôt sur Teranga EDU !",
       });
+      
+      // Force le rechargement de la page pour effacer complètement l'état
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Erreur lors de la déconnexion:", error);
       toast({

@@ -33,6 +33,9 @@ const Unauthorized = () => {
           <p className="mt-2 text-gray-600">
             Votre compte ({user?.email || 'non connecté'}) avec le rôle ({userProfile?.role || 'sans rôle'}) n'a pas les permissions nécessaires pour accéder à cette page.
           </p>
+          <p className="mt-2 text-sm text-gray-500">
+            Note: L'adresse email dagueye82@gmail.com a automatiquement le rôle "admin".
+          </p>
         </div>
         
         <div className="flex flex-col space-y-3">

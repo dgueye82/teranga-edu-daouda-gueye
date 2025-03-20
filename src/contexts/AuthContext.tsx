@@ -45,6 +45,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Si le profil n'existe pas, le créer avec le rôle admin pour le compte spécifique
     // ou teacher pour les autres comptes
     const defaultRole = user.email === "dagueye82@gmail.com" ? "admin" : "teacher";
+    console.log(`Création d'un profil avec le rôle ${defaultRole} pour ${user.email}`);
+    
     const newProfile = await createUserProfile(user.id, user.email || "", defaultRole);
     
     if (newProfile) {
@@ -93,6 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   console.log("État actuel du contexte d'authentification:", { 
     user: user?.id, 
+    email: user?.email,
     isLoading, 
     role: userProfile?.role,
     isAdmin,

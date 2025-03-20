@@ -31,7 +31,7 @@ export const createUserProfile = async (
   role: UserRole = "teacher"
 ): Promise<UserProfile | null> => {
   try {
-    console.log("Création d'un nouveau profil utilisateur pour:", userId);
+    console.log(`Création d'un nouveau profil utilisateur pour: ${userId} avec le rôle: ${role}`);
     
     const { data, error } = await supabase
       .from("user_profiles")

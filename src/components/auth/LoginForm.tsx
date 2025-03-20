@@ -27,6 +27,7 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       
       console.log("Tentative de connexion avec email:", email);
       
+      // Connexion à Supabase
       const data = await signInWithEmailPassword(email, password);
       
       toast({
@@ -34,6 +35,7 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
         description: "Vous êtes maintenant connecté à Teranga EDU",
       });
 
+      // Création ou récupération du profil utilisateur
       console.log("Création du profil si nécessaire...");
       await createUserProfileIfMissing();
       

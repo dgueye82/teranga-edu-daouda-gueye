@@ -17,8 +17,12 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
       return null;
     }
 
-    console.log("Profil utilisateur récupéré:", data);
-    return data as UserProfile;
+    if (data) {
+      console.log("Profil utilisateur récupéré:", data);
+      return data as UserProfile;
+    }
+    
+    return null;
   } catch (error) {
     console.error("Erreur inattendue lors de la récupération du profil utilisateur:", error);
     return null;
@@ -32,6 +36,13 @@ export const createUserProfile = async (
 ): Promise<UserProfile | null> => {
   try {
     console.log(`Création d'un nouveau profil utilisateur pour: ${userId} avec le rôle: ${role}`);
+    
+    // Vérifier si un profil existe déjà pour éviter les doublons
+    const existingProfile = await fetchUserProfile(userId);
+    if (existingProfile) {
+      console.log("Profil utilisateur existant, pas de création nécessaire:", existingProfile);
+      return existingProfile;
+    }
     
     const { data, error } = await supabase
       .from("user_profiles")

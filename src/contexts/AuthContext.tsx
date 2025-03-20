@@ -1,5 +1,5 @@
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthState } from "@/hooks/useAuthState";
 import { createUserProfile, fetchUserProfile, signOutUser } from "@/services/authService";
@@ -22,24 +22,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, session, userProfile, isLoading, setUserProfile } = useAuthState();
   const { toast } = useToast();
 
-  const createUserProfileIfMissing = async () => {
+  const createUserProfileIfMissing = useCallback(async () => {
     if (!user) {
       console.log("Aucun utilisateur authentifié, impossible de créer un profil");
       return;
     }
     
     if (userProfile) {
-      console.log("L'utilisateur a déjà un profil");
-      return;
+      console.log("L'utilisateur a déjà un profil:", userProfile);
+      return userProfile;
     }
 
     // Vérifier si le profil existe déjà
     const profile = await fetchUserProfile(user.id);
     
     if (profile) {
-      setUserProfile(profile);
       console.log("Profil existant récupéré:", profile);
-      return;
+      setUserProfile(profile);
+      return profile;
     }
 
     // Si le profil n'existe pas, le créer avec le rôle admin pour le compte spécifique
@@ -55,14 +55,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         title: "Profil créé",
         description: "Votre profil utilisateur a été créé avec succès.",
       });
+      return newProfile;
     } else {
       toast({
         variant: "destructive",
         title: "Erreur",
         description: "Impossible de créer votre profil utilisateur. Veuillez contacter l'administrateur.",
       });
+      return null;
     }
-  };
+  }, [user, userProfile, setUserProfile, toast]);
 
   const signOut = async () => {
     try {

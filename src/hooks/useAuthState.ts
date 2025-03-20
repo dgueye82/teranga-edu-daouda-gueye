@@ -11,10 +11,21 @@ export const useAuthState = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fonction pour récupérer le profil utilisateur
+  const getProfileForUser = async (userId: string) => {
+    try {
+      const profile = await fetchUserProfile(userId);
+      console.log("Profil récupéré:", profile);
+      setUserProfile(profile);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du profil:", error);
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
     
-    // Configurer le listener d'authentification AVANT de vérifier la session existante
+    // Configurer le listener d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
         console.log("Changement d'état d'authentification:", event, newSession?.user?.id);
@@ -24,14 +35,13 @@ export const useAuthState = () => {
         setSession(newSession);
         
         if (newSession?.user) {
-          console.log("Nouvel utilisateur authentifié:", newSession.user);
+          console.log("Utilisateur authentifié:", newSession.user);
           setUser(newSession.user);
           
-          const profile = await fetchUserProfile(newSession.user.id);
-          console.log("Nouveau profil récupéré:", profile);
-          
-          if (!mounted) return;
-          setUserProfile(profile);
+          // Récupérer le profil uniquement si l'utilisateur est nouveau ou a changé
+          if (!userProfile || userProfile.id !== newSession.user.id) {
+            await getProfileForUser(newSession.user.id);
+          }
         } else {
           console.log("Utilisateur déconnecté");
           setUser(null);
@@ -42,7 +52,7 @@ export const useAuthState = () => {
       }
     );
 
-    // Vérifier ensuite s'il y a une session existante
+    // Vérifier s'il y a une session existante
     const getSession = async () => {
       try {
         console.log("Récupération de la session en cours...");
@@ -58,11 +68,7 @@ export const useAuthState = () => {
           console.log("Utilisateur trouvé dans la session:", data.session.user);
           setUser(data.session.user);
           
-          const profile = await fetchUserProfile(data.session.user.id);
-          console.log("Profil récupéré:", profile);
-          
-          if (!mounted) return;
-          setUserProfile(profile);
+          await getProfileForUser(data.session.user.id);
         } else {
           console.log("Aucun utilisateur dans la session");
           setUser(null);

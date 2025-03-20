@@ -1,10 +1,11 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { signInWithEmailPassword } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LoginFormProps {
   setAuthError: (error: string | null) => void;
@@ -13,6 +14,7 @@ interface LoginFormProps {
 const LoginForm = ({ setAuthError }: LoginFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { createUserProfileIfMissing } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,34 +25,38 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       setLoading(true);
       setAuthError(null);
       
-      console.log("Tentative de connexion avec:", email);
+      console.log("Tentative de connexion avec email:", email);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        console.error("Erreur de connexion:", error);
-        throw error;
-      }
-      
-      console.log("Connexion réussie:", data);
+      const data = await signInWithEmailPassword(email, password);
       
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à Teranga EDU",
       });
+
+      console.log("Création du profil si nécessaire...");
+      await createUserProfileIfMissing();
       
+      console.log("Redirection vers la page d'accueil...");
       navigate("/");
     } catch (error: any) {
-      console.error("Erreur complète:", error);
-      setAuthError(error.message || "Erreur de connexion");
+      console.error("Erreur lors de la connexion:", error);
+      
+      let errorMessage = "Erreur de connexion. Vérifiez vos identifiants.";
+      if (error.message) {
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "Identifiants invalides. Vérifiez votre email et mot de passe.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setAuthError(errorMessage);
       
       toast({
         variant: "destructive",
         title: "Erreur de connexion",
-        description: error.error_description || error.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);

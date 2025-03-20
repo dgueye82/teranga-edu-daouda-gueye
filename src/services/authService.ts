@@ -73,3 +73,58 @@ export const signOutUser = async (): Promise<void> => {
     throw error;
   }
 };
+
+export const signInWithEmailPassword = async (email: string, password: string) => {
+  console.log("Tentative de connexion avec email:", email);
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error("Erreur de connexion:", error);
+      throw error;
+    }
+    
+    console.log("Connexion réussie:", data);
+    return data;
+  } catch (error) {
+    console.error("Erreur complète lors de la connexion:", error);
+    throw error;
+  }
+};
+
+export const signUpWithEmailPassword = async (
+  email: string, 
+  password: string, 
+  firstName: string, 
+  lastName: string
+) => {
+  console.log("Tentative d'inscription avec email:", email);
+  
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+        },
+      },
+    });
+
+    if (error) {
+      console.error("Erreur d'inscription:", error);
+      throw error;
+    }
+    
+    console.log("Inscription réussie:", data);
+    return data;
+  } catch (error) {
+    console.error("Erreur complète lors de l'inscription:", error);
+    throw error;
+  }
+};

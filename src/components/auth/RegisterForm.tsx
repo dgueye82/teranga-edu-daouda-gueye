@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { signUpWithEmailPassword } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -25,36 +25,32 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
       
       console.log("Tentative d'inscription avec:", email, firstName, lastName);
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-          },
-        },
-      });
-
-      if (error) {
-        console.error("Erreur d'inscription:", error);
-        throw error;
-      }
+      const data = await signUpWithEmailPassword(email, password, firstName, lastName);
       
-      console.log("Inscription réussie:", data);
+      console.log("Résultat de l'inscription:", data);
       
       toast({
         title: "Inscription réussie",
         description: "Veuillez vérifier votre email pour confirmer votre compte",
       });
     } catch (error: any) {
-      console.error("Erreur complète:", error);
-      setAuthError(error.message || "Erreur d'inscription");
+      console.error("Erreur d'inscription:", error);
+      
+      let errorMessage = "Erreur d'inscription";
+      if (error.message) {
+        if (error.message.includes("User already registered")) {
+          errorMessage = "Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setAuthError(errorMessage);
       
       toast({
         variant: "destructive",
         title: "Erreur d'inscription",
-        description: error.error_description || error.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);

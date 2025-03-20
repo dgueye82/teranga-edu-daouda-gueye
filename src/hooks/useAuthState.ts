@@ -12,6 +12,8 @@ export const useAuthState = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+    
     // Récupérer la session actuelle
     const getSession = async () => {
       try {
@@ -19,6 +21,8 @@ export const useAuthState = () => {
         
         const { data } = await supabase.auth.getSession();
         console.log("Données de session:", data);
+        
+        if (!mounted) return;
         
         setSession(data.session);
         
@@ -29,6 +33,7 @@ export const useAuthState = () => {
           const profile = await fetchUserProfile(data.session.user.id);
           console.log("Profil récupéré:", profile);
           
+          if (!mounted) return;
           setUserProfile(profile);
         } else {
           console.log("Aucun utilisateur dans la session");
@@ -38,7 +43,9 @@ export const useAuthState = () => {
       } catch (error) {
         console.error("Erreur lors de la récupération de la session:", error);
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -49,6 +56,8 @@ export const useAuthState = () => {
       async (event, newSession) => {
         console.log("Changement d'état d'authentification:", event, newSession?.user?.id);
         
+        if (!mounted) return;
+        
         setSession(newSession);
         
         if (newSession?.user) {
@@ -58,6 +67,7 @@ export const useAuthState = () => {
           const profile = await fetchUserProfile(newSession.user.id);
           console.log("Nouveau profil récupéré:", profile);
           
+          if (!mounted) return;
           setUserProfile(profile);
         } else {
           console.log("Utilisateur déconnecté");
@@ -70,6 +80,7 @@ export const useAuthState = () => {
     );
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);

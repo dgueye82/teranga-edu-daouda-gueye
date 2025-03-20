@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const createUserProfileIfMissing = useCallback(async () => {
     if (!user) {
       console.log("Aucun utilisateur authentifié, impossible de créer un profil");
-      return;
+      return null;
     }
     
     if (userProfile) {
@@ -66,12 +66,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [user, userProfile, setUserProfile, toast]);
 
+  // Wrap the original function to make it void
+  const createUserProfileIfMissingWrapper = useCallback(async (): Promise<void> => {
+    await createUserProfileIfMissing();
+    // Return nothing to match void type
+  }, [createUserProfileIfMissing]);
+
   const signOut = async () => {
     try {
       await signOutUser();
-      
-      // La mise à jour de l'état est gérée par le listener onAuthStateChange
-      // dans useAuthState.ts
       
       toast({
         title: "Déconnexion réussie",
@@ -113,7 +116,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       signOut,
       isAdmin,
       isTeacher,
-      createUserProfileIfMissing
+      createUserProfileIfMissing: createUserProfileIfMissingWrapper
     }}>
       {children}
     </AuthContext.Provider>

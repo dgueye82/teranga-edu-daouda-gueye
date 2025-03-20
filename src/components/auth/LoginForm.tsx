@@ -14,13 +14,15 @@ interface LoginFormProps {
 const LoginForm = ({ setAuthError }: LoginFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { createUserProfileIfMissing } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (loading) return; // Prevent multiple submissions
+    
     try {
       setLoading(true);
       setAuthError(null);
@@ -34,12 +36,7 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à Teranga EDU",
       });
-
-      // Création ou récupération du profil utilisateur
-      console.log("Création du profil si nécessaire...");
-      await createUserProfileIfMissing();
       
-      console.log("Redirection vers la page d'accueil...");
       navigate("/");
     } catch (error: any) {
       console.error("Erreur lors de la connexion:", error);
@@ -78,6 +75,8 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
+          autoComplete="email"
         />
       </div>
       
@@ -92,11 +91,22 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          disabled={loading}
+          autoComplete="current-password"
         />
       </div>
       
-      <Button type="submit" className="w-full bg-teranga-blue" disabled={loading}>
-        {loading ? "Connexion en cours..." : "Se connecter"}
+      <Button 
+        type="submit" 
+        className="w-full bg-teranga-blue" 
+        disabled={loading}
+      >
+        {loading ? 
+          <div className="flex items-center">
+            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            <span>Connexion en cours...</span>
+          </div> 
+        : "Se connecter"}
       </Button>
     </form>
   );

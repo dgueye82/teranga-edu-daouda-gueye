@@ -2,8 +2,17 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { UserProfile, UserRole } from "@/types/auth";
 
+// Cache for user profiles to reduce database calls
+const profileCache: { [key: string]: UserProfile } = {};
+
 export const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
+    // Check if profile is in cache
+    if (profileCache[userId]) {
+      console.log("Profil récupéré du cache pour:", userId);
+      return profileCache[userId];
+    }
+    
     console.log("Récupération du profil utilisateur pour:", userId);
     
     const { data, error } = await supabase
@@ -19,6 +28,8 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
 
     if (data) {
       console.log("Profil utilisateur récupéré:", data);
+      // Store in cache
+      profileCache[userId] = data as UserProfile;
       return data as UserProfile;
     }
     
@@ -37,17 +48,43 @@ export const createUserProfile = async (
   try {
     console.log(`Création d'un nouveau profil utilisateur pour: ${userId} avec le rôle: ${role}`);
     
+    // Force dagueye82@gmail.com to be admin
+    const assignedRole = email === "dagueye82@gmail.com" ? "admin" : role;
+    
     // Vérifier si un profil existe déjà pour éviter les doublons
     const existingProfile = await fetchUserProfile(userId);
     if (existingProfile) {
       console.log("Profil utilisateur existant, pas de création nécessaire:", existingProfile);
+      
+      // If the user should be admin but isn't, update the role
+      if (email === "dagueye82@gmail.com" && existingProfile.role !== "admin") {
+        console.log("Mise à jour du rôle pour dagueye82@gmail.com vers admin");
+        const { data, error } = await supabase
+          .from("user_profiles")
+          .update({ role: "admin" })
+          .eq("id", userId)
+          .select()
+          .single();
+        
+        if (error) {
+          console.error("Erreur lors de la mise à jour du rôle:", error);
+          return existingProfile;
+        }
+        
+        // Update cache
+        if (data) {
+          profileCache[userId] = data as UserProfile;
+          return data as UserProfile;
+        }
+      }
+      
       return existingProfile;
     }
     
     const { data, error } = await supabase
       .from("user_profiles")
       .insert([
-        { id: userId, email, role }
+        { id: userId, email, role: assignedRole }
       ])
       .select()
       .single();
@@ -58,6 +95,12 @@ export const createUserProfile = async (
     }
 
     console.log("Nouveau profil utilisateur créé:", data);
+    
+    // Update cache
+    if (data) {
+      profileCache[userId] = data as UserProfile;
+    }
+    
     return data as UserProfile;
   } catch (error) {
     console.error("Erreur inattendue lors de la création du profil utilisateur:", error);
@@ -65,10 +108,14 @@ export const createUserProfile = async (
   }
 };
 
+// Clear cache on sign out
 export const signOutUser = async (): Promise<void> => {
   try {
     console.log("Tentative de déconnexion");
     const { error } = await supabase.auth.signOut();
+    
+    // Clear the profile cache
+    Object.keys(profileCache).forEach(key => delete profileCache[key]);
     
     if (error) {
       console.error("Erreur lors de la déconnexion:", error);

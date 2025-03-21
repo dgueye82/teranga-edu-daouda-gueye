@@ -84,10 +84,8 @@ export const useAuthState = () => {
           console.log("Utilisateur authentifié:", newSession.user.email);
           setUser(newSession.user);
           
-          // Récupérer le profil uniquement si l'utilisateur est nouveau ou a changé
-          if (!userProfile || userProfile.id !== newSession.user.id) {
-            await getProfileForUser(newSession.user.id);
-          }
+          // Récupérer le profil pour l'utilisateur
+          await getProfileForUser(newSession.user.id);
         } else {
           console.log("Utilisateur déconnecté");
           setUser(null);
@@ -105,7 +103,7 @@ export const useAuthState = () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [userProfile]);
+  }, []);
 
   return { user, session, userProfile, isLoading, setUser, setUserProfile, setSession };
 };

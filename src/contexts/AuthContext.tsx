@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useCallback } from "react";
+import { createContext, useContext, useCallback, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthState } from "@/hooks/useAuthState";
 import { createUserProfile, fetchUserProfile, signOutUser } from "@/services/authService";
@@ -21,6 +21,36 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, session, userProfile, isLoading, setUserProfile } = useAuthState();
   const { toast } = useToast();
+
+  // Check and create profile for admin user if needed
+  useEffect(() => {
+    const ensureAdminProfile = async () => {
+      if (!user || isLoading || userProfile) return;
+      
+      if (user.email === "dagueye82@gmail.com") {
+        console.log("Vérification du profil admin pour:", user.email);
+        const profile = await fetchUserProfile(user.id);
+        
+        if (!profile) {
+          console.log("Création du profil admin pour:", user.email);
+          const newProfile = await createUserProfile(user.id, user.email, "admin");
+          if (newProfile) {
+            setUserProfile(newProfile);
+          }
+        } else if (profile.role !== "admin") {
+          console.log("Mise à jour du profil vers admin pour:", user.email);
+          const updatedProfile = await createUserProfile(user.id, user.email, "admin");
+          if (updatedProfile) {
+            setUserProfile(updatedProfile);
+          }
+        } else {
+          setUserProfile(profile);
+        }
+      }
+    };
+    
+    ensureAdminProfile();
+  }, [user, isLoading, userProfile, setUserProfile]);
 
   const createUserProfileIfMissing = useCallback(async () => {
     if (!user) {
@@ -81,8 +111,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "À bientôt sur Teranga EDU !",
       });
       
-      // Force le rechargement de la page pour effacer complètement l'état
-      window.location.href = "/";
+      // La redirection est gérée dans signOutUser
     } catch (error: any) {
       console.error("Erreur lors de la déconnexion:", error);
       toast({

@@ -22,7 +22,7 @@ const UserMenuButton = () => {
     try {
       console.log("Déconnexion en cours...");
       await signOut();
-      // Ne pas utiliser navigate ici, la redirection est gérée dans signOut
+      // La redirection est maintenant gérée dans signOutUser directement
     } catch (error: any) {
       console.error("Erreur de déconnexion:", error);
       toast({
@@ -34,11 +34,22 @@ const UserMenuButton = () => {
   };
 
   const handleCreateProfile = async () => {
-    await createUserProfileIfMissing();
-    toast({
-      title: "Vérification du profil",
-      description: "Votre profil utilisateur a été vérifié.",
-    });
+    try {
+      await createUserProfileIfMissing();
+      toast({
+        title: "Vérification du profil",
+        description: "Votre profil utilisateur a été vérifié.",
+      });
+      // Force reload to refresh UI after profile creation
+      window.location.reload();
+    } catch (error: any) {
+      console.error("Erreur lors de la création du profil:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de créer votre profil utilisateur.",
+      });
+    }
   };
 
   console.log("UserMenuButton - Auth state:", { 
@@ -84,7 +95,7 @@ const UserMenuButton = () => {
         <DropdownMenuSeparator />
         {!userProfile && (
           <DropdownMenuItem 
-            onSelect={(e) => { e.preventDefault(); handleCreateProfile(); }}
+            onClick={handleCreateProfile}
             className="text-yellow-600 cursor-pointer"
           >
             <Settings className="mr-2 h-4 w-4" />

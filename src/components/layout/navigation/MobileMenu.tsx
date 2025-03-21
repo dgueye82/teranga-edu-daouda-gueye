@@ -20,11 +20,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
     try {
       console.log("Déconnexion mobile en cours...");
       await signOut();
-      toast({
-        title: "Déconnexion réussie",
-        description: "À bientôt sur Teranga EDU !",
-      });
-      // Ne pas utiliser navigate ici, la redirection est gérée dans signOut
+      // La redirection est gérée dans signOutUser directement
       onClose();
     } catch (error: any) {
       console.error("Erreur de déconnexion mobile:", error);

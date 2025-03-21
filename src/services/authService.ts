@@ -54,7 +54,7 @@ export const createUserProfile = async (
     // Vérifier si un profil existe déjà pour éviter les doublons
     const existingProfile = await fetchUserProfile(userId);
     if (existingProfile) {
-      console.log("Profil utilisateur existant, pas de création nécessaire:", existingProfile);
+      console.log("Profil utilisateur existant:", existingProfile);
       
       // If the user should be admin but isn't, update the role
       if (email === "dagueye82@gmail.com" && existingProfile.role !== "admin") {
@@ -123,6 +123,9 @@ export const signOutUser = async (): Promise<void> => {
     }
     
     console.log("Déconnexion réussie");
+    
+    // Force the page to reload to clear all state
+    window.location.href = "/";
   } catch (error) {
     console.error("Erreur critique lors de la déconnexion:", error);
     throw error;

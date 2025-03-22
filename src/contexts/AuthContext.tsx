@@ -50,6 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       // First check if profile already exists
+      console.log("Checking for existing profile for user:", user.id);
       const existingProfile = await fetchUserProfile(user.id);
       
       if (existingProfile) {

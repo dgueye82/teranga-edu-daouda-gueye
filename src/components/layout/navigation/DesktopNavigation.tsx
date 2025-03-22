@@ -1,15 +1,16 @@
 
+import { useEffect } from "react";
 import NavLink from "./NavLink";
 import UserMenuButton from "../UserMenuButton";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
 
 const DesktopNavigation = () => {
   const { userProfile, isAdmin, isTeacher, user, createUserProfileIfMissing } = useAuth();
   
   useEffect(() => {
     if (user && !userProfile) {
+      console.log("Attempting to create user profile for:", user.email);
       createUserProfileIfMissing();
     }
   }, [user, userProfile, createUserProfileIfMissing]);

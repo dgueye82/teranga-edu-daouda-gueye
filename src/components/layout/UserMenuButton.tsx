@@ -17,19 +17,23 @@ const UserMenuButton = () => {
   const { user, userProfile, signOut, createUserProfileIfMissing, isAdmin, isTeacher } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
     try {
-      console.log("Déconnexion en cours...");
+      setIsSigningOut(true);
+      console.log("Signing out...");
       await signOut();
-      // La redirection est maintenant gérée dans signOutUser directement
+      // Redirect is handled in signOutUser
     } catch (error: any) {
-      console.error("Erreur de déconnexion:", error);
+      console.error("Sign out error:", error);
       toast({
         variant: "destructive",
         title: "Erreur de déconnexion",
         description: error.message || "Une erreur est survenue lors de la déconnexion",
       });
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -40,10 +44,10 @@ const UserMenuButton = () => {
         title: "Vérification du profil",
         description: "Votre profil utilisateur a été vérifié.",
       });
-      // Force reload to refresh UI after profile creation
+      // Force reload to refresh UI
       window.location.reload();
     } catch (error: any) {
-      console.error("Erreur lors de la création du profil:", error);
+      console.error("Error creating profile:", error);
       toast({
         variant: "destructive",
         title: "Erreur",
@@ -105,9 +109,19 @@ const UserMenuButton = () => {
         <DropdownMenuItem 
           onClick={handleSignOut}
           className="text-red-600 cursor-pointer"
+          disabled={isSigningOut}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Déconnexion</span>
+          {isSigningOut ? (
+            <>
+              <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
+              <span>Déconnexion en cours...</span>
+            </>
+          ) : (
+            <>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Déconnexion</span>
+            </>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -2,18 +2,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { UserProfile, UserRole } from "@/types/auth";
 
-// Cache for user profiles to reduce database calls
-const profileCache: { [key: string]: UserProfile } = {};
-
 export const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
-    // Check if profile is in cache
-    if (profileCache[userId]) {
-      console.log("Profil récupéré du cache pour:", userId);
-      return profileCache[userId];
-    }
-    
-    console.log("Récupération du profil utilisateur pour:", userId);
+    console.log("Fetching user profile for:", userId);
     
     const { data, error } = await supabase
       .from("user_profiles")
@@ -22,20 +13,18 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
       .single();
 
     if (error) {
-      console.error("Erreur lors de la récupération du profil utilisateur:", error);
+      console.error("Error fetching user profile:", error);
       return null;
     }
 
     if (data) {
-      console.log("Profil utilisateur récupéré:", data);
-      // Store in cache
-      profileCache[userId] = data as UserProfile;
+      console.log("User profile retrieved:", data);
       return data as UserProfile;
     }
     
     return null;
   } catch (error) {
-    console.error("Erreur inattendue lors de la récupération du profil utilisateur:", error);
+    console.error("Unexpected error fetching user profile:", error);
     return null;
   }
 };
@@ -46,19 +35,19 @@ export const createUserProfile = async (
   role: UserRole = "teacher"
 ): Promise<UserProfile | null> => {
   try {
-    console.log(`Création d'un nouveau profil utilisateur pour: ${userId} avec le rôle: ${role}`);
+    console.log(`Creating new user profile for: ${userId} with role: ${role}`);
     
     // Force dagueye82@gmail.com to be admin
     const assignedRole = email === "dagueye82@gmail.com" ? "admin" : role;
     
-    // Vérifier si un profil existe déjà pour éviter les doublons
+    // Check if profile already exists
     const existingProfile = await fetchUserProfile(userId);
     if (existingProfile) {
-      console.log("Profil utilisateur existant:", existingProfile);
+      console.log("User profile already exists:", existingProfile);
       
       // If the user should be admin but isn't, update the role
       if (email === "dagueye82@gmail.com" && existingProfile.role !== "admin") {
-        console.log("Mise à jour du rôle pour dagueye82@gmail.com vers admin");
+        console.log("Updating role for dagueye82@gmail.com to admin");
         const { data, error } = await supabase
           .from("user_profiles")
           .update({ role: "admin" })
@@ -67,13 +56,11 @@ export const createUserProfile = async (
           .single();
         
         if (error) {
-          console.error("Erreur lors de la mise à jour du rôle:", error);
+          console.error("Error updating role:", error);
           return existingProfile;
         }
         
-        // Update cache
         if (data) {
-          profileCache[userId] = data as UserProfile;
           return data as UserProfile;
         }
       }
@@ -90,50 +77,40 @@ export const createUserProfile = async (
       .single();
 
     if (error) {
-      console.error("Erreur lors de la création du profil utilisateur:", error);
+      console.error("Error creating user profile:", error);
       return null;
     }
 
-    console.log("Nouveau profil utilisateur créé:", data);
-    
-    // Update cache
-    if (data) {
-      profileCache[userId] = data as UserProfile;
-    }
-    
+    console.log("New user profile created:", data);
     return data as UserProfile;
   } catch (error) {
-    console.error("Erreur inattendue lors de la création du profil utilisateur:", error);
+    console.error("Unexpected error creating user profile:", error);
     return null;
   }
 };
 
-// Clear cache on sign out
 export const signOutUser = async (): Promise<void> => {
   try {
-    console.log("Tentative de déconnexion");
+    console.log("Attempting to sign out");
     const { error } = await supabase.auth.signOut();
     
-    // Clear the profile cache
-    Object.keys(profileCache).forEach(key => delete profileCache[key]);
-    
     if (error) {
-      console.error("Erreur lors de la déconnexion:", error);
+      console.error("Error signing out:", error);
       throw error;
     }
     
-    console.log("Déconnexion réussie");
+    console.log("Sign out successful");
     
-    // Force the page to reload to clear all state
+    // Force page reload to clear all state
     window.location.href = "/";
   } catch (error) {
-    console.error("Erreur critique lors de la déconnexion:", error);
+    console.error("Critical error during sign out:", error);
     throw error;
   }
 };
 
 export const signInWithEmailPassword = async (email: string, password: string) => {
-  console.log("Tentative de connexion avec email:", email);
+  console.log("Attempting to sign in with email:", email);
   
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -142,14 +119,14 @@ export const signInWithEmailPassword = async (email: string, password: string) =
     });
 
     if (error) {
-      console.error("Erreur de connexion:", error);
+      console.error("Sign in error:", error);
       throw error;
     }
     
-    console.log("Connexion réussie:", data);
+    console.log("Sign in successful:", data);
     return data;
   } catch (error) {
-    console.error("Erreur complète lors de la connexion:", error);
+    console.error("Complete error during sign in:", error);
     throw error;
   }
 };
@@ -158,11 +135,15 @@ export const signUpWithEmailPassword = async (
   email: string, 
   password: string, 
   firstName: string, 
-  lastName: string
+  lastName: string,
+  role: UserRole = "teacher"
 ) => {
-  console.log("Tentative d'inscription avec email:", email);
+  console.log("Attempting to sign up with email:", email);
   
   try {
+    // Force admin role for specific email
+    const actualRole = email === "dagueye82@gmail.com" ? "admin" : role;
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -170,19 +151,26 @@ export const signUpWithEmailPassword = async (
         data: {
           first_name: firstName,
           last_name: lastName,
+          role: actualRole
         },
       },
     });
 
     if (error) {
-      console.error("Erreur d'inscription:", error);
+      console.error("Sign up error:", error);
       throw error;
     }
     
-    console.log("Inscription réussie:", data);
+    console.log("Sign up successful:", data);
+    
+    // Create user profile immediately after signup
+    if (data.user) {
+      await createUserProfile(data.user.id, email, actualRole);
+    }
+    
     return data;
   } catch (error) {
-    console.error("Erreur complète lors de l'inscription:", error);
+    console.error("Complete error during sign up:", error);
     throw error;
   }
 };

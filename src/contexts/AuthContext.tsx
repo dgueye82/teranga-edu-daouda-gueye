@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useCallback, useEffect } from "react";
+import { createContext, useContext, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthState } from "@/hooks/useAuthState";
 import { createUserProfile, fetchUserProfile, signOutUser } from "@/services/authService";
@@ -22,85 +22,58 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, session, userProfile, isLoading, setUserProfile } = useAuthState();
   const { toast } = useToast();
 
-  // Check and create profile for admin user if needed
-  useEffect(() => {
-    const ensureAdminProfile = async () => {
-      if (!user || isLoading || userProfile) return;
-      
-      if (user.email === "dagueye82@gmail.com") {
-        console.log("Vérification du profil admin pour:", user.email);
-        const profile = await fetchUserProfile(user.id);
-        
-        if (!profile) {
-          console.log("Création du profil admin pour:", user.email);
-          const newProfile = await createUserProfile(user.id, user.email, "admin");
-          if (newProfile) {
-            setUserProfile(newProfile);
-          }
-        } else if (profile.role !== "admin") {
-          console.log("Mise à jour du profil vers admin pour:", user.email);
-          const updatedProfile = await createUserProfile(user.id, user.email, "admin");
-          if (updatedProfile) {
-            setUserProfile(updatedProfile);
-          }
-        } else {
-          setUserProfile(profile);
-        }
-      }
-    };
-    
-    ensureAdminProfile();
-  }, [user, isLoading, userProfile, setUserProfile]);
-
-  const createUserProfileIfMissing = useCallback(async () => {
+  const createUserProfileIfMissing = useCallback(async (): Promise<void> => {
     if (!user) {
-      console.log("Aucun utilisateur authentifié, impossible de créer un profil");
-      return null;
+      console.log("No authenticated user, cannot create profile");
+      return;
     }
     
-    if (userProfile) {
-      console.log("L'utilisateur a déjà un profil:", userProfile);
-      return userProfile;
-    }
+    try {
+      if (userProfile) {
+        console.log("User already has a profile:", userProfile);
+        return;
+      }
 
-    // Vérifier si le profil existe déjà
-    const profile = await fetchUserProfile(user.id);
-    
-    if (profile) {
-      console.log("Profil existant récupéré:", profile);
-      setUserProfile(profile);
-      return profile;
-    }
+      // First check if profile already exists
+      const existingProfile = await fetchUserProfile(user.id);
+      
+      if (existingProfile) {
+        console.log("Existing profile found:", existingProfile);
+        setUserProfile(existingProfile);
+        return;
+      }
 
-    // Si le profil n'existe pas, le créer avec le rôle admin pour le compte spécifique
-    // ou teacher pour les autres comptes
-    const defaultRole = user.email === "dagueye82@gmail.com" ? "admin" : "teacher";
-    console.log(`Création d'un profil avec le rôle ${defaultRole} pour ${user.email}`);
-    
-    const newProfile = await createUserProfile(user.id, user.email || "", defaultRole);
-    
-    if (newProfile) {
-      setUserProfile(newProfile);
-      toast({
-        title: "Profil créé",
-        description: "Votre profil utilisateur a été créé avec succès.",
-      });
-      return newProfile;
-    } else {
+      // Special case for admin email
+      const defaultRole = user.email === "dagueye82@gmail.com" ? "admin" : "teacher";
+      console.log(`Creating profile with role ${defaultRole} for ${user.email}`);
+      
+      const newProfile = await createUserProfile(user.id, user.email || "", defaultRole);
+      
+      if (newProfile) {
+        setUserProfile(newProfile);
+        toast({
+          title: "Profil créé",
+          description: "Votre profil utilisateur a été créé avec succès.",
+        });
+        
+        // Force reload to ensure all components get updated
+        window.location.reload();
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erreur",
+          description: "Impossible de créer votre profil utilisateur.",
+        });
+      }
+    } catch (error) {
+      console.error("Error creating user profile:", error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: "Impossible de créer votre profil utilisateur. Veuillez contacter l'administrateur.",
+        title: "Erreur de profil",
+        description: "Une erreur est survenue lors de la création de votre profil.",
       });
-      return null;
     }
   }, [user, userProfile, setUserProfile, toast]);
-
-  // Wrap the original function to make it void
-  const createUserProfileIfMissingWrapper = useCallback(async (): Promise<void> => {
-    await createUserProfileIfMissing();
-    // Return nothing to match void type
-  }, [createUserProfileIfMissing]);
 
   const signOut = async () => {
     try {
@@ -111,9 +84,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "À bientôt sur Teranga EDU !",
       });
       
-      // La redirection est gérée dans signOutUser
+      // Redirect handled in signOutUser
     } catch (error: any) {
-      console.error("Erreur lors de la déconnexion:", error);
+      console.error("Error during sign out:", error);
       toast({
         variant: "destructive",
         title: "Erreur de déconnexion",
@@ -127,8 +100,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isAdmin = userProfile?.role === "admin";
   const isTeacher = userProfile?.role === "teacher";
 
-  console.log("État actuel du contexte d'authentification:", { 
-    user: user?.id, 
+  console.log("Current auth context state:", { 
+    userId: user?.id, 
     email: user?.email,
     isLoading, 
     role: userProfile?.role,
@@ -145,7 +118,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       signOut,
       isAdmin,
       isTeacher,
-      createUserProfileIfMissing: createUserProfileIfMissingWrapper
+      createUserProfileIfMissing
     }}>
       {children}
     </AuthContext.Provider>

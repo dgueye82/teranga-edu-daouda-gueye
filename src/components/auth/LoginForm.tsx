@@ -5,7 +5,6 @@ import { signInWithEmailPassword } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface LoginFormProps {
   setAuthError: (error: string | null) => void;
@@ -27,9 +26,9 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       setLoading(true);
       setAuthError(null);
       
-      console.log("Tentative de connexion avec email:", email);
+      console.log("Attempting to sign in with email:", email);
       
-      // Connexion à Supabase
+      // Sign in with Supabase
       const data = await signInWithEmailPassword(email, password);
       
       toast({
@@ -37,9 +36,10 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
         description: "Vous êtes maintenant connecté à Teranga EDU",
       });
       
-      navigate("/");
+      // Force reload to ensure all components get the updated state
+      window.location.href = "/";
     } catch (error: any) {
-      console.error("Erreur lors de la connexion:", error);
+      console.error("Error during sign in:", error);
       
       let errorMessage = "Erreur de connexion. Vérifiez vos identifiants.";
       if (error.message) {
@@ -102,7 +102,7 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
         disabled={loading}
       >
         {loading ? 
-          <div className="flex items-center">
+          <div className="flex items-center justify-center">
             <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
             <span>Connexion en cours...</span>
           </div> 

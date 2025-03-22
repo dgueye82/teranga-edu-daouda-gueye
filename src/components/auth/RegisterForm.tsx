@@ -4,6 +4,8 @@ import { signUpWithEmailPassword } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { UserRole } from "@/types/auth";
 
 interface RegisterFormProps {
   setAuthError: (error: string | null) => void;
@@ -16,6 +18,7 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [role, setRole] = useState<UserRole>("teacher");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,18 +26,18 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
       setLoading(true);
       setAuthError(null);
       
-      console.log("Tentative d'inscription avec:", email, firstName, lastName);
+      console.log("Attempting to register with:", email, firstName, lastName, role);
       
-      const data = await signUpWithEmailPassword(email, password, firstName, lastName);
+      const data = await signUpWithEmailPassword(email, password, firstName, lastName, role);
       
-      console.log("Résultat de l'inscription:", data);
+      console.log("Registration result:", data);
       
       toast({
         title: "Inscription réussie",
         description: "Veuillez vérifier votre email pour confirmer votre compte",
       });
     } catch (error: any) {
-      console.error("Erreur d'inscription:", error);
+      console.error("Registration error:", error);
       
       let errorMessage = "Erreur d'inscription";
       if (error.message) {
@@ -118,8 +121,36 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
         />
       </div>
       
+      <div>
+        <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+          Rôle
+        </label>
+        <Select
+          value={role}
+          onValueChange={(value) => setRole(value as UserRole)}
+        >
+          <SelectTrigger id="role" className="w-full">
+            <SelectValue placeholder="Sélectionnez un rôle" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="admin">Administrateur</SelectItem>
+            <SelectItem value="teacher">Professeur</SelectItem>
+            <SelectItem value="student">Élève</SelectItem>
+            <SelectItem value="parent">Parent</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-gray-500 mt-1">
+          Note: L'email dagueye82@gmail.com est automatiquement assigné le rôle "admin".
+        </p>
+      </div>
+      
       <Button type="submit" className="w-full bg-teranga-blue" disabled={loading}>
-        {loading ? "Inscription en cours..." : "S'inscrire"}
+        {loading ? (
+          <div className="flex items-center justify-center">
+            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            <span>Inscription en cours...</span>
+          </div>
+        ) : "S'inscrire"}
       </Button>
     </form>
   );

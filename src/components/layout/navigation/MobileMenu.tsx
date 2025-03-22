@@ -1,11 +1,6 @@
 
-import { X, LogOut } from "lucide-react";
+import { X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -13,39 +8,6 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const { user, signOut, isAdmin, isTeacher, userProfile, createUserProfileIfMissing } = useAuth();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user && !userProfile) {
-      createUserProfileIfMissing();
-    }
-  }, [user, userProfile, createUserProfileIfMissing]);
-
-  const handleSignOut = async () => {
-    try {
-      console.log("Déconnexion mobile en cours...");
-      await signOut();
-      // La redirection est gérée dans signOutUser directement
-      onClose();
-    } catch (error: any) {
-      console.error("Erreur de déconnexion mobile:", error);
-      toast({
-        variant: "destructive",
-        title: "Erreur de déconnexion",
-        description: error.message || "Une erreur est survenue lors de la déconnexion",
-      });
-    }
-  };
-
-  console.log("MobileMenu - Auth state:", { 
-    isAdmin, 
-    isTeacher, 
-    userProfile,
-    email: user?.email
-  });
-
   return (
     <div
       className={`fixed inset-0 lg:hidden bg-white z-40 transform transition-transform duration-300 ease-in-out ${
@@ -68,24 +30,15 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <Link to="/about" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           À propos
         </Link>
-        
-        {isAdmin && (
-          <>
-            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-              Gérer l'école
-            </Link>
-            <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-              Gérer le personnel
-            </Link>
-          </>
-        )}
-        
-        {(isAdmin || isTeacher) && (
-          <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-            Gérer l'élève
-          </Link>
-        )}
-        
+        <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Gérer l'école
+        </Link>
+        <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Gérer le personnel
+        </Link>
+        <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Gérer l'élève
+        </Link>
         <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Formation en ligne
         </Link>
@@ -95,22 +48,6 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <Link to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Portails parents
         </Link>
-        
-        {user ? (
-          <Button 
-            onClick={handleSignOut}
-            className="flex items-center py-2 gap-2 text-lg font-medium text-red-500 justify-start"
-            variant="outline"
-            type="button"
-          >
-            <LogOut className="h-5 w-5" />
-            Déconnexion
-          </Button>
-        ) : (
-          <Link to="/auth" className="py-2 text-lg font-medium border-b border-gray-100 text-blue-600" onClick={onClose}>
-            Se connecter
-          </Link>
-        )}
       </div>
     </div>
   );

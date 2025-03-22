@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -12,9 +13,15 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const { user, signOut, isAdmin, isTeacher } = useAuth();
+  const { user, signOut, isAdmin, isTeacher, userProfile, createUserProfileIfMissing } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && !userProfile) {
+      createUserProfileIfMissing();
+    }
+  }, [user, userProfile, createUserProfileIfMissing]);
 
   const handleSignOut = async () => {
     try {
@@ -32,7 +39,12 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
     }
   };
 
-  console.log("MobileMenu - Auth state:", { isAdmin, isTeacher });
+  console.log("MobileMenu - Auth state:", { 
+    isAdmin, 
+    isTeacher, 
+    userProfile,
+    email: user?.email
+  });
 
   return (
     <div

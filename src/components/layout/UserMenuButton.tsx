@@ -25,7 +25,8 @@ const UserMenuButton = () => {
       setIsSigningOut(true);
       console.log("Signing out...");
       await signOut();
-      // Redirect is handled in signOutUser
+      // Force page reload to clear all states
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Sign out error:", error);
       toast({
@@ -61,7 +62,8 @@ const UserMenuButton = () => {
     userEmail: user?.email,
     userProfile,
     isAdmin,
-    isTeacher
+    isTeacher,
+    role: userProfile?.role
   });
 
   if (!user) {

@@ -3,14 +3,23 @@ import NavLink from "./NavLink";
 import UserMenuButton from "../UserMenuButton";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 const DesktopNavigation = () => {
-  const { userProfile, isAdmin, isTeacher } = useAuth();
+  const { userProfile, isAdmin, isTeacher, user, createUserProfileIfMissing } = useAuth();
+  
+  useEffect(() => {
+    if (user && !userProfile) {
+      createUserProfileIfMissing();
+    }
+  }, [user, userProfile, createUserProfileIfMissing]);
+  
   console.log("DesktopNavigation - User Profile:", { 
     userProfile, 
     isAdmin, 
     isTeacher, 
-    role: userProfile?.role 
+    role: userProfile?.role,
+    email: user?.email
   });
   
   return (

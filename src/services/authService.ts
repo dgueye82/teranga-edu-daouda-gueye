@@ -61,6 +61,7 @@ export const createUserProfile = async (
         }
         
         if (data) {
+          console.log("Profile updated with admin role:", data);
           return data as UserProfile;
         }
       }

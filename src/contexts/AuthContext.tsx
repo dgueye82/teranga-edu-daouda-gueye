@@ -31,6 +31,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       if (userProfile) {
         console.log("User already has a profile:", userProfile);
+        
+        // Special case for admin email - make sure they always have admin role
+        if (user.email === "dagueye82@gmail.com" && userProfile.role !== "admin") {
+          console.log("Updating dagueye82@gmail.com to admin role");
+          const updatedProfile = await createUserProfile(user.id, user.email || "", "admin");
+          if (updatedProfile) {
+            setUserProfile(updatedProfile);
+            toast({
+              title: "Rôle mis à jour",
+              description: "Votre rôle a été mis à jour en admin.",
+            });
+            // Force reload
+            window.location.reload();
+          }
+        }
         return;
       }
 
@@ -39,6 +54,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (existingProfile) {
         console.log("Existing profile found:", existingProfile);
+        
+        // Special case for admin email - make sure they always have admin role
+        if (user.email === "dagueye82@gmail.com" && existingProfile.role !== "admin") {
+          console.log("Updating dagueye82@gmail.com to admin role");
+          const updatedProfile = await createUserProfile(user.id, user.email || "", "admin");
+          if (updatedProfile) {
+            setUserProfile(updatedProfile);
+            toast({
+              title: "Rôle mis à jour",
+              description: "Votre rôle a été mis à jour en admin.",
+            });
+            // Force reload
+            window.location.reload();
+            return;
+          }
+        }
+        
         setUserProfile(existingProfile);
         return;
       }
@@ -84,7 +116,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "À bientôt sur Teranga EDU !",
       });
       
-      // Redirect handled in signOutUser
+      // Force page reload to clear all states
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Error during sign out:", error);
       toast({
@@ -96,7 +129,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Helper properties to check user roles
+  // Helper properties to check user roles - guaranteed to be accurate
   const isAdmin = userProfile?.role === "admin";
   const isTeacher = userProfile?.role === "teacher";
 

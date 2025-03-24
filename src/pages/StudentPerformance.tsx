@@ -1,9 +1,9 @@
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudentById } from "@/services/student";
-import { getStudentPerformances, createStudentPerformance, updateStudentPerformance, deleteStudentPerformance } from "@/services/student/performanceService";
+import { getStudentPerformances, createStudentPerformance, updateStudentPerformance, deleteStudentPerformance, calculateStudentAverage } from "@/services/student/performanceService";
 import { StudentPerformance as StudentPerformanceType, StudentPerformanceFormData } from "@/types/student";
 import Navbar from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,19 @@ const StudentPerformance = () => {
   const queryClient = useQueryClient();
   const [performanceFormOpen, setPerformanceFormOpen] = useState(false);
   const [editingPerformance, setEditingPerformance] = useState<StudentPerformanceType | null>(null);
+  const [averageInfo, setAverageInfo] = useState<{
+    overallAverage: number;
+    percentage: number;
+    totalGrade: number;
+    totalMaxGrade: number;
+    subjectAverages: Array<{
+      subject: string;
+      average: number;
+      maxGrade: number;
+      percentage: number;
+      count: number;
+    }>;
+  } | null>(null);
 
   const { data: student, isLoading: isLoadingStudent } = useQuery({
     queryKey: ["student", id],
@@ -42,6 +55,21 @@ const StudentPerformance = () => {
     queryFn: () => getStudentPerformances(id!),
     enabled: !!id,
   });
+
+  // Fetch the average calculations
+  useEffect(() => {
+    const fetchAverages = async () => {
+      if (!id) return;
+      try {
+        const averageData = await calculateStudentAverage(id);
+        setAverageInfo(averageData);
+      } catch (error) {
+        console.error("Error calculating averages:", error);
+      }
+    };
+    
+    fetchAverages();
+  }, [id, performances]);
 
   const createPerformanceMutation = useMutation({
     mutationFn: createStudentPerformance,
@@ -81,67 +109,16 @@ const StudentPerformance = () => {
     },
   });
 
-  // Calculate subject averages
-  const subjectAverages = useMemo(() => {
-    const subjectMap = new Map<string, { totalGrade: number; totalMaxGrade: number; count: number }>();
-    
-    performances.forEach((performance) => {
-      const subject = performance.subject;
-      const grade = performance.grade;
-      const maxGrade = performance.max_grade;
-      
-      if (!subjectMap.has(subject)) {
-        subjectMap.set(subject, { totalGrade: 0, totalMaxGrade: 0, count: 0 });
-      }
-      
-      const current = subjectMap.get(subject)!;
-      subjectMap.set(subject, {
-        totalGrade: current.totalGrade + grade,
-        totalMaxGrade: current.totalMaxGrade + maxGrade,
-        count: current.count + 1,
-      });
-    });
-    
-    const result = Array.from(subjectMap.entries()).map(([subject, data]) => {
-      const averageGrade = data.totalGrade / data.count;
-      const averageMaxGrade = data.totalMaxGrade / data.count;
-      const percentage = (averageGrade / averageMaxGrade) * 100;
-      
-      return {
-        subject,
-        averageGrade: averageGrade.toFixed(2),
-        averageMaxGrade: averageMaxGrade.toFixed(2),
-        percentage: percentage.toFixed(2),
-        count: data.count,
-      };
-    });
-    
-    return result;
-  }, [performances]);
-  
-  // Calculate overall average
-  const overallAverage = useMemo(() => {
-    if (performances.length === 0) return { grade: "0", maxGrade: "0", percentage: "0" };
-    
-    const totalGrade = performances.reduce((sum, perf) => sum + perf.grade, 0);
-    const totalMaxGrade = performances.reduce((sum, perf) => sum + perf.max_grade, 0);
-    const percentage = totalMaxGrade > 0 ? (totalGrade / totalMaxGrade) * 100 : 0;
-    
-    return {
-      grade: (totalGrade / performances.length).toFixed(2),
-      maxGrade: (totalMaxGrade / performances.length).toFixed(2),
-      percentage: percentage.toFixed(2),
-    };
-  }, [performances]);
-
   // Prepare chart data
   const chartData = useMemo(() => {
-    return subjectAverages.map(subject => ({
+    if (!averageInfo) return [];
+    
+    return averageInfo.subjectAverages.map(subject => ({
       name: subject.subject,
-      moyenne: parseFloat(subject.averageGrade),
-      percentage: parseFloat(subject.percentage),
+      moyenne: subject.average,
+      percentage: subject.percentage,
     }));
-  }, [subjectAverages]);
+  }, [averageInfo]);
 
   const handleEditPerformance = (performance: StudentPerformanceType) => {
     setEditingPerformance(performance);
@@ -196,12 +173,30 @@ const StudentPerformance = () => {
     );
   }
 
+  // Calculate summary data for the card
+  const summaryData = averageInfo ? {
+    grade: averageInfo.overallAverage.toFixed(2),
+    maxGrade: "20",
+    percentage: averageInfo.percentage.toFixed(2)
+  } : {
+    grade: "0",
+    maxGrade: "0",
+    percentage: "0"
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="container mx-auto px-4 py-8 mt-16">
-        <StudentPerformanceHeader student={student} id={id!} />
-        <PerformanceSummaryCard overallAverage={overallAverage} />
+        <StudentPerformanceHeader 
+          student={student} 
+          id={id!} 
+          averageInfo={averageInfo ? {
+            overallAverage: averageInfo.overallAverage,
+            percentage: averageInfo.percentage
+          } : undefined}
+        />
+        <PerformanceSummaryCard overallAverage={summaryData} />
 
         <Tabs defaultValue="list" className="space-y-4">
           <div className="flex items-center justify-between">
@@ -233,7 +228,13 @@ const StudentPerformance = () => {
 
           <TabsContent value="subjects">
             <SubjectsTab 
-              subjectAverages={subjectAverages}
+              subjectAverages={averageInfo?.subjectAverages.map(subj => ({
+                subject: subj.subject,
+                averageGrade: subj.average.toFixed(2),
+                averageMaxGrade: subj.maxGrade.toFixed(2),
+                percentage: subj.percentage.toFixed(2),
+                count: subj.count
+              })) || []}
               isLoadingPerformances={isLoadingPerformances}
             />
           </TabsContent>

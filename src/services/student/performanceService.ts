@@ -69,3 +69,77 @@ export const deleteStudentPerformance = async (id: string): Promise<void> => {
     throw new Error(error.message);
   }
 };
+
+export const calculateStudentAverage = async (studentId: string): Promise<{
+  overallAverage: number;
+  totalGrade: number;
+  totalMaxGrade: number;
+  percentage: number;
+  subjectAverages: {
+    subject: string;
+    average: number;
+    maxGrade: number;
+    percentage: number;
+    count: number;
+  }[];
+}> => {
+  const performances = await getStudentPerformances(studentId);
+  
+  if (performances.length === 0) {
+    return {
+      overallAverage: 0,
+      totalGrade: 0,
+      totalMaxGrade: 0,
+      percentage: 0,
+      subjectAverages: []
+    };
+  }
+  
+  // Calculate the overall average
+  const totalGrade = performances.reduce((sum, perf) => sum + perf.grade, 0);
+  const totalMaxGrade = performances.reduce((sum, perf) => sum + perf.max_grade, 0);
+  const overallAverage = totalGrade / performances.length;
+  const percentage = (totalGrade / totalMaxGrade) * 100;
+  
+  // Calculate averages by subject
+  const subjectMap = new Map<string, { totalGrade: number; totalMaxGrade: number; count: number }>();
+  
+  performances.forEach((performance) => {
+    const subject = performance.subject;
+    const grade = performance.grade;
+    const maxGrade = performance.max_grade;
+    
+    if (!subjectMap.has(subject)) {
+      subjectMap.set(subject, { totalGrade: 0, totalMaxGrade: 0, count: 0 });
+    }
+    
+    const current = subjectMap.get(subject)!;
+    subjectMap.set(subject, {
+      totalGrade: current.totalGrade + grade,
+      totalMaxGrade: current.totalMaxGrade + maxGrade,
+      count: current.count + 1,
+    });
+  });
+  
+  const subjectAverages = Array.from(subjectMap.entries()).map(([subject, data]) => {
+    const average = data.totalGrade / data.count;
+    const maxGrade = data.totalMaxGrade / data.count;
+    const subjectPercentage = (data.totalGrade / data.totalMaxGrade) * 100;
+    
+    return {
+      subject,
+      average,
+      maxGrade,
+      percentage: subjectPercentage,
+      count: data.count,
+    };
+  });
+  
+  return {
+    overallAverage,
+    totalGrade,
+    totalMaxGrade,
+    percentage,
+    subjectAverages
+  };
+};

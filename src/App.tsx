@@ -23,7 +23,6 @@ import StudentPerformance from '@/pages/StudentPerformance';
 import StaffManagement from '@/pages/StaffManagement';
 import StaffDashboard from '@/pages/StaffDashboard';
 import StaffList from '@/pages/StaffList';
-import BulkPerformance from './pages/BulkPerformance';
 
 const queryClient = new QueryClient();
 
@@ -48,7 +47,6 @@ function App() {
           <Route path="/student/:id" element={<StudentDetails />} />
           <Route path="/student/:id/attendance" element={<StudentAttendance />} />
           <Route path="/student/:id/performance" element={<StudentPerformance />} />
-          <Route path="/bulk-performance" element={<BulkPerformance />} />
           <Route path="/staff-dashboard" element={<StaffDashboard />} />
           <Route path="/staff-list" element={<StaffList />} />
           <Route path="/school-students" element={<SchoolStudents />} />

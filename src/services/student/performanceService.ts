@@ -69,30 +69,3 @@ export const deleteStudentPerformance = async (id: string): Promise<void> => {
     throw new Error(error.message);
   }
 };
-
-export const createBulkPerformances = async (
-  studentIds: string[],
-  performanceTemplate: Omit<StudentPerformanceFormData, 'student_id'>
-): Promise<StudentPerformance[]> => {
-  // Préparer les données pour une insertion en masse
-  const performancesToInsert = studentIds.map(studentId => ({
-    student_id: studentId,
-    ...performanceTemplate
-  }));
-
-  const { data, error } = await supabase
-    .from("student_performances")
-    .insert(performancesToInsert)
-    .select();
-
-  if (error) {
-    console.error("Error creating bulk performances:", error);
-    throw new Error(error.message);
-  }
-
-  // Ensure evaluation_type matches the expected type
-  return (data || []).map(item => ({
-    ...item,
-    evaluation_type: item.evaluation_type as "exam" | "quiz" | "homework" | "project"
-  }));
-};

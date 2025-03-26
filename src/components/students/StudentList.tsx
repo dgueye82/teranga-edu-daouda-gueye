@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Student } from "@/types/student";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { calculateStudentAverage } from "@/services/student";
 
 interface StudentListProps {
   students: Student[];
@@ -21,6 +22,40 @@ const StudentList: React.FC<StudentListProps> = ({
   onDelete,
 }) => {
   const navigate = useNavigate();
+  // State to store student averages
+  const [studentAverages, setStudentAverages] = useState<{
+    [key: string]: { overallAverage: number; percentage: number } | null
+  }>({});
+
+  // Fetch average for each student
+  useEffect(() => {
+    const fetchAverages = async () => {
+      const averages: { [key: string]: { overallAverage: number; percentage: number } | null } = {};
+      
+      for (const student of students) {
+        try {
+          const averageData = await calculateStudentAverage(student.id);
+          if (averageData.overallAverage > 0) {
+            averages[student.id] = {
+              overallAverage: averageData.overallAverage,
+              percentage: averageData.percentage
+            };
+          } else {
+            averages[student.id] = null;
+          }
+        } catch (error) {
+          console.error(`Error fetching average for student ${student.id}:`, error);
+          averages[student.id] = null;
+        }
+      }
+      
+      setStudentAverages(averages);
+    };
+    
+    if (students.length > 0) {
+      fetchAverages();
+    }
+  }, [students]);
 
   function getStatusColor(status: string | undefined) {
     switch (status) {
@@ -39,6 +74,13 @@ const StudentList: React.FC<StudentListProps> = ({
 
   function getAvatarFallback(firstName: string, lastName: string) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  }
+
+  function getAverageColor(percentage: number | undefined) {
+    if (!percentage) return "text-gray-500";
+    return percentage >= 70 ? "text-green-600" :
+           percentage >= 50 ? "text-amber-600" :
+           "text-red-600";
   }
 
   function navigateToStudentDetails(id: string) {
@@ -103,12 +145,20 @@ const StudentList: React.FC<StudentListProps> = ({
                     <p>{student.phone}</p>
                   </div>
                 )}
-                {student.birth_date && (
-                  <div>
-                    <p className="text-gray-500">Date de naissance:</p>
-                    <p>{new Date(student.birth_date).toLocaleDateString()}</p>
-                  </div>
-                )}
+                <div>
+                  <p className="text-gray-500">Moyenne:</p>
+                  {studentAverages[student.id] ? (
+                    <p className={getAverageColor(studentAverages[student.id]?.percentage)}>
+                      <span className="font-semibold">{studentAverages[student.id]?.overallAverage.toFixed(2)}</span>
+                      <span> / 20</span>
+                      <span className="text-xs ml-1">
+                        ({studentAverages[student.id]?.percentage.toFixed(1)}%)
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="text-gray-400">Non évalué</p>
+                  )}
+                </div>
                 {student.enrollment_date && (
                   <div>
                     <p className="text-gray-500">Inscription:</p>

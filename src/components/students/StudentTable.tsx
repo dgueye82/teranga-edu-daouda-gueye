@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Student } from "@/types/student";
 import { Button } from "@/components/ui/button";
 import { 
@@ -14,6 +14,7 @@ import {
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { calculateStudentAverage } from "@/services/student";
 
 interface StudentTableProps {
   students: Student[];
@@ -30,6 +31,41 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  // State to store student averages
+  const [studentAverages, setStudentAverages] = useState<{
+    [key: string]: { overallAverage: number; percentage: number } | null
+  }>({});
+
+  // Fetch average for each student
+  useEffect(() => {
+    const fetchAverages = async () => {
+      const averages: { [key: string]: { overallAverage: number; percentage: number } | null } = {};
+      
+      for (const student of students) {
+        try {
+          const averageData = await calculateStudentAverage(student.id);
+          if (averageData.overallAverage > 0) {
+            averages[student.id] = {
+              overallAverage: averageData.overallAverage,
+              percentage: averageData.percentage
+            };
+          } else {
+            averages[student.id] = null;
+          }
+        } catch (error) {
+          console.error(`Error fetching average for student ${student.id}:`, error);
+          averages[student.id] = null;
+        }
+      }
+      
+      setStudentAverages(averages);
+    };
+    
+    if (students.length > 0) {
+      fetchAverages();
+    }
+  }, [students]);
+
   if (isLoading) {
     return (
       <div className="w-full py-10 flex items-center justify-center">
@@ -58,6 +94,13 @@ const StudentTable: React.FC<StudentTableProps> = ({
     return firstName && lastName ? `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() : "?";
   }
 
+  function getAverageColor(percentage: number | undefined) {
+    if (!percentage) return "text-gray-500";
+    return percentage >= 70 ? "text-green-600" :
+           percentage >= 50 ? "text-amber-600" :
+           "text-red-600";
+  }
+
   return (
     <Table>
       <TableCaption>Liste des élèves</TableCaption>
@@ -67,6 +110,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
           <TableHead>École</TableHead>
           <TableHead>Parent</TableHead>
           <TableHead>Statut</TableHead>
+          <TableHead>Moyenne</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -106,6 +150,19 @@ const StudentTable: React.FC<StudentTableProps> = ({
                   ? "Diplômé"
                   : "Suspendu"}
               </span>
+            </TableCell>
+            <TableCell>
+              {studentAverages[student.id] ? (
+                <div className={getAverageColor(studentAverages[student.id]?.percentage)}>
+                  <span className="font-semibold">{studentAverages[student.id]?.overallAverage.toFixed(2)}</span>
+                  <span className="text-xs ml-1">/ 20</span>
+                  <span className="text-xs ml-1">
+                    ({studentAverages[student.id]?.percentage.toFixed(1)}%)
+                  </span>
+                </div>
+              ) : (
+                <span className="text-gray-400 text-sm">Non évalué</span>
+              )}
             </TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end space-x-2">

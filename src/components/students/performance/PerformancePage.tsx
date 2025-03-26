@@ -12,7 +12,8 @@ import SubjectsTab from "./SubjectsTab";
 import PerformanceChartTab from "./PerformanceChartTab";
 import StudentPerformanceForm from "@/components/students/StudentPerformanceForm";
 import { useStudentPerformanceData } from "./hooks/useStudentPerformanceData";
-import { StudentPerformance } from "@/types/student";
+import PerformancePageLoading from "./PerformancePageLoading";
+import PerformancePageError from "./PerformancePageError";
 
 interface PerformancePageProps {
   studentId: string;
@@ -61,24 +62,15 @@ const PerformancePage: React.FC<PerformancePageProps> = ({ studentId }) => {
   }, [averageInfo]);
 
   if (isLoadingStudent) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
-      </div>
-    );
+    return <PerformancePageLoading />;
   }
 
   if (!student) {
     return (
-      <div className="bg-white rounded-xl p-12 shadow text-center">
-        <h2 className="text-xl font-semibold mb-4">Élève non trouvé</h2>
-        <p className="text-gray-500 mb-6">
-          L'élève que vous recherchez n'existe pas ou a été supprimé.
-        </p>
-        <Button onClick={() => navigate("/student-management")}>
-          Retour à la liste des élèves
-        </Button>
-      </div>
+      <PerformancePageError 
+        title="Élève non trouvé"
+        description="L'élève que vous recherchez n'existe pas ou a été supprimé."
+      />
     );
   }
 

@@ -15,6 +15,7 @@ import { Pencil, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateStudentAverage } from "@/services/student";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface StudentTableProps {
   students: Student[];
@@ -32,6 +33,8 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onDelete,
 }) => {
   const navigate = useNavigate();
+  const { isAdmin, userProfile } = useAuth();
+  
   // State to store student averages
   const [studentAverages, setStudentAverages] = useState<{
     [key: string]: { overallAverage: number; percentage: number } | null
@@ -86,7 +89,9 @@ const StudentTable: React.FC<StudentTableProps> = ({
   if (students.length === 0) {
     return (
       <div className="w-full py-10 flex items-center justify-center text-gray-500">
-        Aucun élève n'a été trouvé.
+        {isAdmin 
+          ? "Aucun élève n'a été trouvé."
+          : "Vous n'avez pas encore d'élèves assignés."}
       </div>
     );
   }
@@ -106,9 +111,11 @@ const StudentTable: React.FC<StudentTableProps> = ({
     navigate(`/student/${studentId}`);
   };
 
+  const tableCaption = isAdmin ? "Liste des élèves" : "Liste de mes élèves";
+
   return (
     <Table>
-      <TableCaption>Liste des élèves</TableCaption>
+      <TableCaption>{tableCaption}</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Nom</TableHead>

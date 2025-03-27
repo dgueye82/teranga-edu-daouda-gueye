@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/student";
+import { getTeacherStudents } from "@/services/student/teacherStudentService";
 import { getSchools } from "@/services/school";
 import { Student as StudentType, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";
@@ -11,6 +12,7 @@ import StudentForm from "@/components/students/StudentForm";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { confirm } from "@/components/ui/confirm";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Ajouter l'import pour le nouveau composant
 import { PlusCircle, FileText } from "lucide-react";
@@ -21,6 +23,7 @@ const StudentManagement = () => {
   const queryClient = useQueryClient();
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [studentToEdit, setStudentToEdit] = useState<StudentType | null>(null);
+  const { user, userProfile, isAdmin } = useAuth();
 
   const {
     data: students = [],
@@ -28,8 +31,16 @@ const StudentManagement = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["students"],
-    queryFn: getStudents,
+    queryKey: ["students", user?.id],
+    queryFn: async () => {
+      // Si l'utilisateur est admin, récupérer tous les élèves
+      if (isAdmin) {
+        return getStudents();
+      }
+      // Sinon, récupérer seulement les élèves de l'enseignant
+      return user ? getTeacherStudents(user.id) : [];
+    },
+    enabled: !!user,
   });
 
   const { data: schools = [] as School[] } = useQuery({
@@ -40,7 +51,7 @@ const StudentManagement = () => {
   const createStudentMutation = useMutation({
     mutationFn: createStudent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["students", user?.id] });
       toast({
         title: "Étudiant ajouté",
         description: "L'étudiant a été ajouté avec succès",
@@ -53,7 +64,7 @@ const StudentManagement = () => {
     mutationFn: ({ id, data }: { id: string; data: StudentFormData }) =>
       updateStudent(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["students", user?.id] });
       toast({
         title: "Étudiant mis à jour",
         description: "Les informations de l'étudiant ont été mises à jour avec succès",
@@ -66,7 +77,7 @@ const StudentManagement = () => {
   const deleteStudentMutation = useMutation({
     mutationFn: deleteStudent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["students", user?.id] });
       toast({
         title: "Étudiant supprimé",
         description: "L'étudiant a été supprimé avec succès",
@@ -104,7 +115,9 @@ const StudentManagement = () => {
       <Navbar />
       <div className="container mx-auto px-4 py-8 mt-16">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <h1 className="text-2xl font-bold mb-4 md:mb-0">Gestion des élèves</h1>
+          <h1 className="text-2xl font-bold mb-4 md:mb-0">
+            {isAdmin ? "Gestion des élèves" : "Mes élèves"}
+          </h1>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
             <Link to="/bulk-performance">
               <Button variant="outline" className="w-full sm:w-auto">

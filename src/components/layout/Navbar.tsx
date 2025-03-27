@@ -11,10 +11,11 @@ import MobileMenu from './navigation/MobileMenu';
 import MobileMenuToggle from './navigation/MobileMenuToggle';
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated, user, signOut } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isMobile = useMobile();
   const location = useLocation();
+  const isAuthenticated = !!user;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -30,6 +31,10 @@ const Navbar: React.FC = () => {
     { href: '/school-management', label: 'Gestion des écoles' },
     { href: '/staff-management', label: 'Gestion du personnel' },
   ];
+
+  const handleCloseMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <header className="fixed w-full bg-white shadow-md z-50">
@@ -49,7 +54,7 @@ const Navbar: React.FC = () => {
           {!isMobile ? (
             <DesktopNavigation links={links} />
           ) : (
-            <MobileMenuToggle isOpen={isMobileMenuOpen} toggle={toggleMobileMenu} />
+            <MobileMenuToggle isOpen={isMobileMenuOpen} onToggle={toggleMobileMenu} />
           )}
 
           <div className="flex items-center">
@@ -69,7 +74,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {isMobile && <MobileMenu isOpen={isMobileMenuOpen} links={links} />}
+      {isMobile && <MobileMenu isOpen={isMobileMenuOpen} onClose={handleCloseMenu} links={links} />}
     </header>
   );
 };

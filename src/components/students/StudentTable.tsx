@@ -12,7 +12,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Pencil, Trash2, Eye } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { calculateStudentAverage } from "@/services/student";
 
@@ -31,6 +31,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const navigate = useNavigate();
   // State to store student averages
   const [studentAverages, setStudentAverages] = useState<{
     [key: string]: { overallAverage: number; percentage: number } | null
@@ -101,6 +102,10 @@ const StudentTable: React.FC<StudentTableProps> = ({
            "text-red-600";
   }
 
+  const viewStudentDetails = (studentId: string) => {
+    navigate(`/student/${studentId}`);
+  };
+
   return (
     <Table>
       <TableCaption>Liste des élèves</TableCaption>
@@ -170,7 +175,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
                   variant="outline"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => window.location.href = `/student/${student.id}`}
+                  onClick={() => viewStudentDetails(student.id)}
                   title="Voir l'élève"
                 >
                   <Eye className="h-4 w-4" />

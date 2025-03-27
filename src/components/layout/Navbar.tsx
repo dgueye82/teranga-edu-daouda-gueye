@@ -1,9 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import UserMenuButton from './UserMenuButton';
 import DesktopNavigation from './navigation/DesktopNavigation';
@@ -11,9 +9,9 @@ import MobileMenu from './navigation/MobileMenu';
 import MobileMenuToggle from './navigation/MobileMenuToggle';
 
 const Navbar: React.FC = () => {
-  const { user, userProfile, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const location = useLocation();
   const isAuthenticated = !!user;
 
@@ -60,12 +58,12 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             {!isAuthenticated ? (
               <div className="flex space-x-2">
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/">Se connecter</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link to="/">S'inscrire</Link>
-                </Button>
+                <Link to="/" className="text-sm font-medium px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+                  Se connecter
+                </Link>
+                <Link to="/" className="text-sm font-medium px-4 py-2 bg-teranga-blue text-white rounded-md hover:bg-blue-600">
+                  S'inscrire
+                </Link>
               </div>
             ) : (
               <UserMenuButton user={user} signOut={signOut} />

@@ -203,7 +203,7 @@ const StudentDetails = () => {
           <Menu className="h-6 w-6" />
         </button>
         
-        <main className="flex-1 bg-teranga-background transition-all duration-300">
+        <main className="flex-1 bg-white transition-all duration-300">
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div className="flex items-center gap-4">
@@ -213,10 +213,15 @@ const StudentDetails = () => {
                 </Button>
                 <h1 className="text-2xl font-bold text-gray-800">Détails de l'élève</h1>
               </div>
-              <Button onClick={handleEditStudent}>
-                <Edit className="h-4 w-4 mr-2" />
-                Modifier
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => navigate(`/student/${student.id}/report-card`)} variant="outline">
+                  Bulletin de notes
+                </Button>
+                <Button onClick={handleEditStudent}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Modifier
+                </Button>
+              </div>
             </div>
             
             <div className="bg-white rounded-xl shadow overflow-hidden">

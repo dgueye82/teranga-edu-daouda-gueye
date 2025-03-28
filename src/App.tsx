@@ -20,6 +20,7 @@ import StudentManagement from '@/pages/StudentManagement';
 import StudentDetails from '@/pages/StudentDetails';
 import StudentAttendance from '@/pages/StudentAttendance';
 import StudentPerformance from '@/pages/StudentPerformance';
+import StudentReportCard from '@/pages/StudentReportCard';
 import StaffManagement from '@/pages/StaffManagement';
 import StaffDashboard from '@/pages/StaffDashboard';
 import StaffList from '@/pages/StaffList';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/student/:id" element={<StudentDetails />} />
           <Route path="/student/:id/attendance" element={<StudentAttendance />} />
           <Route path="/student/:id/performance" element={<StudentPerformance />} />
+          <Route path="/student/:id/report-card" element={<StudentReportCard />} />
           <Route path="/staff-dashboard" element={<StaffDashboard />} />
           <Route path="/staff-list" element={<StaffList />} />
           <Route path="/school-students" element={<SchoolStudents />} />

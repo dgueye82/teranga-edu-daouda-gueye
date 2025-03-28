@@ -143,3 +143,48 @@ export const calculateStudentAverage = async (studentId: string): Promise<{
     subjectAverages
   };
 };
+
+// Fonction pour récupérer les données du bulletin de notes
+export const getStudentReportCard = async (studentId: string, trimestre: string = "Trimestre 1"): Promise<{
+  student: any;
+  averageInfo: {
+    overallAverage: number;
+    totalGrade: number;
+    totalMaxGrade: number;
+    percentage: number;
+    subjectAverages: {
+      subject: string;
+      average: number;
+      maxGrade: number;
+      percentage: number;
+      count: number;
+    }[];
+  };
+  performances: StudentPerformance[];
+  trimestre: string;
+}> => {
+  // Récupérer les données de l'élève
+  const { data: student, error: studentError } = await supabase
+    .from("students")
+    .select("*, schools(name)")
+    .eq("id", studentId)
+    .single();
+
+  if (studentError) {
+    console.error("Error fetching student:", studentError);
+    throw new Error(studentError.message);
+  }
+
+  // Calculer les moyennes
+  const averageInfo = await calculateStudentAverage(studentId);
+  
+  // Récupérer les performances
+  const performances = await getStudentPerformances(studentId);
+
+  return {
+    student,
+    averageInfo,
+    performances,
+    trimestre
+  };
+};

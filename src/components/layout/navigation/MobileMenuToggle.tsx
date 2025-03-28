@@ -2,7 +2,7 @@
 import { Menu, X } from "lucide-react";
 import UserMenuButton from "../UserMenuButton";
 
-export interface MobileMenuToggleProps {
+interface MobileMenuToggleProps {
   isOpen: boolean;
   onToggle: () => void;
 }

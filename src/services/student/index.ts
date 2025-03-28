@@ -3,4 +3,3 @@
 export * from './studentService';
 export * from './performanceService';
 export * from './attendanceService';
-export * from './teacherStudentService';

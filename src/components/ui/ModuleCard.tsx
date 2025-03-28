@@ -11,19 +11,16 @@ interface ModuleCardProps {
   delay?: number;
 }
 
-const ModuleCard = ({ title, icon, description, linkTo, path, delay = 0 }: ModuleCardProps) => {
+const ModuleCard = ({ title, icon, description, linkTo, path }: ModuleCardProps) => {
   // Utiliser linkTo ou path (pour assurer la rétrocompatibilité)
   const linkPath = linkTo || path || "/";
   
   return (
     <Link 
       to={linkPath}
-      className="flex flex-col items-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-center animate-fade-in"
-      style={{
-        animationDelay: `${delay}ms`
-      }}
+      className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 text-center h-full"
     >
-      <div className="mb-4 p-4 bg-teranga-skyBlue rounded-full">
+      <div className="mb-4 p-3 bg-blue-50 rounded-full">
         {icon}
       </div>
       <h3 className="text-xl font-semibold text-gray-800 mb-2 hover:text-teranga-blue transition-colors">

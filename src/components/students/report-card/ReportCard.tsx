@@ -223,7 +223,8 @@ const ReportCard: React.FC<ReportCardProps> = ({
         </div>
       </div>
 
-      <style jsx global>{`
+      <style>
+        {`
         @media print {
           @page {
             size: A4;
@@ -245,7 +246,8 @@ const ReportCard: React.FC<ReportCardProps> = ({
             width: 100%;
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };

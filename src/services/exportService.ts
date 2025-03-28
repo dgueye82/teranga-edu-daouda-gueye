@@ -32,6 +32,11 @@ export const exportReportCardToPdf = (
   const margin = 20;
   const contentWidth = pageWidth - 2 * margin;
   
+  // Extraire la classe de l'élève depuis les notes
+  const studentClass = student.notes || "Non spécifiée";
+  // S'assurer que l'école est bien affichée
+  const schoolName = student.school_name || "Non spécifiée";
+  
   // Ajouter le titre
   doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
@@ -41,10 +46,8 @@ export const exportReportCardToPdf = (
   // Informations de l'école
   doc.setFontSize(12);
   doc.setFont("helvetica", "normal");
-  if (student.school_name) {
-    doc.text(`École: ${student.school_name}`, margin, 45);
-  }
-  doc.text(`Année scolaire: ${new Date().getFullYear()}`, margin, 52);
+  doc.text(`École: ${schoolName}`, margin, 45);
+  doc.text(`Année scolaire: ${new Date().getFullYear() - 1}-${new Date().getFullYear()}`, margin, 52);
   
   // Informations de l'élève
   doc.setFontSize(12);
@@ -57,13 +60,14 @@ export const exportReportCardToPdf = (
   if (student.birth_date) {
     doc.text(`Date de naissance: ${new Date(student.birth_date).toLocaleDateString()}`, margin, 89);
   }
+  doc.text(`Classe: ${studentClass}`, margin, 96);
   if (student.status) {
-    doc.text(`Statut: ${student.status}`, margin, 96);
+    doc.text(`Statut: ${student.status}`, margin, 103);
   }
   
   // Tableau des résultats par matière
   doc.setFont("helvetica", "bold");
-  doc.text("Résultats par matière", margin, 110);
+  doc.text("Résultats par matière", margin, 115);
   
   const subjectRows = averageInfo.subjectAverages.map(subject => [
     subject.subject,
@@ -74,7 +78,7 @@ export const exportReportCardToPdf = (
   ]);
   
   doc.autoTable({
-    startY: 115,
+    startY: 120,
     head: [["Matière", "Moyenne", "Max", "Pourcentage", "Appréciation"]],
     body: subjectRows,
     theme: "grid",

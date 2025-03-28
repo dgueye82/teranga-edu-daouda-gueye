@@ -62,6 +62,11 @@ const ReportCard: React.FC<ReportCardProps> = ({
   const handlePrint = () => {
     window.print();
   };
+  
+  // Extraire la classe de l'élève à partir des notes (qui contiennent la classe)
+  const studentClass = student.notes || "Non spécifiée";
+  // Assurer que l'école est correctement affichée
+  const schoolName = student.school_name || "Non spécifiée";
 
   return (
     <div className="print:shadow-none print:m-0 print:p-0">
@@ -111,6 +116,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                 {student.status && (
                   <p><span className="font-medium">Statut:</span> {student.status}</p>
                 )}
+                <p><span className="font-medium">Classe:</span> {studentClass}</p>
               </div>
             </CardContent>
           </Card>
@@ -121,8 +127,8 @@ const ReportCard: React.FC<ReportCardProps> = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Nom:</span> {student.school_name || "Non spécifié"}</p>
-                <p><span className="font-medium">Classe:</span> {student.notes || "Non spécifié"}</p>
+                <p><span className="font-medium">Nom:</span> {schoolName}</p>
+                <p><span className="font-medium">Classe:</span> {studentClass}</p>
                 <p><span className="font-medium">Année scolaire:</span> {new Date().getFullYear() - 1}-{new Date().getFullYear()}</p>
               </div>
             </CardContent>

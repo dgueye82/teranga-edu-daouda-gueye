@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Plus, Download, Upload } from "lucide-react";
 import { getPaginatedStaffMembers } from "@/services/staff";
 import { useToast } from "@/hooks/use-toast";
+import SearchBar from "@/components/staff/SearchBar";
 
 const StaffManagement = () => {
   const navigate = useNavigate();
@@ -90,7 +91,11 @@ const StaffManagement = () => {
               </div>
             </div>
 
-            <StaffFilters onSearch={handleSearch} />
+            {/* Replace the direct onSearch prop with the SearchBar component that accepts this prop */}
+            <div className="mb-6">
+              <SearchBar searchTerm={searchTerm} onSearchChange={handleSearch} />
+              <StaffFilters />
+            </div>
 
             <TabsContent value="teachers" className="mt-0">
               <StaffTable 

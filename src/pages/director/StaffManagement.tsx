@@ -91,7 +91,6 @@ const StaffManagement = () => {
               </div>
             </div>
 
-            {/* Replace the direct onSearch prop with the SearchBar component that accepts this prop */}
             <div className="mb-6">
               <SearchBar searchTerm={searchTerm} onSearchChange={handleSearch} />
               <StaffFilters />

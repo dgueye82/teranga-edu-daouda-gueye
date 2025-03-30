@@ -25,6 +25,12 @@ import StaffManagement from '@/pages/StaffManagement';
 import StaffDashboard from '@/pages/StaffDashboard';
 import StaffList from '@/pages/StaffList';
 
+// Director pages
+import DirectorDashboard from '@/pages/DirectorDashboard';
+import DirectorStaffManagement from '@/pages/director/StaffManagement';
+import ClassStudents from '@/pages/director/ClassStudents';
+import StudentReports from '@/pages/director/StudentReports';
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -40,7 +46,7 @@ function App() {
           <Route path="/parent-portal" element={<ParentPortal />} />
           <Route path="/curriculum" element={<Curriculum />} />
           
-          {/* Management routes - now accessible to everyone */}
+          {/* Management routes */}
           <Route path="/school-management" element={<SchoolManagement />} />
           <Route path="/staff-management" element={<StaffManagement />} />
           <Route path="/school/:id/students" element={<SchoolStudents />} />
@@ -52,6 +58,12 @@ function App() {
           <Route path="/staff-dashboard" element={<StaffDashboard />} />
           <Route path="/staff-list" element={<StaffList />} />
           <Route path="/school-students" element={<SchoolStudents />} />
+          
+          {/* Director routes */}
+          <Route path="/director-dashboard" element={<DirectorDashboard />} />
+          <Route path="/director/staff" element={<DirectorStaffManagement />} />
+          <Route path="/director/classes" element={<ClassStudents />} />
+          <Route path="/director/reports" element={<StudentReports />} />
           
           {/* Catch all route */}
           <Route path="*" element={<NotFound />} />

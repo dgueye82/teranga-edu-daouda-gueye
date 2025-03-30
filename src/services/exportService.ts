@@ -2,6 +2,7 @@
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { Student, StudentPerformance } from "@/types/student";
+import { getAppreciation, getGlobalAppreciation } from "@/components/students/report-card/utils/gradeUtils";
 
 // Ajout du type pour jsPDF-autotable
 declare module "jspdf" {
@@ -30,26 +31,55 @@ export const exportReportCardToPdf = (
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
-  const contentWidth = pageWidth - 2 * margin;
   
   // Extraire la classe de l'élève depuis les notes
   const studentClass = student.notes || "Non spécifiée";
   // S'assurer que l'école est bien affichée
   const schoolName = student.school_name || "Non spécifiée";
   
-  // Ajouter le titre
+  // Section titre
+  addTitleSection(doc, pageWidth, trimestre);
+  
+  // Informations de l'école
+  addSchoolInfoSection(doc, margin, schoolName);
+  
+  // Informations de l'élève
+  addStudentInfoSection(doc, margin, student, studentClass);
+  
+  // Tableau des résultats par matière
+  const tableEndY = addSubjectsTable(doc, margin, averageInfo.subjectAverages);
+  
+  // Moyenne générale
+  addFinalResultSection(doc, margin, tableEndY, averageInfo, student.first_name);
+  
+  // Signatures
+  addSignatureSection(doc, margin, tableEndY, pageWidth);
+  
+  // Pied de page
+  addFooter(doc, pageWidth);
+  
+  // Télécharger le PDF
+  doc.save(`bulletin_${student.last_name}_${student.first_name}_${trimestre.replace(/\s+/g, "_")}.pdf`);
+};
+
+// Ajouter le titre au PDF
+function addTitleSection(doc: jsPDF, pageWidth: number, trimestre: string): void {
   doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
   doc.text("BULLETIN DE NOTES", pageWidth / 2, 20, { align: "center" });
   doc.text(trimestre.toUpperCase(), pageWidth / 2, 30, { align: "center" });
-  
-  // Informations de l'école
+}
+
+// Ajouter les informations de l'école
+function addSchoolInfoSection(doc: jsPDF, margin: number, schoolName: string): void {
   doc.setFontSize(12);
   doc.setFont("helvetica", "normal");
   doc.text(`École: ${schoolName}`, margin, 45);
   doc.text(`Année scolaire: ${new Date().getFullYear() - 1}-${new Date().getFullYear()}`, margin, 52);
-  
-  // Informations de l'élève
+}
+
+// Ajouter les informations de l'élève
+function addStudentInfoSection(doc: jsPDF, margin: number, student: Student, studentClass: string): void {
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.text("Informations de l'élève", margin, 65);
@@ -64,12 +94,14 @@ export const exportReportCardToPdf = (
   if (student.status) {
     doc.text(`Statut: ${student.status}`, margin, 103);
   }
-  
-  // Tableau des résultats par matière
+}
+
+// Ajouter le tableau des matières
+function addSubjectsTable(doc: jsPDF, margin: number, subjectAverages: any[]): number {
   doc.setFont("helvetica", "bold");
   doc.text("Résultats par matière", margin, 115);
   
-  const subjectRows = averageInfo.subjectAverages.map(subject => [
+  const subjectRows = subjectAverages.map(subject => [
     subject.subject,
     subject.average.toFixed(2),
     subject.maxGrade.toFixed(2),
@@ -94,44 +126,58 @@ export const exportReportCardToPdf = (
     }
   });
   
-  // Moyenne générale
-  const finalY = (doc as any).lastAutoTable.finalY + 10;
-  doc.setFont("helvetica", "bold");
-  doc.text(`Moyenne générale: ${averageInfo.overallAverage.toFixed(2)}/20`, margin, finalY);
-  doc.text(`Pourcentage: ${averageInfo.percentage.toFixed(2)}%`, margin, finalY + 7);
-  doc.text(`Appréciation globale: ${getGlobalAppreciation(averageInfo.percentage)}`, margin, finalY + 14);
-  
-  // Signatures
-  doc.text("Signatures:", margin, finalY + 30);
-  
-  doc.setFont("helvetica", "normal");
-  doc.text("Directeur/trice de l'école", margin, finalY + 45);
-  doc.text("Parent/Tuteur", pageWidth - margin - 50, finalY + 45);
-  
-  // Pied de page
-  doc.setFontSize(10);
-  doc.text(`Généré le ${new Date().toLocaleDateString()}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: "center" });
-  
-  // Télécharger le PDF
-  doc.save(`bulletin_${student.last_name}_${student.first_name}_${trimestre.replace(/\s+/g, "_")}.pdf`);
-};
-
-// Fonction pour déterminer l'appréciation selon le pourcentage
-function getAppreciation(percentage: number): string {
-  if (percentage >= 90) return "Excellent";
-  if (percentage >= 80) return "Très bien";
-  if (percentage >= 70) return "Bien";
-  if (percentage >= 60) return "Assez bien";
-  if (percentage >= 50) return "Passable";
-  return "Insuffisant";
+  // Retourner la position Y finale du tableau pour placer les éléments suivants
+  return (doc as any).lastAutoTable.finalY + 10;
 }
 
-// Fonction pour déterminer l'appréciation globale
-function getGlobalAppreciation(percentage: number): string {
-  if (percentage >= 90) return "Félicitations";
-  if (percentage >= 80) return "Compliments du conseil de classe";
-  if (percentage >= 70) return "Tableau d'honneur";
-  if (percentage >= 60) return "Encouragements";
-  if (percentage >= 50) return "Doit faire plus d'efforts";
-  return "Travail insuffisant";
+// Ajouter la section des résultats finaux
+function addFinalResultSection(
+  doc: jsPDF, 
+  margin: number, 
+  yPosition: number, 
+  averageInfo: { overallAverage: number; percentage: number }, 
+  studentFirstName: string
+): void {
+  doc.setFont("helvetica", "bold");
+  doc.text(`Moyenne générale: ${averageInfo.overallAverage.toFixed(2)}/20`, margin, yPosition);
+  doc.text(`Pourcentage: ${averageInfo.percentage.toFixed(2)}%`, margin, yPosition + 7);
+  doc.text(`Appréciation globale: ${getGlobalAppreciation(averageInfo.percentage)}`, margin, yPosition + 14);
+  
+  // Ajouter un commentaire personnalisé
+  doc.setFont("helvetica", "normal");
+  doc.text("Commentaires:", margin, yPosition + 22);
+  
+  let comment = "";
+  if (averageInfo.percentage >= 70) {
+    comment = `${studentFirstName} a obtenu d'excellents résultats ce trimestre. Félicitations !`;
+  } else if (averageInfo.percentage >= 50) {
+    comment = `${studentFirstName} a obtenu des résultats satisfaisants. Continuez à travailler régulièrement.`;
+  } else {
+    comment = `${studentFirstName} doit fournir plus d'efforts et travailler plus régulièrement.`;
+  }
+  
+  doc.text(comment, margin, yPosition + 30);
+}
+
+// Ajouter la section des signatures
+function addSignatureSection(doc: jsPDF, margin: number, finalY: number, pageWidth: number): void {
+  doc.setFont("helvetica", "bold");
+  doc.text("Signatures:", margin, finalY + 40);
+  
+  doc.setFont("helvetica", "normal");
+  doc.text("Directeur/trice de l'école", margin, finalY + 50);
+  doc.text("Parent/Tuteur", pageWidth - margin - 50, finalY + 50);
+  
+  // Ajouter des lignes pour les signatures
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineDashPattern([3, 3], 0);
+  doc.line(margin, finalY + 60, margin + 70, finalY + 60);
+  doc.line(pageWidth - margin - 70, finalY + 60, pageWidth - margin, finalY + 60);
+}
+
+// Ajouter le pied de page
+function addFooter(doc: jsPDF, pageWidth: number): void {
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Généré le ${new Date().toLocaleDateString()}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: "center" });
 }

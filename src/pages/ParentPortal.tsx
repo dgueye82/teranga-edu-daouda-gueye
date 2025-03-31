@@ -1,9 +1,7 @@
-
 import Navbar from "@/components/layout/Navbar";
-import { MessageCircle, Calendar, FileBarChart, BookOpen, Bell } from "lucide-react";
+import { MessageCircle, Calendar, FileBarChart, BookOpen, Bell, LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ParentPortal = () => {
@@ -51,7 +49,7 @@ const ParentPortal = () => {
                 </div>
                 
                 {!user && (
-                  <Link to="/auth" className="block md:hidden">
+                  <Link to="/auth">
                     <Button className="flex items-center gap-2">
                       <LogIn className="h-4 w-4" />
                       Connexion

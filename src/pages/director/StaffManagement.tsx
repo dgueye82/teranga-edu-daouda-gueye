@@ -7,10 +7,11 @@ import StaffTable from "@/components/staff/StaffTable";
 import StaffFilters from "@/components/staff/StaffFilters";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Plus, Download, Upload } from "lucide-react";
+import { ArrowLeft, Plus, Download, Upload, LayoutGrid, LayoutList } from "lucide-react";
 import { getPaginatedStaffMembers } from "@/services/staff";
 import { useToast } from "@/hooks/use-toast";
 import SearchBar from "@/components/staff/SearchBar";
+import StaffCardView from "@/components/staff/StaffCardView";
 
 const StaffManagement = () => {
   const navigate = useNavigate();
@@ -18,11 +19,14 @@ const StaffManagement = () => {
   const [currentTab, setCurrentTab] = useState("teachers");
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "card">("table");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
 
   // Récupérer le personnel en fonction du filtre de département
   const staffData = getPaginatedStaffMembers(
-    1, 
-    20, 
+    currentPage, 
+    pageSize, 
     searchTerm,
     currentTab === "teachers" ? "teaching" : currentTab === "admin" ? "administrative" : undefined
   );
@@ -37,6 +41,15 @@ const StaffManagement = () => {
       description: "La liste du personnel est en cours d'exportation au format CSV"
     });
     // Logique d'export à implémenter
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const toggleViewMode = () => {
+    setViewMode(viewMode === "table" ? "card" : "table");
   };
 
   return (
@@ -76,6 +89,19 @@ const StaffManagement = () => {
               </TabsList>
               
               <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={toggleViewMode}>
+                  {viewMode === "table" ? (
+                    <>
+                      <LayoutGrid className="h-4 w-4 mr-2" />
+                      Vue Cartes
+                    </>
+                  ) : (
+                    <>
+                      <LayoutList className="h-4 w-4 mr-2" />
+                      Vue Tableau
+                    </>
+                  )}
+                </Button>
                 <Button variant="outline" size="sm" onClick={handleExport}>
                   <Download className="h-4 w-4 mr-2" />
                   Exporter
@@ -97,55 +123,107 @@ const StaffManagement = () => {
             </div>
 
             <TabsContent value="teachers" className="mt-0">
-              <StaffTable 
-                filteredStaff={staffData.data.filter(staff => 
-                  staff.role.toLowerCase().includes("enseignant") || 
-                  staff.department === "Mathématiques" ||
-                  staff.department === "Sciences" ||
-                  staff.department === "Lettres" ||
-                  staff.department === "Langues" ||
-                  staff.department === "Histoire-Géographie" ||
-                  staff.department === "Education Physique" ||
-                  staff.department === "Informatique"
-                )}
-                onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
-                onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
-                currentPage={1}
-                totalPages={Math.ceil(staffData.total / 20)}
-                onPageChange={() => {}}
-              />
+              {viewMode === "table" ? (
+                <StaffTable 
+                  filteredStaff={staffData.data.filter(staff => 
+                    staff.role.toLowerCase().includes("enseignant") || 
+                    staff.department === "Mathématiques" ||
+                    staff.department === "Sciences" ||
+                    staff.department === "Lettres" ||
+                    staff.department === "Langues" ||
+                    staff.department === "Histoire-Géographie" ||
+                    staff.department === "Education Physique" ||
+                    staff.department === "Informatique"
+                  )}
+                  onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
+                  onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(staffData.total / pageSize)}
+                  onPageChange={handlePageChange}
+                />
+              ) : (
+                <StaffCardView 
+                  filteredStaff={staffData.data.filter(staff => 
+                    staff.role.toLowerCase().includes("enseignant") || 
+                    staff.department === "Mathématiques" ||
+                    staff.department === "Sciences" ||
+                    staff.department === "Lettres" ||
+                    staff.department === "Langues" ||
+                    staff.department === "Histoire-Géographie" ||
+                    staff.department === "Education Physique" ||
+                    staff.department === "Informatique"
+                  )}
+                  onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
+                  onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(staffData.total / pageSize)}
+                  onPageChange={handlePageChange}
+                />
+              )}
             </TabsContent>
             
             <TabsContent value="admin" className="mt-0">
-              <StaffTable 
-                filteredStaff={staffData.data.filter(staff => 
-                  staff.role.includes("Directeur") || 
-                  staff.role.includes("Adjoint") || 
-                  staff.role.includes("Conseiller") || 
-                  staff.role.includes("Administrateur") || 
-                  staff.role.includes("Technicien") || 
-                  staff.role.includes("Entretien") ||
-                  staff.department === "Administration" ||
-                  staff.department === "Support Technique" ||
-                  staff.department === "Orientation"
-                )}
-                onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
-                onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
-                currentPage={1}
-                totalPages={Math.ceil(staffData.total / 20)}
-                onPageChange={() => {}}
-              />
+              {viewMode === "table" ? (
+                <StaffTable 
+                  filteredStaff={staffData.data.filter(staff => 
+                    staff.role.includes("Directeur") || 
+                    staff.role.includes("Adjoint") || 
+                    staff.role.includes("Conseiller") || 
+                    staff.role.includes("Administrateur") || 
+                    staff.role.includes("Technicien") || 
+                    staff.role.includes("Entretien") ||
+                    staff.department === "Administration" ||
+                    staff.department === "Support Technique" ||
+                    staff.department === "Orientation"
+                  )}
+                  onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
+                  onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(staffData.total / pageSize)}
+                  onPageChange={handlePageChange}
+                />
+              ) : (
+                <StaffCardView 
+                  filteredStaff={staffData.data.filter(staff => 
+                    staff.role.includes("Directeur") || 
+                    staff.role.includes("Adjoint") || 
+                    staff.role.includes("Conseiller") || 
+                    staff.role.includes("Administrateur") || 
+                    staff.role.includes("Technicien") || 
+                    staff.role.includes("Entretien") ||
+                    staff.department === "Administration" ||
+                    staff.department === "Support Technique" ||
+                    staff.department === "Orientation"
+                  )}
+                  onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
+                  onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(staffData.total / pageSize)}
+                  onPageChange={handlePageChange}
+                />
+              )}
             </TabsContent>
             
             <TabsContent value="all" className="mt-0">
-              <StaffTable 
-                filteredStaff={staffData.data}
-                onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
-                onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
-                currentPage={1}
-                totalPages={Math.ceil(staffData.total / 20)}
-                onPageChange={() => {}}
-              />
+              {viewMode === "table" ? (
+                <StaffTable 
+                  filteredStaff={staffData.data}
+                  onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
+                  onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(staffData.total / pageSize)}
+                  onPageChange={handlePageChange}
+                />
+              ) : (
+                <StaffCardView 
+                  filteredStaff={staffData.data}
+                  onViewStaff={(staff) => navigate(`/director/staff/${staff.id}`)}
+                  onEditStaff={(staff) => navigate(`/director/staff/${staff.id}/edit`)}
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(staffData.total / pageSize)}
+                  onPageChange={handlePageChange}
+                />
+              )}
             </TabsContent>
           </Tabs>
         </main>

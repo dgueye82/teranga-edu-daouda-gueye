@@ -106,12 +106,12 @@ const UserRoleManagement = () => {
   const impersonateUser = async (userId: string) => {
     try {
       // Store the current admin user ID for later restoration
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const sessionResponse = await supabase.auth.getSession();
       
-      if (sessionError) throw sessionError;
+      if (sessionResponse.error) throw sessionResponse.error;
       
-      if (sessionData.session) {
-        localStorage.setItem("adminUserId", sessionData.session.user.id || "");
+      if (sessionResponse.data.session) {
+        localStorage.setItem("adminUserId", sessionResponse.data.session.user.id || "");
       }
       
       // For demo purposes, we'll just show a toast and redirect

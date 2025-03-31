@@ -106,7 +106,13 @@ const UserRoleManagement = () => {
   const impersonateUser = async (userId: string) => {
     try {
       // Store the current admin user ID for later restoration
-      localStorage.setItem("adminUserId", supabase.auth.getSession()?.data?.session?.user?.id || "");
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) throw sessionError;
+      
+      if (sessionData.session) {
+        localStorage.setItem("adminUserId", sessionData.session.user.id || "");
+      }
       
       // For demo purposes, we'll just show a toast and redirect
       // In a real implementation, you would need a backend endpoint to generate a session for the impersonated user

@@ -1,6 +1,8 @@
 
-import { X } from "lucide-react";
+import { X, LogIn, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -8,6 +10,13 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  const { user, signOut, isAdmin } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    onClose();
+  };
+
   return (
     <div
       className={`fixed inset-0 lg:hidden bg-white z-40 transform transition-transform duration-300 ease-in-out ${
@@ -48,6 +57,34 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <Link to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Portails parents
         </Link>
+        
+        <div className="pt-4 mt-auto">
+          {user ? (
+            <Button 
+              variant="outline" 
+              onClick={handleSignOut} 
+              className="w-full"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Déconnexion
+            </Button>
+          ) : (
+            <Link to="/auth" onClick={onClose}>
+              <Button variant="default" className="w-full">
+                <LogIn className="mr-2 h-4 w-4" />
+                Connexion
+              </Button>
+            </Link>
+          )}
+          
+          {isAdmin && (
+            <Link to="/admin/users" onClick={onClose}>
+              <Button variant="outline" className="w-full mt-2">
+                Gestion des utilisateurs
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );

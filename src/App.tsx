@@ -12,6 +12,7 @@ import OnlineTraining from '@/pages/OnlineTraining';
 import ParentPortal from '@/pages/ParentPortal';
 import Curriculum from '@/pages/Curriculum';
 import NotFound from '@/pages/NotFound';
+import Auth from '@/pages/Auth';
 
 // Management pages
 import SchoolManagement from '@/pages/SchoolManagement';
@@ -31,6 +32,13 @@ import DirectorStaffManagement from '@/pages/director/StaffManagement';
 import ClassStudents from '@/pages/director/ClassStudents';
 import StudentReports from '@/pages/director/StudentReports';
 
+// Admin pages
+import UserManagement from '@/pages/admin/UserManagement';
+
+// Auth components
+import Unauthorized from '@/pages/Unauthorized';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -45,6 +53,8 @@ function App() {
           <Route path="/online-training" element={<OnlineTraining />} />
           <Route path="/parent-portal" element={<ParentPortal />} />
           <Route path="/curriculum" element={<Curriculum />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
           
           {/* Management routes */}
           <Route path="/school-management" element={<SchoolManagement />} />
@@ -59,11 +69,18 @@ function App() {
           <Route path="/staff-list" element={<StaffList />} />
           <Route path="/school-students" element={<SchoolStudents />} />
           
-          {/* Director routes */}
-          <Route path="/director-dashboard" element={<DirectorDashboard />} />
-          <Route path="/director/staff" element={<DirectorStaffManagement />} />
-          <Route path="/director/classes" element={<ClassStudents />} />
-          <Route path="/director/reports" element={<StudentReports />} />
+          {/* Protected Director routes */}
+          <Route element={<ProtectedRoute allowedRoles={["admin", "teacher"]} />}>
+            <Route path="/director-dashboard" element={<DirectorDashboard />} />
+            <Route path="/director/staff" element={<DirectorStaffManagement />} />
+            <Route path="/director/classes" element={<ClassStudents />} />
+            <Route path="/director/reports" element={<StudentReports />} />
+          </Route>
+          
+          {/* Admin-only routes */}
+          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            <Route path="/admin/users" element={<UserManagement />} />
+          </Route>
           
           {/* Catch all route */}
           <Route path="*" element={<NotFound />} />

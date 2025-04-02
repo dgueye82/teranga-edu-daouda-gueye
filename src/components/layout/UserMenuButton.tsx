@@ -23,6 +23,13 @@ const UserMenuButton = () => {
       toast({
         title: "Connecté",
         description: `Vous êtes connecté en tant que ${user.email}`,
+        variant: "default"
+      });
+    } else {
+      toast({
+        title: "Non connecté",
+        description: "Vous n'êtes pas connecté",
+        variant: "default"
       });
     }
   };

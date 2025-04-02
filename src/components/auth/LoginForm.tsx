@@ -34,10 +34,11 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à Teranga EDU",
+        variant: "default"
       });
       
-      // Force reload to ensure all components get the updated state
-      window.location.href = "/";
+      // Naviguer vers la page d'accueil après une connexion réussie
+      navigate("/");
     } catch (error: any) {
       console.error("Error during sign in:", error);
       

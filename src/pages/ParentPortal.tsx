@@ -1,5 +1,6 @@
+
 import Navbar from "@/components/layout/Navbar";
-import { MessageCircle, Calendar, FileBarChart, BookOpen, Bell, LogIn } from "lucide-react";
+import { MessageCircle, Calendar, FileBarChart, BookOpen, Bell, LogIn, UserCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -50,11 +51,18 @@ const ParentPortal = () => {
                 
                 {!user && (
                   <Link to="/auth">
-                    <Button className="flex items-center gap-2">
+                    <Button className="flex items-center gap-2 bg-teranga-blue text-white hover:bg-teranga-blue/90">
                       <LogIn className="h-4 w-4" />
                       Connexion
                     </Button>
                   </Link>
+                )}
+                
+                {user && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
+                    <UserCheck className="h-5 w-5 text-green-600" />
+                    <span className="text-green-700 font-medium">Connecté</span>
+                  </div>
                 )}
               </div>
               <p className="text-lg text-gray-700">
@@ -125,6 +133,20 @@ const ParentPortal = () => {
                     Connexion au portail
                   </Button>
                 </Link>
+              </div>
+            )}
+            
+            {/* Already logged in message */}
+            {user && (
+              <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-8 shadow-lg mt-8 animate-fade-in-up">
+                <h2 className="text-2xl font-bold mb-4">Vous êtes connecté</h2>
+                <p className="mb-4">
+                  Bienvenue sur le portail parent de Teranga EDU. Vous pouvez maintenant accéder à toutes les fonctionnalités 
+                  pour suivre le parcours scolaire de votre enfant.
+                </p>
+                <p className="text-sm text-green-700">
+                  Connecté en tant que: <span className="font-semibold">{user.email}</span>
+                </p>
               </div>
             )}
           </div>

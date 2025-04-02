@@ -102,7 +102,7 @@ export const signOutUser = async (): Promise<void> => {
     
     console.log("Sign out successful");
     
-    // Force page reload to clear all state
+    // Rediriger vers la page d'accueil après déconnexion
     window.location.href = "/";
   } catch (error) {
     console.error("Critical error during sign out:", error);

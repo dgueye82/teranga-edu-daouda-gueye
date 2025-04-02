@@ -1,5 +1,5 @@
 
-import { X, LogIn, LogOut } from "lucide-react";
+import { X, LogIn, LogOut, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, userProfile } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -33,6 +33,20 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       </button>
       
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
+        {user && (
+          <div className="py-3 px-4 mb-2 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-2">
+              <UserCheck className="h-5 w-5 text-teranga-blue" />
+              <div>
+                <p className="font-medium text-teranga-blue">{user.email}</p>
+                {userProfile?.role && (
+                  <p className="text-xs text-gray-500">Rôle: {userProfile.role}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      
         <Link to="/" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Accueil
         </Link>

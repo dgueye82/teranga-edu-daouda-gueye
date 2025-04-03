@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getStudentsBySchool } from "@/services/student";
 import { School } from "@/types/school";
@@ -12,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp, Search, UserCheck, LineChart, ClipboardList } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SchoolStudentsListProps {
   school: School;
@@ -21,11 +21,21 @@ const SchoolStudentsList: React.FC<SchoolStudentsListProps> = ({ school }) => {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const { user } = useAuth();
   
-  const { data: students = [], isLoading, isError } = useQuery({
+  const { data: students = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["students", "school", school.id],
     queryFn: () => getStudentsBySchool(school.id),
   });
+
+  useEffect(() => {
+    console.log(`Auth state changed in SchoolStudentsList for school: ${school.id}, refetching...`);
+    refetch();
+  }, [user, refetch, school.id]);
+
+  useEffect(() => {
+    console.log(`SchoolStudentsList for school ${school.id} rendered with ${students.length} students`);
+  }, [school.id, students]);
 
   const filteredStudents = students.filter(student => 
     `${student.first_name} ${student.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||

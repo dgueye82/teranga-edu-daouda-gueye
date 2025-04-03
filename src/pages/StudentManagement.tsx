@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/student";
 import { getSchools } from "@/services/school";
@@ -11,13 +10,13 @@ import StudentForm from "@/components/students/StudentForm";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { confirm } from "@/components/ui/confirm";
-
-// Ajouter l'import pour le nouveau composant
+import { useAuth } from "@/contexts/AuthContext";
 import { PlusCircle, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const StudentManagement = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [studentToEdit, setStudentToEdit] = useState<StudentType | null>(null);
@@ -31,6 +30,11 @@ const StudentManagement = () => {
     queryKey: ["students"],
     queryFn: getStudents,
   });
+
+  useEffect(() => {
+    console.log("Auth state changed, refetching students...");
+    refetch();
+  }, [user, refetch]);
 
   const { data: schools = [] as School[] } = useQuery({
     queryKey: ["schools"],
@@ -98,6 +102,10 @@ const StudentManagement = () => {
     }
     refetch();
   };
+
+  useEffect(() => {
+    console.log(`StudentManagement rendered with ${students.length} students`);
+  }, [students]);
 
   return (
     <div className="min-h-screen bg-gray-50">

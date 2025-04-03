@@ -59,11 +59,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (user) {
       console.log("Auth state updated, user is logged in:", user.email);
+      // Invalidate all queries when auth state changes
+      queryClient.invalidateQueries();
     } else {
       console.log("Auth state updated, user is logged out");
+      // Clear query cache when user is logged out
+      queryClient.clear();
     }
-    // Invalidate all queries when auth state changes
-    queryClient.invalidateQueries();
   }, [user, queryClient]);
 
   return (

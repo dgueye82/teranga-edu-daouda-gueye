@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Shield, UserCheck, User, AlertCircle } from "lucide-react";
+import { Shield, UserCheck, User, AlertCircle, Building, BookOpen, Users, FileText, School } from "lucide-react";
 import { UserRole } from "@/types/auth";
 
 type UserWithProfile = {
@@ -123,10 +123,12 @@ const UserRoleManagement = () => {
       
       // Simulate redirection based on the impersonated user's role
       const user = users.find(u => u.id === userId);
-      if (user?.role === "teacher") {
+      if (user?.role === "teacher" || user?.role === "director" || user?.role === "secretary") {
         window.location.href = "/staff-dashboard";
-      } else if (user?.role === "admin") {
+      } else if (user?.role === "admin" || user?.role === "inspector") {
         window.location.href = "/director-dashboard";
+      } else if (user?.role === "student" || user?.role === "parent") {
+        window.location.href = "/student-dashboard";
       }
     } catch (error) {
       console.error("Error impersonating user:", error);
@@ -157,10 +159,20 @@ const UserRoleManagement = () => {
     switch (role) {
       case "admin":
         return <Shield className="h-4 w-4 text-red-500" />;
+      case "director":
+        return <Building className="h-4 w-4 text-purple-500" />;
+      case "secretary":
+        return <FileText className="h-4 w-4 text-blue-500" />;
       case "teacher":
-        return <UserCheck className="h-4 w-4 text-green-500" />;
+        return <BookOpen className="h-4 w-4 text-green-500" />;
+      case "parent":
+        return <Users className="h-4 w-4 text-orange-500" />;
       case "student":
         return <User className="h-4 w-4 text-blue-500" />;
+      case "inspector":
+        return <School className="h-4 w-4 text-yellow-500" />;
+      case "school_life":
+        return <UserCheck className="h-4 w-4 text-teal-500" />;
       default:
         return <AlertCircle className="h-4 w-4 text-gray-500" />;
     }
@@ -207,10 +219,14 @@ const UserRoleManagement = () => {
                     <SelectValue placeholder="Sélectionner un rôle" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Directeur (Admin)</SelectItem>
+                    <SelectItem value="admin">Administrateur</SelectItem>
+                    <SelectItem value="director">Directeur d'École</SelectItem>
+                    <SelectItem value="secretary">Secrétaire</SelectItem>
                     <SelectItem value="teacher">Enseignant</SelectItem>
-                    <SelectItem value="student">Étudiant</SelectItem>
                     <SelectItem value="parent">Parent</SelectItem>
+                    <SelectItem value="student">Élève</SelectItem>
+                    <SelectItem value="inspector">Inspecteur</SelectItem>
+                    <SelectItem value="school_life">Vie Scolaire</SelectItem>
                   </SelectContent>
                 </Select>
               </TableCell>
@@ -250,11 +266,16 @@ const UserRoleManagement = () => {
         </div>
 
         <Tabs defaultValue="all">
-          <TabsList className="mb-4">
+          <TabsList className="mb-4 flex flex-wrap">
             <TabsTrigger value="all">Tous</TabsTrigger>
-            <TabsTrigger value="admin">Directeurs</TabsTrigger>
+            <TabsTrigger value="admin">Administrateurs</TabsTrigger>
+            <TabsTrigger value="director">Directeurs</TabsTrigger>
+            <TabsTrigger value="secretary">Secrétaires</TabsTrigger>
             <TabsTrigger value="teacher">Enseignants</TabsTrigger>
-            <TabsTrigger value="student">Étudiants</TabsTrigger>
+            <TabsTrigger value="parent">Parents</TabsTrigger>
+            <TabsTrigger value="student">Élèves</TabsTrigger>
+            <TabsTrigger value="inspector">Inspecteurs</TabsTrigger>
+            <TabsTrigger value="school_life">Vie Scolaire</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all">
@@ -277,6 +298,26 @@ const UserRoleManagement = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="director">
+            {isLoading ? (
+              <div className="flex justify-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
+              </div>
+            ) : (
+              renderUsersTable(getFilteredUsersByRole("director"))
+            )}
+          </TabsContent>
+
+          <TabsContent value="secretary">
+            {isLoading ? (
+              <div className="flex justify-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
+              </div>
+            ) : (
+              renderUsersTable(getFilteredUsersByRole("secretary"))
+            )}
+          </TabsContent>
+
           <TabsContent value="teacher">
             {isLoading ? (
               <div className="flex justify-center p-8">
@@ -287,6 +328,16 @@ const UserRoleManagement = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="parent">
+            {isLoading ? (
+              <div className="flex justify-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
+              </div>
+            ) : (
+              renderUsersTable(getFilteredUsersByRole("parent"))
+            )}
+          </TabsContent>
+
           <TabsContent value="student">
             {isLoading ? (
               <div className="flex justify-center p-8">
@@ -294,6 +345,26 @@ const UserRoleManagement = () => {
               </div>
             ) : (
               renderUsersTable(getFilteredUsersByRole("student"))
+            )}
+          </TabsContent>
+
+          <TabsContent value="inspector">
+            {isLoading ? (
+              <div className="flex justify-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
+              </div>
+            ) : (
+              renderUsersTable(getFilteredUsersByRole("inspector"))
+            )}
+          </TabsContent>
+
+          <TabsContent value="school_life">
+            {isLoading ? (
+              <div className="flex justify-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
+              </div>
+            ) : (
+              renderUsersTable(getFilteredUsersByRole("school_life"))
             )}
           </TabsContent>
         </Tabs>

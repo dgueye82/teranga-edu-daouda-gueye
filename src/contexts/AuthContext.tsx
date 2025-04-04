@@ -15,6 +15,12 @@ type AuthContextType = {
   isLoading: boolean;
   isAdmin: boolean;
   isTeacher: boolean;
+  isDirector: boolean;
+  isSecretary: boolean;
+  isParent: boolean;
+  isStudent: boolean;
+  isInspector: boolean;
+  isSchoolLife: boolean;
   signOut: () => Promise<void>;
   createUserProfileIfMissing: () => Promise<void>;
 };
@@ -26,6 +32,12 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   isAdmin: false,
   isTeacher: false,
+  isDirector: false,
+  isSecretary: false,
+  isParent: false,
+  isStudent: false,
+  isInspector: false,
+  isSchoolLife: false,
   signOut: async () => {},
   createUserProfileIfMissing: async () => {},
 });
@@ -36,11 +48,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const queryClient = useQueryClient();
   const { user, session, userProfile, isLoading, setUser, setUserProfile, setSession } = useAuthState();
 
-  // Check if the user has admin role
+  // Check for all user roles
   const isAdmin = userProfile?.role === "admin";
-  
-  // Check if the user has teacher role
   const isTeacher = userProfile?.role === "teacher";
+  const isDirector = userProfile?.role === "director";
+  const isSecretary = userProfile?.role === "secretary";
+  const isParent = userProfile?.role === "parent";
+  const isStudent = userProfile?.role === "student";
+  const isInspector = userProfile?.role === "inspector";
+  const isSchoolLife = userProfile?.role === "school_life";
 
   const handleSignOut = async () => {
     try {
@@ -111,6 +127,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         isAdmin,
         isTeacher,
+        isDirector,
+        isSecretary,
+        isParent,
+        isStudent,
+        isInspector,
+        isSchoolLife,
         signOut: handleSignOut,
         createUserProfileIfMissing,
       }}

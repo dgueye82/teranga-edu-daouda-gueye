@@ -27,4 +27,3 @@ export const filterUsersByRole = (users: UserWithProfile[], role: UserRole | "al
   if (role === "all") return users;
   return users.filter((user) => user.role === role);
 };
-

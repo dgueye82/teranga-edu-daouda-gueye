@@ -106,14 +106,16 @@ const UserRoleManagement = () => {
         description: "Dans un environnement de production, vous seriez maintenant connecté en tant que cet utilisateur.",
       });
       
-      // Simulate redirection based on the impersonated user's role
+      // Redirect based on the impersonated user's role
       const user = users.find(u => u.id === userId);
-      if (user?.role === "teacher" || user?.role === "director" || user?.role === "secretary") {
-        window.location.href = "/staff-dashboard";
-      } else if (user?.role === "admin" || user?.role === "inspector") {
-        window.location.href = "/director-dashboard";
-      } else if (user?.role === "student" || user?.role === "parent" || user?.role === "school_life") {
-        window.location.href = "/student-dashboard";
+      if (user) {
+        if (user.role === "teacher" || user.role === "director" || user.role === "secretary") {
+          window.location.href = "/staff-dashboard";
+        } else if (user.role === "admin" || user.role === "inspector") {
+          window.location.href = "/director-dashboard";
+        } else if (user.role === "student" || user.role === "parent" || user.role === "school_life") {
+          window.location.href = "/student-dashboard";
+        }
       }
     } catch (error) {
       console.error("Error impersonating user:", error);

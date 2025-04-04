@@ -112,7 +112,7 @@ const UserRoleManagement = () => {
         window.location.href = "/staff-dashboard";
       } else if (user?.role === "admin" || user?.role === "inspector") {
         window.location.href = "/director-dashboard";
-      } else if (user?.role === "student" || user?.role === "parent") {
+      } else if (user?.role === "student" || user?.role === "parent" || user?.role === "school_life") {
         window.location.href = "/student-dashboard";
       }
     } catch (error) {

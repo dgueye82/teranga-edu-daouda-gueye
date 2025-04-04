@@ -6,6 +6,7 @@ import { UserProfile } from "@/types/auth";
 import { signOutUser } from "@/services/authService";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useQueryClient } from "@tanstack/react-query";
+import { createUserProfile } from "@/services/authService";
 
 type AuthContextType = {
   user: User | null;
@@ -15,6 +16,7 @@ type AuthContextType = {
   isAdmin: boolean;
   isTeacher: boolean;
   signOut: () => Promise<void>;
+  createUserProfileIfMissing: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   isTeacher: false,
   signOut: async () => {},
+  createUserProfileIfMissing: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -55,6 +58,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Function to create a user profile if it doesn't exist
+  const createUserProfileIfMissing = async () => {
+    try {
+      if (!user) {
+        console.error("Cannot create profile: No authenticated user");
+        return;
+      }
+      
+      console.log("Attempting to create user profile if missing for:", user.email);
+      
+      // If user already has a profile, no need to create one
+      if (userProfile) {
+        console.log("User profile already exists:", userProfile);
+        return;
+      }
+      
+      // Create a new profile
+      const newProfile = await createUserProfile(user.id, user.email || "", "teacher");
+      
+      if (newProfile) {
+        console.log("New user profile created:", newProfile);
+        setUserProfile(newProfile);
+        
+        // Invalidate queries that might depend on the user profile
+        queryClient.invalidateQueries();
+      }
+    } catch (error) {
+      console.error("Error creating user profile:", error);
+    }
+  };
+
   // Force invalidation of queries when auth state changes
   useEffect(() => {
     if (user) {
@@ -78,6 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAdmin,
         isTeacher,
         signOut: handleSignOut,
+        createUserProfileIfMissing,
       }}
     >
       {children}

@@ -36,6 +36,11 @@ const DesktopNavigation = () => {
       <Link to="/parent-portal" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
         Portails parents
       </Link>
+      {!user && (
+        <Link to="/auth" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
+          Connexion / Inscription
+        </Link>
+      )}
     </nav>
   );
 };

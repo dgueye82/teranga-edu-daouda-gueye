@@ -4,10 +4,10 @@ import { UserRole } from "@/types/auth";
 export type UserWithProfile = {
   id: string;
   email: string;
-  role: UserRole; // Changed from optional to required
-  first_name?: string;
-  last_name?: string;
-  created_at?: string;
+  role: UserRole; // Already changed from optional to required
+  first_name: string;  // Changed from optional to required
+  last_name: string;   // Changed from optional to required
+  created_at: string;  // Changed from optional to required
 };
 
 // Filter users based on search term

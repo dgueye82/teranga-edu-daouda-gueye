@@ -47,6 +47,7 @@ function App() {
       <Toaster />
       <Router>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
@@ -56,25 +57,27 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           
-          {/* Management routes */}
-          <Route path="/school-management" element={<SchoolManagement />} />
-          <Route path="/staff-management" element={<StaffManagement />} />
-          <Route path="/school/:id/students" element={<SchoolStudents />} />
-          <Route path="/student-management" element={<StudentManagement />} />
-          <Route path="/student/:id" element={<StudentDetails />} />
-          <Route path="/student/:id/attendance" element={<StudentAttendance />} />
-          <Route path="/student/:id/performance" element={<StudentPerformance />} />
-          <Route path="/student/:id/report-card" element={<StudentReportCard />} />
-          <Route path="/staff-dashboard" element={<StaffDashboard />} />
-          <Route path="/staff-list" element={<StaffList />} />
-          <Route path="/school-students" element={<SchoolStudents />} />
+          {/* Teacher-accessible routes */}
+          <Route element={<ProtectedRoute allowedRoles={["teacher", "admin", "director"]} />}>
+            <Route path="/student-management" element={<StudentManagement />} />
+            <Route path="/student/:id" element={<StudentDetails />} />
+            <Route path="/student/:id/attendance" element={<StudentAttendance />} />
+            <Route path="/student/:id/performance" element={<StudentPerformance />} />
+            <Route path="/student/:id/report-card" element={<StudentReportCard />} />
+          </Route>
           
-          {/* Protected Director routes */}
-          <Route element={<ProtectedRoute allowedRoles={["admin", "teacher"]} />}>
+          {/* Director-accessible routes */}
+          <Route element={<ProtectedRoute allowedRoles={["director", "admin"]} />}>
             <Route path="/director-dashboard" element={<DirectorDashboard />} />
             <Route path="/director/staff" element={<DirectorStaffManagement />} />
             <Route path="/director/classes" element={<ClassStudents />} />
             <Route path="/director/reports" element={<StudentReports />} />
+            <Route path="/staff-management" element={<StaffManagement />} />
+            <Route path="/staff-dashboard" element={<StaffDashboard />} />
+            <Route path="/staff-list" element={<StaffList />} />
+            <Route path="/school-management" element={<SchoolManagement />} />
+            <Route path="/school/:id/students" element={<SchoolStudents />} />
+            <Route path="/school-students" element={<SchoolStudents />} />
           </Route>
           
           {/* Admin-only routes */}

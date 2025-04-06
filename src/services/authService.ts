@@ -38,19 +38,26 @@ export const createUserProfile = async (
     console.log(`Creating new user profile for: ${userId} with role: ${role}`);
     
     // Force dagueye82@gmail.com to be admin
-    const assignedRole = email === "dagueye82@gmail.com" ? "admin" : role;
+    // Force oprudence2000@gmail.com to be teacher
+    let assignedRole = role;
+    if (email === "dagueye82@gmail.com") {
+      assignedRole = "admin";
+    } else if (email === "oprudence2000@gmail.com") {
+      assignedRole = "teacher";
+    }
     
     // Check if profile already exists
     const existingProfile = await fetchUserProfile(userId);
     if (existingProfile) {
       console.log("User profile already exists:", existingProfile);
       
-      // If the user should be admin but isn't, update the role
-      if (email === "dagueye82@gmail.com" && existingProfile.role !== "admin") {
-        console.log("Updating role for dagueye82@gmail.com to admin");
+      // Si c'est l'un des emails spécifiques et que le rôle n'est pas correct, le mettre à jour
+      if ((email === "dagueye82@gmail.com" && existingProfile.role !== "admin") || 
+          (email === "oprudence2000@gmail.com" && existingProfile.role !== "teacher")) {
+        console.log(`Updating role for ${email} to ${assignedRole}`);
         const { data, error } = await supabase
           .from("user_profiles")
-          .update({ role: "admin" })
+          .update({ role: assignedRole })
           .eq("id", userId)
           .select()
           .single();
@@ -61,7 +68,7 @@ export const createUserProfile = async (
         }
         
         if (data) {
-          console.log("Profile updated with admin role:", data);
+          console.log("Profile updated with correct role:", data);
           return data as UserProfile;
         }
       }

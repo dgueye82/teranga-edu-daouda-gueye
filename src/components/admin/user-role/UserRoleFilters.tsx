@@ -1,28 +1,44 @@
 
 import React from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { UserRole } from "@/types/auth";
 
 interface UserRoleFiltersProps {
   activeTab: string;
   onChange: (value: string) => void;
+  showAllTabs?: boolean;
+  showTeacherTab?: boolean;
+  showStudentTab?: boolean;
+  showParentTab?: boolean;
 }
 
-const UserRoleFilters: React.FC<UserRoleFiltersProps> = ({ activeTab, onChange }) => {
+const UserRoleFilters: React.FC<UserRoleFiltersProps> = ({
+  activeTab,
+  onChange,
+  showAllTabs = true,
+  showTeacherTab = true,
+  showStudentTab = true,
+  showParentTab = true,
+}) => {
   return (
-    <Tabs value={activeTab} onValueChange={onChange}>
-      <TabsList className="mb-4 flex flex-wrap">
-        <TabsTrigger value="all">Tous</TabsTrigger>
-        <TabsTrigger value="admin">Administrateurs</TabsTrigger>
-        <TabsTrigger value="director">Directeurs</TabsTrigger>
-        <TabsTrigger value="secretary">Secrétaires</TabsTrigger>
-        <TabsTrigger value="teacher">Enseignants</TabsTrigger>
-        <TabsTrigger value="parent">Parents</TabsTrigger>
-        <TabsTrigger value="student">Élèves</TabsTrigger>
-        <TabsTrigger value="inspector">Inspecteurs</TabsTrigger>
-        <TabsTrigger value="school_life">Vie Scolaire</TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <div className="mb-6">
+      <Tabs value={activeTab} onValueChange={onChange}>
+        <TabsList className="mb-4 flex-wrap">
+          {showAllTabs && (
+            <>
+              <TabsTrigger value="all">Tous</TabsTrigger>
+              <TabsTrigger value="admin">Administrateurs</TabsTrigger>
+              <TabsTrigger value="director">Directeurs</TabsTrigger>
+              <TabsTrigger value="secretary">Secrétaires</TabsTrigger>
+              <TabsTrigger value="inspector">Inspecteurs</TabsTrigger>
+            </>
+          )}
+          {showTeacherTab && <TabsTrigger value="teacher">Enseignants</TabsTrigger>}
+          {showStudentTab && <TabsTrigger value="student">Élèves</TabsTrigger>}
+          {showParentTab && <TabsTrigger value="parent">Parents</TabsTrigger>}
+          {showAllTabs && <TabsTrigger value="school_life">Vie Scolaire</TabsTrigger>}
+        </TabsList>
+      </Tabs>
+    </div>
   );
 };
 

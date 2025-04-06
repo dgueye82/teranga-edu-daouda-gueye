@@ -1,93 +1,126 @@
 
 import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ChevronDown, User } from "lucide-react";
+import { UserRole } from "@/types/auth";
 import UserRoleIcon from "./UserRoleIcon";
 import UserRoleSelect from "./UserRoleSelect";
-import { UserRole } from "@/types/auth";
-
-type UserWithProfile = {
-  id: string;
-  email: string;
-  role?: UserRole;
-  first_name?: string;
-  last_name?: string;
-  created_at?: string;
-};
+import { UserWithProfile } from "./userRoleUtils";
+import { format } from "date-fns";
 
 interface UserRoleTableProps {
   users: UserWithProfile[];
   updateUserRole: (userId: string, role: UserRole) => Promise<void>;
   impersonateUser: (userId: string) => Promise<void>;
-  isLoading?: boolean;
+  isLoading: boolean;
+  currentUserRole?: UserRole;
 }
 
 const UserRoleTable: React.FC<UserRoleTableProps> = ({
   users,
   updateUserRole,
   impersonateUser,
-  isLoading = false,
+  isLoading,
+  currentUserRole
 }) => {
+  // Determine permissions based on user role
+  const canEditRoles = currentUserRole === "admin" || currentUserRole === "director";
+  const canImpersonate = currentUserRole === "admin";
+
+  // Helper to format dates
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    return format(new Date(dateString), "dd/MM/yyyy");
+  };
+
   if (isLoading) {
     return (
-      <div className="flex justify-center p-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
+      <div className="w-full flex justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (!users.length) {
+    return (
+      <div className="w-full text-center py-8">
+        <p className="text-gray-500">Aucun utilisateur trouvé</p>
       </div>
     );
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Email</TableHead>
-          <TableHead>Nom</TableHead>
-          <TableHead>Rôle actuel</TableHead>
-          <TableHead>Changer le rôle</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {users.length === 0 ? (
+    <div className="w-full overflow-auto">
+      <Table>
+        <TableHeader>
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-              Aucun utilisateur trouvé
-            </TableCell>
+            <TableHead className="w-12"></TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Nom</TableHead>
+            <TableHead>Date de création</TableHead>
+            <TableHead>Rôle</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
-        ) : (
-          users.map((user) => (
+        </TableHeader>
+        <TableBody>
+          {users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>{user.email}</TableCell>
+              <TableCell>
+                <UserRoleIcon role={user.role} />
+              </TableCell>
+              <TableCell className="font-medium">{user.email}</TableCell>
               <TableCell>
                 {user.first_name || user.last_name
-                  ? `${user.first_name || ""} ${user.last_name || ""}`.trim()
-                  : "Non spécifié"}
+                  ? `${user.first_name || ""} ${user.last_name || ""}`
+                  : "—"}
               </TableCell>
-              <TableCell className="flex items-center gap-2">
-                <UserRoleIcon role={user.role} />
-                {user.role || "Non défini"}
-              </TableCell>
+              <TableCell>{formatDate(user.created_at)}</TableCell>
               <TableCell>
-                <UserRoleSelect 
-                  value={user.role || ""}
-                  onValueChange={(value) => updateUserRole(user.id, value)}
-                />
+                {canEditRoles ? (
+                  <UserRoleSelect
+                    value={user.role || "student"}
+                    onChange={(newRole) => updateUserRole(user.id, newRole)}
+                  />
+                ) : (
+                  <span className="capitalize">{user.role || "—"}</span>
+                )}
               </TableCell>
-              <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => impersonateUser(user.id)}
-                  disabled={!user.role || user.role === "student" || user.role === "parent"}
-                >
-                  Impersonifier
-                </Button>
+              <TableCell className="text-right">
+                {canImpersonate && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        Actions <ChevronDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => impersonateUser(user.id)}>
+                        <User className="mr-2 h-4 w-4" />
+                        Impersonifier
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </TableCell>
             </TableRow>
-          ))
-        )}
-      </TableBody>
-    </Table>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 

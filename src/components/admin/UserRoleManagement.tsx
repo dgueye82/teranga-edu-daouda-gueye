@@ -9,7 +9,8 @@ import { TabsContent } from "@/components/ui/tabs";
 import { UserRole } from "@/types/auth";
 import UserRoleTable from "./user-role/UserRoleTable";
 import UserRoleFilters from "./user-role/UserRoleFilters";
-import { UserWithProfile, filterUsersBySearch, filterUsersByRole } from "./user-role/userRoleUtils";
+import { UserWithProfile, filterUsersBySearch, filterUsersByRole, filterUsersByUserAccess } from "./user-role/userRoleUtils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const UserRoleManagement = () => {
   const [users, setUsers] = useState<UserWithProfile[]>([]);
@@ -17,6 +18,7 @@ const UserRoleManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const { toast } = useToast();
+  const { userProfile } = useAuth();
 
   // Fetch all users and their profiles
   const fetchUsers = async () => {
@@ -30,16 +32,21 @@ const UserRoleManagement = () => {
         throw profilesError;
       }
 
-      setUsers(
-        profiles.map((profile) => ({
-          id: profile.id,
-          email: profile.email,
-          role: profile.role as UserRole,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          created_at: profile.created_at,
-        }))
-      );
+      let userProfiles = profiles.map((profile) => ({
+        id: profile.id,
+        email: profile.email,
+        role: profile.role as UserRole,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        created_at: profile.created_at,
+      }));
+      
+      // Filter users based on current user's role
+      if (userProfile) {
+        userProfiles = filterUsersByUserAccess(userProfiles, userProfile.role);
+      }
+
+      setUsers(userProfiles);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -54,11 +61,21 @@ const UserRoleManagement = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [userProfile]);
 
   // Update a user's role
   const updateUserRole = async (userId: string, role: UserRole) => {
     try {
+      // Check if current user has permission to update roles
+      if (userProfile?.role !== "admin" && userProfile?.role !== "director") {
+        toast({
+          variant: "destructive",
+          title: "Permission refusée",
+          description: "Vous n'avez pas les droits pour modifier les rôles des utilisateurs.",
+        });
+        return;
+      }
+      
       const { data, error } = await supabase
         .from("user_profiles")
         .update({ role })
@@ -91,6 +108,16 @@ const UserRoleManagement = () => {
   // Impersonate a user (log in as them)
   const impersonateUser = async (userId: string) => {
     try {
+      // Check if current user has permission to impersonate
+      if (userProfile?.role !== "admin") {
+        toast({
+          variant: "destructive",
+          title: "Permission refusée",
+          description: "Seuls les administrateurs peuvent impersonifier d'autres utilisateurs.",
+        });
+        return;
+      }
+      
       // Store the current admin user ID for later restoration
       const sessionResponse = await supabase.auth.getSession();
       
@@ -131,12 +158,19 @@ const UserRoleManagement = () => {
   const filteredUsers = filterUsersBySearch(users, searchTerm);
   const getFilteredUsersByRole = (role: UserRole | "all") => filterUsersByRole(filteredUsers, role);
 
+  // Determine which tabs to show based on user role
+  const showAllTabs = userProfile?.role === "admin" || userProfile?.role === "director";
+  const showTeacherTab = showAllTabs || ["admin", "director", "inspector"].includes(userProfile?.role);
+  const showStudentTab = showAllTabs || ["admin", "director", "teacher", "secretary", "school_life"].includes(userProfile?.role);
+  const showParentTab = showAllTabs || ["admin", "director", "teacher", "secretary", "school_life"].includes(userProfile?.role);
+
   const renderTabContent = (role: UserRole | "all") => (
     <UserRoleTable 
       users={getFilteredUsersByRole(role)} 
       updateUserRole={updateUserRole}
       impersonateUser={impersonateUser}
       isLoading={isLoading}
+      currentUserRole={userProfile?.role}
     />
   );
 
@@ -145,7 +179,10 @@ const UserRoleManagement = () => {
       <CardHeader>
         <CardTitle>Gestion des Rôles Utilisateurs</CardTitle>
         <CardDescription>
-          Attribuez des rôles aux utilisateurs et impersonifiez des comptes directeur ou enseignant.
+          {userProfile?.role === "admin" ? 
+            "Attribuez des rôles aux utilisateurs et impersonifiez des comptes." :
+            "Consultez les utilisateurs selon vos permissions."
+          }
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -158,7 +195,14 @@ const UserRoleManagement = () => {
           />
         </div>
 
-        <UserRoleFilters activeTab={activeTab} onChange={setActiveTab} />
+        <UserRoleFilters 
+          activeTab={activeTab} 
+          onChange={setActiveTab}
+          showAllTabs={showAllTabs}
+          showTeacherTab={showTeacherTab}
+          showStudentTab={showStudentTab}
+          showParentTab={showParentTab}
+        />
 
         <TabsContent value="all">{renderTabContent("all")}</TabsContent>
         <TabsContent value="admin">{renderTabContent("admin")}</TabsContent>

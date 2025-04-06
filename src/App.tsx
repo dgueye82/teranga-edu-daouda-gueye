@@ -58,7 +58,7 @@ function App() {
           <Route path="/unauthorized" element={<Unauthorized />} />
           
           {/* Teacher-accessible routes */}
-          <Route element={<ProtectedRoute allowedRoles={["teacher", "admin", "director"]} />}>
+          <Route element={<ProtectedRoute allowedRoles={["teacher", "admin", "director", "inspector"]} />}>
             <Route path="/student-management" element={<StudentManagement />} />
             <Route path="/student/:id" element={<StudentDetails />} />
             <Route path="/student/:id/attendance" element={<StudentAttendance />} />
@@ -66,18 +66,41 @@ function App() {
             <Route path="/student/:id/report-card" element={<StudentReportCard />} />
           </Route>
           
-          {/* Director-accessible routes */}
-          <Route element={<ProtectedRoute allowedRoles={["director", "admin"]} />}>
+          {/* Director and Administrative staff routes */}
+          <Route element={<ProtectedRoute allowedRoles={["director", "admin", "secretary"]} />}>
+            <Route path="/school-management" element={<SchoolManagement />} />
+            <Route path="/school/:id/students" element={<SchoolStudents />} />
+            <Route path="/school-students" element={<SchoolStudents />} />
+          </Route>
+          
+          {/* Director-specific routes */}
+          <Route element={<ProtectedRoute allowedRoles={["director", "admin", "inspector"]} />}>
             <Route path="/director-dashboard" element={<DirectorDashboard />} />
             <Route path="/director/staff" element={<DirectorStaffManagement />} />
             <Route path="/director/classes" element={<ClassStudents />} />
             <Route path="/director/reports" element={<StudentReports />} />
+          </Route>
+          
+          {/* Staff management routes */}
+          <Route element={<ProtectedRoute allowedRoles={["admin", "director", "secretary"]} />}>
             <Route path="/staff-management" element={<StaffManagement />} />
             <Route path="/staff-dashboard" element={<StaffDashboard />} />
             <Route path="/staff-list" element={<StaffList />} />
-            <Route path="/school-management" element={<SchoolManagement />} />
-            <Route path="/school/:id/students" element={<SchoolStudents />} />
-            <Route path="/school-students" element={<SchoolStudents />} />
+          </Route>
+          
+          {/* School life personnel routes */}
+          <Route element={<ProtectedRoute allowedRoles={["school_life", "admin", "director"]} />}>
+            {/* Currently no specific routes for school_life, but can be added here */}
+          </Route>
+          
+          {/* Parent-specific routes */}
+          <Route element={<ProtectedRoute allowedRoles={["parent", "admin"]} />}>
+            {/* Currently no specific routes for parents, but can be added here */}
+          </Route>
+          
+          {/* Student-specific routes */}
+          <Route element={<ProtectedRoute allowedRoles={["student", "admin"]} />}>
+            {/* Currently no specific routes for students, but can be added here */}
           </Route>
           
           {/* Admin-only routes */}

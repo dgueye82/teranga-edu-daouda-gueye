@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { UserProfile, UserRole } from "@/types/auth";
 
@@ -37,8 +36,7 @@ export const createUserProfile = async (
   try {
     console.log(`Creating new user profile for: ${userId} with role: ${role}`);
     
-    // Force dagueye82@gmail.com to be admin
-    // Force oprudence2000@gmail.com to be teacher
+    // Assign specific roles to specific email addresses
     let assignedRole = role;
     if (email === "dagueye82@gmail.com") {
       assignedRole = "admin";
@@ -51,7 +49,7 @@ export const createUserProfile = async (
     if (existingProfile) {
       console.log("User profile already exists:", existingProfile);
       
-      // Si c'est l'un des emails spécifiques et que le rôle n'est pas correct, le mettre à jour
+      // If it's one of the specific emails and the role is not correct, update it
       if ((email === "dagueye82@gmail.com" && existingProfile.role !== "admin") || 
           (email === "oprudence2000@gmail.com" && existingProfile.role !== "teacher")) {
         console.log(`Updating role for ${email} to ${assignedRole}`);

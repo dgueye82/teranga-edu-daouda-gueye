@@ -35,10 +35,10 @@ const UserRoleManagement = () => {
       let userProfiles = profiles.map((profile) => ({
         id: profile.id,
         email: profile.email,
-        role: profile.role as UserRole,
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        created_at: profile.created_at,
+        role: profile.role as UserRole, // Ensure role is always set
+        first_name: profile.first_name || undefined,
+        last_name: profile.last_name || undefined,
+        created_at: profile.created_at || undefined,
       }));
       
       // Filter users based on current user's role

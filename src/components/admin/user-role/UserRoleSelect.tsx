@@ -5,14 +5,14 @@ import { UserRole } from "@/types/auth";
 
 interface UserRoleSelectProps {
   value: UserRole | string;
-  onValueChange: (value: UserRole) => void;
+  onChange: (value: UserRole) => void; // Changed from onValueChange to onChange
 }
 
-const UserRoleSelect: React.FC<UserRoleSelectProps> = ({ value, onValueChange }) => {
+const UserRoleSelect: React.FC<UserRoleSelectProps> = ({ value, onChange }) => {
   return (
     <Select
       value={value || ""}
-      onValueChange={(value) => onValueChange(value as UserRole)}
+      onValueChange={(value) => onChange(value as UserRole)} // Keep using onValueChange internally
     >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Sélectionner un rôle" />

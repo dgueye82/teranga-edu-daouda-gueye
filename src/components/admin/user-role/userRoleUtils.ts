@@ -4,7 +4,7 @@ import { UserRole } from "@/types/auth";
 export type UserWithProfile = {
   id: string;
   email: string;
-  role?: UserRole;
+  role: UserRole; // Changed from optional to required
   first_name?: string;
   last_name?: string;
   created_at?: string;

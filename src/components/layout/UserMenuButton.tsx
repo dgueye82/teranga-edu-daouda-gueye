@@ -22,7 +22,7 @@ const UserMenuButton = () => {
     if (user) {
       toast({
         title: "Connecté",
-        description: `Vous êtes connecté en tant que ${user.email}`,
+        description: `Vous êtes connecté en tant que ${user.email}${userProfile ? ' ('+userProfile.role+')' : ''}`,
         variant: "default"
       });
     } else {
@@ -40,8 +40,7 @@ const UserMenuButton = () => {
         <Button
           variant="ghost"
           className="h-10 w-10 rounded-full relative"
-          aria-label="User menu"
-          onClick={showLoginStatus}
+          aria-label="Menu utilisateur"
         >
           {user ? (
             <>

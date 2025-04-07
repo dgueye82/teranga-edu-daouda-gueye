@@ -4,10 +4,12 @@ import { NavLink } from "react-router-dom";
 import DesktopNavigation from "./navigation/DesktopNavigation";
 import MobileMenuToggle from "./navigation/MobileMenuToggle";
 import MobileMenu from "./navigation/MobileMenu";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {

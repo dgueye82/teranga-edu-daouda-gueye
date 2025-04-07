@@ -1,9 +1,10 @@
 
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import UserMenuButton from "../UserMenuButton";
 
 const DesktopNavigation = () => {
-  const { isAdmin, isTeacher, user } = useAuth();
+  const { isAdmin, isTeacher, user, userProfile } = useAuth();
 
   return (
     <nav className="hidden lg:flex items-center space-x-6">
@@ -36,11 +37,9 @@ const DesktopNavigation = () => {
       <Link to="/parent-portal" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
         Portails parents
       </Link>
-      {!user && (
-        <Link to="/auth" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-          Connexion / Inscription
-        </Link>
-      )}
+      
+      {/* User menu button for desktop */}
+      <UserMenuButton />
     </nav>
   );
 };

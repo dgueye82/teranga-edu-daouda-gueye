@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const UserMenuButton = () => {
-  const { user, signOut, isAdmin, isTeacher, userProfile } = useAuth();
+  const { user, signOut, isAdmin, isTeacher, isDirector, isParent, isStudent, userProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -43,6 +43,21 @@ const UserMenuButton = () => {
       return user.email.substring(0, 2).toUpperCase();
     } else {
       return "TE"; // Default for Teranga Edu
+    }
+  };
+
+  // Helper function to get role-specific display name
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'admin': return 'Administrateur';
+      case 'teacher': return 'Enseignant';
+      case 'director': return 'Directeur';
+      case 'secretary': return 'Secrétaire';
+      case 'parent': return 'Parent';
+      case 'student': return 'Élève';
+      case 'inspector': return 'Inspecteur';
+      case 'school_life': return 'Vie Scolaire';
+      default: return role;
     }
   };
 
@@ -83,7 +98,7 @@ const UserMenuButton = () => {
               <div className="text-xs text-gray-500 mt-1">{user.email}</div>
               {userProfile?.role && (
                 <span className="block text-xs text-gray-500 mt-1 bg-gray-100 px-2 py-1 rounded-full w-fit">
-                  {userProfile.role}
+                  {getRoleDisplayName(userProfile.role)}
                 </span>
               )}
             </div>
@@ -95,9 +110,27 @@ const UserMenuButton = () => {
               </DropdownMenuItem>
             )}
             
-            {(isAdmin || isTeacher) && (
+            {isDirector && (
               <DropdownMenuItem onClick={() => navigate('/director-dashboard')} className="cursor-pointer">
-                Tableau de bord
+                Tableau de bord directeur
+              </DropdownMenuItem>
+            )}
+            
+            {isTeacher && (
+              <DropdownMenuItem onClick={() => navigate('/student-management')} className="cursor-pointer">
+                Gestion des élèves
+              </DropdownMenuItem>
+            )}
+            
+            {isParent && (
+              <DropdownMenuItem onClick={() => navigate('/parent-portal')} className="cursor-pointer">
+                Espace parent
+              </DropdownMenuItem>
+            )}
+            
+            {isStudent && (
+              <DropdownMenuItem onClick={() => navigate('/student-portal')} className="cursor-pointer">
+                Espace élève
               </DropdownMenuItem>
             )}
             

@@ -11,7 +11,7 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const { user, signOut, isAdmin, userProfile, isTeacher } = useAuth();
+  const { user, signOut, isAdmin, userProfile, isTeacher, isDirector, isParent, isStudent, isSecretary, isInspector, isSchoolLife } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -26,6 +26,21 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       return user.email.substring(0, 2).toUpperCase();
     } else {
       return "TE"; // Default for Teranga Edu
+    }
+  };
+
+  // Helper function to get role-specific display name
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'admin': return 'Administrateur';
+      case 'teacher': return 'Enseignant';
+      case 'director': return 'Directeur';
+      case 'secretary': return 'Secrétaire';
+      case 'parent': return 'Parent';
+      case 'student': return 'Élève';
+      case 'inspector': return 'Inspecteur';
+      case 'school_life': return 'Vie Scolaire';
+      default: return role;
     }
   };
 
@@ -59,7 +74,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               <p className="text-sm text-gray-500">{user.email}</p>
               {userProfile?.role && (
                 <span className="inline-block text-xs mt-1 bg-gray-200 px-2 py-0.5 rounded-full">
-                  {userProfile.role}
+                  {getRoleDisplayName(userProfile.role)}
                 </span>
               )}
             </div>
@@ -70,32 +85,78 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           Accueil
         </Link>
         
-        {(isAdmin || isTeacher) && user && (
-          <Link to="/director-dashboard" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-            Tableau de bord directeur
-          </Link>
-        )}
-        
         <Link to="/about" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           À propos
         </Link>
-        <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer l'école
-        </Link>
-        <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer le personnel
-        </Link>
-        <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer l'élève
-        </Link>
+        
+        {/* Admin specific links */}
+        {isAdmin && (
+          <>
+            <Link to="/admin/users" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gestion des utilisateurs
+            </Link>
+            <Link to="/director-dashboard" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Tableau de bord administrateur
+            </Link>
+          </>
+        )}
+        
+        {/* Director specific links */}
+        {isDirector && (
+          <>
+            <Link to="/director-dashboard" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Tableau de bord directeur
+            </Link>
+            <Link to="/director/staff" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gestion du personnel
+            </Link>
+            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer l'école
+            </Link>
+          </>
+        )}
+        
+        {/* Teacher specific links */}
+        {isTeacher && (
+          <>
+            <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer les élèves
+            </Link>
+            <Link to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Programme d'études et évaluation
+            </Link>
+          </>
+        )}
+        
+        {/* Secretary specific links */}
+        {isSecretary && (
+          <>
+            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer l'école
+            </Link>
+            <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer le personnel
+            </Link>
+          </>
+        )}
+        
+        {/* Parent specific links */}
+        {isParent && (
+          <Link to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+            Portail parent
+          </Link>
+        )}
+        
+        {/* Student specific links */}
+        {isStudent && (
+          <Link to="/student-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+            Portail élève
+          </Link>
+        )}
+        
+        {/* General links shown to all users */}
         <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Formation en ligne
-        </Link>
-        <Link to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Programme d'études et évaluation
-        </Link>
-        <Link to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Portails parents
         </Link>
         
         <div className="pt-4 mt-auto">
@@ -113,14 +174,6 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               <Button variant="default" className="w-full">
                 <LogIn className="mr-2 h-4 w-4" />
                 Connexion
-              </Button>
-            </Link>
-          )}
-          
-          {isAdmin && (
-            <Link to="/admin/users" onClick={onClose}>
-              <Button variant="outline" className="w-full mt-2">
-                Gestion des utilisateurs
               </Button>
             </Link>
           )}

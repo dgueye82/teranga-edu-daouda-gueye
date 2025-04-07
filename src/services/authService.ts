@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { UserProfile, UserRole } from "@/types/auth";
 
@@ -31,7 +32,9 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
 export const createUserProfile = async (
   userId: string, 
   email: string, 
-  role: UserRole = "teacher"
+  role: UserRole = "teacher",
+  firstName?: string,
+  lastName?: string
 ): Promise<UserProfile | null> => {
   try {
     console.log(`Creating new user profile for: ${userId} with role: ${role}`);
@@ -74,10 +77,25 @@ export const createUserProfile = async (
       return existingProfile;
     }
     
+    // Try to get name from user metadata if not provided
+    if (!firstName || !lastName) {
+      const { data: userData } = await supabase.auth.getUser(userId);
+      if (userData?.user?.user_metadata) {
+        firstName = firstName || userData.user.user_metadata.first_name;
+        lastName = lastName || userData.user.user_metadata.last_name;
+      }
+    }
+    
     const { data, error } = await supabase
       .from("user_profiles")
       .insert([
-        { id: userId, email, role: assignedRole }
+        { 
+          id: userId, 
+          email, 
+          role: assignedRole,
+          first_name: firstName,
+          last_name: lastName
+        }
       ])
       .select()
       .single();
@@ -171,7 +189,7 @@ export const signUpWithEmailPassword = async (
     
     // Create user profile immediately after signup
     if (data.user) {
-      await createUserProfile(data.user.id, email, actualRole);
+      await createUserProfile(data.user.id, email, actualRole, firstName, lastName);
     }
     
     return data;

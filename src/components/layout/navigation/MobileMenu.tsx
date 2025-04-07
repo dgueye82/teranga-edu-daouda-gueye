@@ -1,7 +1,9 @@
+
 import { X, LogIn, LogOut, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -14,6 +16,17 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const handleSignOut = async () => {
     await signOut();
     onClose();
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (userProfile?.first_name && userProfile?.last_name) {
+      return `${userProfile.first_name[0]}${userProfile.last_name[0]}`.toUpperCase();
+    } else if (user?.email) {
+      return user.email.substring(0, 2).toUpperCase();
+    } else {
+      return "TE"; // Default for Teranga Edu
+    }
   };
 
   return (
@@ -33,15 +46,22 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
         {user && (
-          <div className="py-3 px-4 mb-2 bg-gray-50 rounded-lg">
-            <div className="flex items-center gap-2">
-              <UserCheck className="h-5 w-5 text-teranga-blue" />
-              <div>
-                <p className="font-medium text-teranga-blue">{user.email}</p>
-                {userProfile?.role && (
-                  <p className="text-xs text-gray-500">Rôle: {userProfile.role}</p>
-                )}
-              </div>
+          <div className="py-4 px-4 mb-2 bg-gray-50 rounded-lg flex items-start gap-3">
+            <Avatar className="h-10 w-10 border-2 border-teranga-blue">
+              <AvatarFallback className="bg-teranga-blue text-white">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-bold text-teranga-blue">
+                {userProfile?.first_name} {userProfile?.last_name || user.email?.split('@')[0]}
+              </p>
+              <p className="text-sm text-gray-500">{user.email}</p>
+              {userProfile?.role && (
+                <span className="inline-block text-xs mt-1 bg-gray-200 px-2 py-0.5 rounded-full">
+                  {userProfile.role}
+                </span>
+              )}
             </div>
           </div>
         )}
@@ -83,7 +103,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             <Button 
               variant="outline" 
               onClick={handleSignOut} 
-              className="w-full"
+              className="w-full flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-50"
             >
               <LogOut className="mr-2 h-4 w-4" />
               Déconnexion

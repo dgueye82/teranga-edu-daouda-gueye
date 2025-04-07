@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const UserMenuButton = () => {
   const { user, signOut, isAdmin, isTeacher, userProfile } = useAuth();
@@ -34,58 +35,81 @@ const UserMenuButton = () => {
     }
   };
 
+  // Get user initials for avatar fallback
+  const getUserInitials = () => {
+    if (userProfile?.first_name && userProfile?.last_name) {
+      return `${userProfile.first_name[0]}${userProfile.last_name[0]}`.toUpperCase();
+    } else if (user?.email) {
+      return user.email.substring(0, 2).toUpperCase();
+    } else {
+      return "TE"; // Default for Teranga Edu
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="h-10 w-10 rounded-full relative"
-          aria-label="Menu utilisateur"
-        >
-          {user ? (
-            <>
-              <UserCheck className="h-5 w-5 text-teranga-blue" />
-              <span className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"></span>
-            </>
-          ) : (
+        {user ? (
+          <Button
+            variant="ghost"
+            className="relative flex items-center gap-2 px-2 py-1.5 rounded-full"
+            aria-label="Menu utilisateur"
+          >
+            <Avatar className="h-8 w-8 border-2 border-teranga-blue">
+              <AvatarFallback className="bg-teranga-blue text-white">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="hidden md:inline-block text-sm font-medium">
+              {userProfile?.first_name || user.email?.split('@')[0]}
+            </span>
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"></span>
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            className="h-9 w-9 rounded-full"
+            aria-label="Menu utilisateur"
+          >
             <User className="h-5 w-5" />
-          )}
-        </Button>
+          </Button>
+        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-64">
         {user ? (
           <>
-            <div className="px-2 py-1.5 text-sm font-medium text-teranga-blue">
-              {user.email}
+            <div className="px-4 py-3 text-sm font-medium text-teranga-blue">
+              <div className="font-bold">{userProfile?.first_name} {userProfile?.last_name}</div>
+              <div className="text-xs text-gray-500 mt-1">{user.email}</div>
               {userProfile?.role && (
-                <span className="block text-xs text-gray-500 mt-1">
-                  Rôle: {userProfile.role}
+                <span className="block text-xs text-gray-500 mt-1 bg-gray-100 px-2 py-1 rounded-full w-fit">
+                  {userProfile.role}
                 </span>
               )}
             </div>
             <DropdownMenuSeparator />
             
             {isAdmin && (
-              <DropdownMenuItem onClick={() => navigate('/admin/users')}>
+              <DropdownMenuItem onClick={() => navigate('/admin/users')} className="cursor-pointer">
                 Gestion des utilisateurs
               </DropdownMenuItem>
             )}
             
             {(isAdmin || isTeacher) && (
-              <DropdownMenuItem onClick={() => navigate('/director-dashboard')}>
+              <DropdownMenuItem onClick={() => navigate('/director-dashboard')} className="cursor-pointer">
                 Tableau de bord
               </DropdownMenuItem>
             )}
             
             <DropdownMenuSeparator />
             
-            <DropdownMenuItem onClick={signOut}>
+            <DropdownMenuItem onClick={signOut} className="text-red-500 cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               Déconnexion
             </DropdownMenuItem>
           </>
         ) : (
-          <DropdownMenuItem onClick={() => navigate('/auth')}>
+          <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer">
             <LogIn className="mr-2 h-4 w-4" />
             Connexion
           </DropdownMenuItem>

@@ -23,6 +23,23 @@ export const useAuthState = () => {
       } else {
         console.log("No profile found for:", userId);
         setUserProfile(null);
+        
+        // Get user metadata as fallback for name display
+        const { data } = await supabase.auth.getUser();
+        const metadata = data?.user?.user_metadata;
+        
+        if (metadata?.first_name || metadata?.last_name) {
+          console.log("Using metadata for name:", metadata);
+          // Create a temporary profile with metadata
+          setUserProfile({
+            ...profile,
+            id: userId,
+            email: data?.user?.email || '',
+            role: profile?.role || 'user',
+            first_name: metadata?.first_name,
+            last_name: metadata?.last_name
+          } as UserProfile);
+        }
       }
     } catch (error) {
       console.error("Error fetching profile:", error);

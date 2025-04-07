@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
-import type { UserProfile } from "@/types/auth";
+import type { UserProfile, UserRole } from "@/types/auth";
 import { fetchUserProfile } from "@/services/authService";
 
 export const useAuthState = () => {
@@ -29,11 +29,11 @@ export const useAuthState = () => {
         
         if (metadata?.first_name || metadata?.last_name) {
           console.log("Using metadata for name:", metadata);
-          // Create a temporary profile with metadata
+          // Create a temporary profile with metadata using a valid UserRole value
           setUserProfile({
             id: userId,
             email: data?.user?.email || '',
-            role: 'user',
+            role: "teacher" as UserRole, // Use a valid role from UserRole type
             first_name: metadata?.first_name,
             last_name: metadata?.last_name
           } as UserProfile);

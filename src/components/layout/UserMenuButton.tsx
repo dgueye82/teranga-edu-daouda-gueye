@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const UserMenuButton = () => {
-  const { user, signOut, isAdmin, isTeacher, isDirector, isParent, isStudent, userProfile } = useAuth();
+  const { user, signOut, isAdmin, isTeacher, isDirector, isParent, isStudent, isSecretary, isInspector, isSchoolLife, userProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -104,31 +104,85 @@ const UserMenuButton = () => {
             </div>
             <DropdownMenuSeparator />
             
+            {/* Menu administrateur */}
             {isAdmin && (
-              <DropdownMenuItem onClick={() => navigate('/admin/users')} className="cursor-pointer">
-                Gestion des utilisateurs
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem onClick={() => navigate('/admin/users')} className="cursor-pointer">
+                  Gestion des utilisateurs
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/director-dashboard')} className="cursor-pointer">
+                  Tableau de bord
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/school-management')} className="cursor-pointer">
+                  Gérer les écoles
+                </DropdownMenuItem>
+              </>
             )}
             
-            {isDirector && (
-              <DropdownMenuItem onClick={() => navigate('/director-dashboard')} className="cursor-pointer">
-                Tableau de bord directeur
-              </DropdownMenuItem>
+            {/* Menu directeur */}
+            {isDirector && !isAdmin && (
+              <>
+                <DropdownMenuItem onClick={() => navigate('/director-dashboard')} className="cursor-pointer">
+                  Tableau de bord directeur
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/school-management')} className="cursor-pointer">
+                  Gérer l'école
+                </DropdownMenuItem>
+              </>
             )}
             
-            {isTeacher && (
+            {/* Menu secrétaire */}
+            {isSecretary && !isAdmin && !isDirector && (
+              <>
+                <DropdownMenuItem onClick={() => navigate('/school-management')} className="cursor-pointer">
+                  Administration
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/student-management')} className="cursor-pointer">
+                  Inscriptions
+                </DropdownMenuItem>
+              </>
+            )}
+            
+            {/* Menu enseignant */}
+            {isTeacher && !isAdmin && !isDirector && !isSecretary && (
+              <>
+                <DropdownMenuItem onClick={() => navigate('/student-management')} className="cursor-pointer">
+                  Classes & Élèves
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/curriculum')} className="cursor-pointer">
+                  Programme d'études
+                </DropdownMenuItem>
+              </>
+            )}
+            
+            {/* Menu inspecteur */}
+            {isInspector && (
+              <>
+                <DropdownMenuItem onClick={() => navigate('/director-dashboard')} className="cursor-pointer">
+                  Tableau de bord
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/school-management')} className="cursor-pointer">
+                  Supervision des écoles
+                </DropdownMenuItem>
+              </>
+            )}
+            
+            {/* Menu vie scolaire */}
+            {isSchoolLife && (
               <DropdownMenuItem onClick={() => navigate('/student-management')} className="cursor-pointer">
-                Gestion des élèves
+                Suivi des élèves
               </DropdownMenuItem>
             )}
             
-            {isParent && (
+            {/* Menu parent */}
+            {isParent && !isAdmin && (
               <DropdownMenuItem onClick={() => navigate('/parent-portal')} className="cursor-pointer">
                 Espace parent
               </DropdownMenuItem>
             )}
             
-            {isStudent && (
+            {/* Menu élève */}
+            {isStudent && !isAdmin && (
               <DropdownMenuItem onClick={() => navigate('/student-portal')} className="cursor-pointer">
                 Espace élève
               </DropdownMenuItem>
@@ -136,6 +190,7 @@ const UserMenuButton = () => {
             
             <DropdownMenuSeparator />
             
+            {/* Option de déconnexion pour tous les utilisateurs */}
             <DropdownMenuItem onClick={signOut} className="text-red-500 cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />
               Déconnexion

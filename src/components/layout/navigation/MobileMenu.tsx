@@ -1,5 +1,5 @@
 
-import { X, LogIn, LogOut, UserCheck } from "lucide-react";
+import { X, LogIn, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -89,75 +89,116 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           À propos
         </Link>
         
-        {/* Admin specific links */}
+        {/* Menu administrateur */}
         {isAdmin && (
           <>
             <Link to="/admin/users" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
               Gestion des utilisateurs
             </Link>
             <Link to="/director-dashboard" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-              Tableau de bord administrateur
+              Tableau de bord admin
+            </Link>
+            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer les écoles
+            </Link>
+            <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer le personnel
+            </Link>
+            <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer les élèves
             </Link>
           </>
         )}
         
-        {/* Director specific links */}
-        {isDirector && (
+        {/* Menu directeur */}
+        {isDirector && !isAdmin && (
           <>
             <Link to="/director-dashboard" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
               Tableau de bord directeur
             </Link>
-            <Link to="/director/staff" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-              Gestion du personnel
-            </Link>
-            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-              Gérer l'école
-            </Link>
-          </>
-        )}
-        
-        {/* Teacher specific links */}
-        {isTeacher && (
-          <>
-            <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-              Gérer les élèves
-            </Link>
-            <Link to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-              Programme d'études et évaluation
-            </Link>
-          </>
-        )}
-        
-        {/* Secretary specific links */}
-        {isSecretary && (
-          <>
             <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
               Gérer l'école
             </Link>
             <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
               Gérer le personnel
             </Link>
+            <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Gérer les élèves
+            </Link>
           </>
         )}
         
-        {/* Parent specific links */}
-        {isParent && (
+        {/* Menu secrétaire */}
+        {isSecretary && !isAdmin && !isDirector && (
+          <>
+            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Administration
+            </Link>
+            <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Personnel
+            </Link>
+            <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Inscriptions
+            </Link>
+          </>
+        )}
+        
+        {/* Menu enseignant */}
+        {isTeacher && !isAdmin && !isDirector && !isSecretary && (
+          <>
+            <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Classes & Élèves
+            </Link>
+            <Link to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Programme d'études
+            </Link>
+          </>
+        )}
+        
+        {/* Menu inspecteur */}
+        {isInspector && (
+          <>
+            <Link to="/director-dashboard" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Tableau de bord
+            </Link>
+            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Supervision des écoles
+            </Link>
+          </>
+        )}
+        
+        {/* Menu vie scolaire */}
+        {isSchoolLife && (
+          <>
+            <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Suivi des élèves
+            </Link>
+            <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+              Activités scolaires
+            </Link>
+          </>
+        )}
+        
+        {/* Menu parent */}
+        {isParent && !isAdmin && (
           <Link to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-            Portail parent
+            Espace parent
           </Link>
         )}
         
-        {/* Student specific links */}
-        {isStudent && (
+        {/* Menu élève */}
+        {isStudent && !isAdmin && (
           <Link to="/student-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-            Portail élève
+            Espace élève
           </Link>
         )}
         
-        {/* General links shown to all users */}
-        <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Formation en ligne
-        </Link>
+        {/* Formation en ligne - accessible à tous les utilisateurs connectés */}
+        {user && (
+          <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+            Formation en ligne
+          </Link>
+        )}
         
         <div className="pt-4 mt-auto">
           {user ? (

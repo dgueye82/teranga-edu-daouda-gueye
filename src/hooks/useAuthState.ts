@@ -22,7 +22,6 @@ export const useAuthState = () => {
         setUserProfile(profile);
       } else {
         console.log("No profile found for:", userId);
-        setUserProfile(null);
         
         // Get user metadata as fallback for name display
         const { data } = await supabase.auth.getUser();
@@ -32,13 +31,14 @@ export const useAuthState = () => {
           console.log("Using metadata for name:", metadata);
           // Create a temporary profile with metadata
           setUserProfile({
-            ...profile,
             id: userId,
             email: data?.user?.email || '',
-            role: profile?.role || 'user',
+            role: 'user',
             first_name: metadata?.first_name,
             last_name: metadata?.last_name
           } as UserProfile);
+        } else {
+          setUserProfile(null);
         }
       }
     } catch (error) {
@@ -86,7 +86,7 @@ export const useAuthState = () => {
         if (!mounted) return;
         
         if (data.session) {
-          console.log("Initial session found");
+          console.log("Initial session found:", data.session.user.email);
           setSession(data.session);
           setUser(data.session.user);
           

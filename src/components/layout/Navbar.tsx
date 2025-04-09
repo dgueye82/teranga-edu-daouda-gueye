@@ -5,11 +5,13 @@ import DesktopNavigation from "./navigation/DesktopNavigation";
 import MobileMenuToggle from "./navigation/MobileMenuToggle";
 import MobileMenu from "./navigation/MobileMenu";
 import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
+import { UserRound } from "lucide-react";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,6 +43,14 @@ const Navbar = () => {
           <span className="text-2xl font-heading font-bold text-teranga-blue">
             TERANGA EDU
           </span>
+          
+          {/* Login status indicator */}
+          {user && (
+            <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+              <UserRound className="h-3 w-3" />
+              <span>{userProfile?.first_name || "Connecté"}</span>
+            </Badge>
+          )}
         </NavLink>
 
         {/* Desktop Navigation */}

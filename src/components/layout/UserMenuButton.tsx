@@ -17,7 +17,7 @@ const UserMenuButton = () => {
     if (user) {
       toast({
         title: "Connecté",
-        description: `Vous êtes connecté en tant que ${user.email}${userProfile ? ' ('+userProfile.role+')' : ''}`,
+        description: `Vous êtes connecté en tant que ${userProfile?.first_name || user.email?.split('@')[0]}${userProfile ? ' ('+userProfile.role+')' : ''}`,
         variant: "default"
       });
     } else {
@@ -35,11 +35,14 @@ const UserMenuButton = () => {
         {user ? (
           <Button
             variant="ghost"
-            className="relative flex items-center gap-2 px-2 py-1.5 rounded-full"
+            className="relative flex items-center gap-2 px-2 py-1.5 rounded-full hover:bg-green-50"
             aria-label="Menu utilisateur"
             onClick={() => showLoginStatus()}
           >
-            <UserAvatar userProfile={userProfile} user={user} showName={true} />
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <UserAvatar userProfile={userProfile} user={user} showName={true} />
+            </div>
           </Button>
         ) : (
           <Button

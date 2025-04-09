@@ -44,11 +44,11 @@ const Navbar = () => {
             TERANGA EDU
           </span>
           
-          {/* Login status indicator */}
+          {/* Login status indicator with more visibility */}
           {user && (
-            <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
-              <UserRound className="h-3 w-3" />
-              <span>{userProfile?.first_name || "Connecté"}</span>
+            <Badge variant="outline" className="ml-2 bg-green-100 text-green-700 border-green-300 flex items-center gap-1 px-3 py-1">
+              <UserRound className="h-3 w-3 text-green-600" />
+              <span className="font-medium">{userProfile?.first_name || "Connecté"}</span>
             </Badge>
           )}
         </NavLink>

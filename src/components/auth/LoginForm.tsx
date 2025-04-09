@@ -31,6 +31,7 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       // Sign in with Supabase
       const data = await signInWithEmailPassword(email, password);
       
+      // Toast notification avec plus de visibilité
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à Teranga EDU",

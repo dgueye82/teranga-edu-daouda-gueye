@@ -34,7 +34,7 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à Teranga EDU",
-        variant: "success"
+        variant: "default"
       });
       
       // Naviguer vers la page d'accueil après une connexion réussie

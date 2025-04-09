@@ -25,8 +25,7 @@ const Auth = () => {
       toast({
         title: "Connecté avec succès",
         description: `Bienvenue ${userProfile?.first_name || user.email?.split('@')[0]}!`,
-        variant: "default",
-        icon: <UserRound className="h-4 w-4 text-green-500" />
+        variant: "default"
       });
       
       const from = location.state?.from?.pathname || "/";

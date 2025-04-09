@@ -29,14 +29,18 @@ export const useAuthState = () => {
         
         if (metadata?.first_name || metadata?.last_name) {
           console.log("Using metadata for name:", metadata);
-          // Create a temporary profile with metadata using a valid UserRole value
+          
+          // Use the role from metadata if available, or default to "teacher"
+          const role = (metadata?.role as UserRole) || "teacher";
+          
+          // Create a temporary profile with metadata
           setUserProfile({
             id: userId,
             email: data?.user?.email || '',
-            role: "teacher" as UserRole, // Use a valid role from UserRole type
+            role: role,
             first_name: metadata?.first_name,
             last_name: metadata?.last_name
-          } as UserProfile);
+          });
         } else {
           setUserProfile(null);
         }

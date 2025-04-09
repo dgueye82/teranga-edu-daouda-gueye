@@ -18,6 +18,20 @@ const UserMenuButton = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Debug log
+  console.log("UserMenuButton - User roles:", {
+    email: user?.email,
+    role: userProfile?.role,
+    isAdmin,
+    isTeacher,
+    isDirector,
+    isSecretary,
+    isParent,
+    isStudent,
+    isInspector,
+    isSchoolLife
+  });
+
   // Function to display login status toast
   const showLoginStatus = () => {
     if (user) {
@@ -69,6 +83,7 @@ const UserMenuButton = () => {
             variant="ghost"
             className="relative flex items-center gap-2 px-2 py-1.5 rounded-full"
             aria-label="Menu utilisateur"
+            onClick={() => showLoginStatus()}
           >
             <Avatar className="h-8 w-8 border-2 border-teranga-blue">
               <AvatarFallback className="bg-teranga-blue text-white">
@@ -156,7 +171,7 @@ const UserMenuButton = () => {
             )}
             
             {/* Menu inspecteur */}
-            {isInspector && (
+            {isInspector && !isAdmin && (
               <>
                 <DropdownMenuItem onClick={() => navigate('/director-dashboard')} className="cursor-pointer">
                   Tableau de bord
@@ -168,7 +183,7 @@ const UserMenuButton = () => {
             )}
             
             {/* Menu vie scolaire */}
-            {isSchoolLife && (
+            {isSchoolLife && !isAdmin && (
               <DropdownMenuItem onClick={() => navigate('/student-management')} className="cursor-pointer">
                 Suivi des élèves
               </DropdownMenuItem>

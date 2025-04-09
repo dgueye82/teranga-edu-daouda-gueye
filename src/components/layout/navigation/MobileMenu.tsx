@@ -44,6 +44,19 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
     }
   };
 
+  // Log user role information
+  console.log("MobileMenu - User roles:", { 
+    isAdmin, 
+    isTeacher, 
+    isDirector, 
+    isSecretary, 
+    isParent, 
+    isStudent, 
+    isInspector, 
+    isSchoolLife,
+    userProfile: userProfile?.role
+  });
+
   return (
     <div
       className={`fixed inset-0 lg:hidden bg-white z-40 transform transition-transform duration-300 ease-in-out ${
@@ -156,7 +169,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         )}
         
         {/* Menu inspecteur */}
-        {isInspector && (
+        {isInspector && !isAdmin && (
           <>
             <Link to="/director-dashboard" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
               Tableau de bord
@@ -168,7 +181,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         )}
         
         {/* Menu vie scolaire */}
-        {isSchoolLife && (
+        {isSchoolLife && !isAdmin && (
           <>
             <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
               Suivi des élèves

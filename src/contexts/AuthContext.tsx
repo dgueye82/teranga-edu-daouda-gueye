@@ -58,6 +58,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isInspector = userProfile?.role === "inspector";
   const isSchoolLife = userProfile?.role === "school_life";
 
+  // Debug log for roles
+  useEffect(() => {
+    if (userProfile) {
+      console.log("User profile in AuthContext:", {
+        email: userProfile.email,
+        role: userProfile.role,
+        isAdmin,
+        isTeacher,
+        isDirector,
+        isSecretary,
+        isParent,
+        isStudent,
+        isInspector,
+        isSchoolLife
+      });
+    }
+  }, [userProfile, isAdmin, isTeacher, isDirector, isSecretary, isParent, isStudent, isInspector, isSchoolLife]);
+
   const handleSignOut = async () => {
     try {
       await signOutUser();

@@ -39,12 +39,17 @@ export const createUserProfile = async (
   try {
     console.log(`Creating new user profile for: ${userId} with role: ${role}`);
     
-    // Assign specific roles to specific email addresses
+    // Assign specific roles to specific email addresses - add your admin email here
     let assignedRole = role;
-    if (email === "dagueye82@gmail.com") {
+    if (email === "dagueye82@gmail.com" || email === "admin@example.com") {
       assignedRole = "admin";
-    } else if (email === "oprudence2000@gmail.com") {
+      console.log(`Setting admin role for ${email}`);
+    } else if (email === "oprudence2000@gmail.com" || email === "teacher@example.com") {
       assignedRole = "teacher";
+    } else if (email === "director@example.com") {
+      assignedRole = "director";
+    } else if (email === "secretary@example.com") {
+      assignedRole = "secretary";
     }
     
     // Check if profile already exists

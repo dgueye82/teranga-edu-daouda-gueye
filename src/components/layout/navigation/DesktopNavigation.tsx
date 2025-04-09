@@ -6,6 +6,8 @@ import UserMenuButton from "../UserMenuButton";
 const DesktopNavigation = () => {
   const { isAdmin, isTeacher, isDirector, isSecretary, isParent, isStudent, isInspector, isSchoolLife, user } = useAuth();
 
+  console.log("Current user roles:", { isAdmin, isTeacher, isDirector, isSecretary, isParent, isStudent, isInspector, isSchoolLife });
+
   return (
     <nav className="hidden lg:flex items-center space-x-4">
       <Link to="/about" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
@@ -79,7 +81,7 @@ const DesktopNavigation = () => {
       )}
       
       {/* Menu inspecteur */}
-      {isInspector && user && (
+      {isInspector && !isAdmin && user && (
         <>
           <Link to="/director-dashboard" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
             Tableau de bord
@@ -91,7 +93,7 @@ const DesktopNavigation = () => {
       )}
       
       {/* Menu vie scolaire */}
-      {isSchoolLife && user && (
+      {isSchoolLife && !isAdmin && user && (
         <>
           <Link to="/student-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
             Suivi des élèves

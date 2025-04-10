@@ -34,6 +34,7 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à Teranga EDU",
+        variant: "default",
       });
       
       // Force reload to ensure all components get the updated state

@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import DesktopNavigation from "./navigation/DesktopNavigation";
 import MobileMenuToggle from "./navigation/MobileMenuToggle";
 import MobileMenu from "./navigation/MobileMenu";
+import UserMenuButton from "./UserMenuButton";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,11 +45,21 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <DesktopNavigation />
 
+        {/* User Menu Button */}
+        <div className="hidden lg:block">
+          <UserMenuButton />
+        </div>
+
         {/* Mobile Menu Toggle */}
-        <MobileMenuToggle 
-          isOpen={isMobileMenuOpen} 
-          onToggle={toggleMobileMenu} 
-        />
+        <div className="lg:hidden flex items-center">
+          <div className="mr-4">
+            <UserMenuButton />
+          </div>
+          <MobileMenuToggle 
+            isOpen={isMobileMenuOpen} 
+            onToggle={toggleMobileMenu} 
+          />
+        </div>
       </div>
 
       {/* Mobile Menu */}

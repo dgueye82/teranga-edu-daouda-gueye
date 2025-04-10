@@ -1,4 +1,5 @@
 
+import React, { useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Hero from "@/components/ui/Hero";
 import ModuleCard from "@/components/ui/ModuleCard";
@@ -14,6 +15,10 @@ import {
 import { Link } from "react-router-dom";
 
 const Index = () => {
+  useEffect(() => {
+    console.log("Index page rendered");
+  }, []);
+  
   const modules = [
     {
       title: "Gérer l'école",
@@ -63,7 +68,7 @@ const Index = () => {
         {/* Modules Section */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16 animate-fade-in">
+            <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-800 mb-4">
                 Nos Modules
               </h2>
@@ -73,7 +78,7 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 stagger-animate">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {modules.map((module, index) => (
                 <ModuleCard
                   key={index}
@@ -92,7 +97,7 @@ const Index = () => {
         <section className="py-20 bg-teranga-background">
           <div className="container mx-auto px-4">
             <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-              <div className="lg:w-1/2 animate-fade-in">
+              <div className="lg:w-1/2">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6">
                   Comment ça marche
                 </h2>
@@ -107,8 +112,11 @@ const Index = () => {
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Link>
               </div>
-              <div className="lg:w-1/2 glass-card rounded-xl overflow-hidden shadow-xl animate-float">
-                
+              <div className="lg:w-1/2 glass-card rounded-xl overflow-hidden shadow-xl">
+                {/* Placeholder for image or content */}
+                <div className="bg-gray-100 h-64 flex items-center justify-center">
+                  <p className="text-gray-500">Illustration du fonctionnement</p>
+                </div>
               </div>
             </div>
           </div>

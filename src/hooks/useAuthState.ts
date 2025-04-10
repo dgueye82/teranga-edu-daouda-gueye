@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
-import type { UserProfile, UserRole } from "@/types/auth";
+import type { UserProfile } from "@/types/auth";
 import { fetchUserProfile } from "@/services/authService";
 
 export const useAuthState = () => {
@@ -22,28 +22,7 @@ export const useAuthState = () => {
         setUserProfile(profile);
       } else {
         console.log("No profile found for:", userId);
-        
-        // Get user metadata as fallback for name display
-        const { data } = await supabase.auth.getUser();
-        const metadata = data?.user?.user_metadata;
-        
-        if (metadata?.first_name || metadata?.last_name) {
-          console.log("Using metadata for name:", metadata);
-          
-          // Use the role from metadata if available, or default to "teacher"
-          const role = (metadata?.role as UserRole) || "teacher";
-          
-          // Create a temporary profile with metadata
-          setUserProfile({
-            id: userId,
-            email: data?.user?.email || '',
-            role: role,
-            first_name: metadata?.first_name,
-            last_name: metadata?.last_name
-          });
-        } else {
-          setUserProfile(null);
-        }
+        setUserProfile(null);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -90,7 +69,7 @@ export const useAuthState = () => {
         if (!mounted) return;
         
         if (data.session) {
-          console.log("Initial session found:", data.session.user.email);
+          console.log("Initial session found");
           setSession(data.session);
           setUser(data.session.user);
           

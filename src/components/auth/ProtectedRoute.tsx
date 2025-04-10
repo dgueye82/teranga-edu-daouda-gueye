@@ -3,14 +3,13 @@ import React, { useEffect } from "react";
 import { Navigate, useLocation, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { UserRole } from "@/types/auth";
 
 interface ProtectedRouteProps {
-  allowedRoles?: UserRole[];
+  allowedRoles?: ("admin" | "teacher")[];
 }
 
 const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
-  const { user, isLoading, userProfile, createUserProfileIfMissing } = useAuth();
+  const { user, isLoading, userProfile, createUserProfileIfMissing, isAdmin, isTeacher } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
 
@@ -21,6 +20,8 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
       isLoading, 
       userProfile,
       role: userProfile?.role,
+      isAdmin,
+      isTeacher,
       allowedRoles,
       currentPath: location.pathname
     });
@@ -30,7 +31,7 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
       console.log("Tentative de création de profil pour:", user.email);
       createUserProfileIfMissing();
     }
-  }, [user, isLoading, userProfile, allowedRoles, location.pathname, createUserProfileIfMissing]);
+  }, [user, isLoading, userProfile, allowedRoles, location.pathname, createUserProfileIfMissing, isAdmin, isTeacher]);
 
   if (isLoading) {
     return (
@@ -70,10 +71,10 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps = {}) => {
       userEmail: user.email,
       userRole, 
       allowedRoles,
-      hasAccess: userRole && allowedRoles.includes(userRole)
+      hasAccess: userRole && allowedRoles.includes(userRole as any)
     });
     
-    if (!userRole || !allowedRoles.includes(userRole)) {
+    if (!userRole || !allowedRoles.includes(userRole as any)) {
       console.log(`Rôle non autorisé (${userRole}), redirection vers /unauthorized`);
       toast({
         title: "Accès non autorisé",

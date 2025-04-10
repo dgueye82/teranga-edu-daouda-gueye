@@ -1,13 +1,8 @@
 
 import Navbar from "@/components/layout/Navbar";
-import { MessageCircle, Calendar, FileBarChart, BookOpen, Bell, LogIn, UserCheck } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { MessageCircle, Calendar, FileBarChart, BookOpen, Bell } from "lucide-react";
 
 const ParentPortal = () => {
-  const { user } = useAuth();
-  
   const features = [
     {
       title: "Communication directe",
@@ -43,28 +38,8 @@ const ParentPortal = () => {
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
             <div className="mb-12 animate-fade-in">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h1 className="text-4xl font-bold text-gray-800 mb-2">Portails parents</h1>
-                  <div className="h-1 w-20 bg-teranga-blue mb-4"></div>
-                </div>
-                
-                {!user && (
-                  <Link to="/auth">
-                    <Button className="flex items-center gap-2 bg-teranga-blue text-white hover:bg-teranga-blue/90">
-                      <LogIn className="h-4 w-4" />
-                      Connexion
-                    </Button>
-                  </Link>
-                )}
-                
-                {user && (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg">
-                    <UserCheck className="h-5 w-5 text-green-600" />
-                    <span className="text-green-700 font-medium">Connecté</span>
-                  </div>
-                )}
-              </div>
+              <h1 className="text-4xl font-bold text-gray-800 mb-6">Portails parents</h1>
+              <div className="h-1 w-20 bg-teranga-blue mb-8"></div>
               <p className="text-lg text-gray-700">
                 Notre portail parents facilite la communication et l'implication des parents 
                 dans le parcours scolaire de leurs enfants. Renforcez le lien entre l'école 
@@ -72,7 +47,6 @@ const ParentPortal = () => {
               </p>
             </div>
             
-            {/* Features grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 stagger-animate">
               {features.map((feature, index) => {
                 const Icon = feature.icon;
@@ -99,7 +73,6 @@ const ParentPortal = () => {
               })}
             </div>
             
-            {/* Info section */}
             <div className="bg-white rounded-xl p-8 shadow-lg animate-fade-in-up">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">
                 L'importance de l'implication des parents
@@ -118,37 +91,6 @@ const ParentPortal = () => {
                 Avec Teranga EDU, les parents deviennent des partenaires actifs dans la réussite scolaire de leurs enfants.
               </p>
             </div>
-            
-            {/* Login CTA - visible if not logged in */}
-            {!user && (
-              <div className="bg-teranga-blue text-white rounded-xl p-8 shadow-lg mt-8 animate-fade-in-up">
-                <h2 className="text-2xl font-bold mb-4">Accédez à l'espace parent</h2>
-                <p className="mb-6">
-                  Connectez-vous pour accéder à toutes les fonctionnalités du portail parent et suivre
-                  le parcours scolaire de votre enfant.
-                </p>
-                <Link to="/auth">
-                  <Button variant="secondary" className="bg-white text-teranga-blue hover:bg-gray-100">
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Connexion au portail
-                  </Button>
-                </Link>
-              </div>
-            )}
-            
-            {/* Already logged in message */}
-            {user && (
-              <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-8 shadow-lg mt-8 animate-fade-in-up">
-                <h2 className="text-2xl font-bold mb-4">Vous êtes connecté</h2>
-                <p className="mb-4">
-                  Bienvenue sur le portail parent de Teranga EDU. Vous pouvez maintenant accéder à toutes les fonctionnalités 
-                  pour suivre le parcours scolaire de votre enfant.
-                </p>
-                <p className="text-sm text-green-700">
-                  Connecté en tant que: <span className="font-semibold">{user.email}</span>
-                </p>
-              </div>
-            )}
           </div>
         </div>
         

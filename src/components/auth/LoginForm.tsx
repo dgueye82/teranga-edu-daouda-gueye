@@ -31,15 +31,13 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       // Sign in with Supabase
       const data = await signInWithEmailPassword(email, password);
       
-      // Toast notification avec plus de visibilité
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à Teranga EDU",
-        variant: "default"
       });
       
-      // Naviguer vers la page d'accueil après une connexion réussie
-      navigate("/", { replace: true });
+      // Force reload to ensure all components get the updated state
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Error during sign in:", error);
       

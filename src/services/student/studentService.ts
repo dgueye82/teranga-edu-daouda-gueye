@@ -4,7 +4,6 @@ import { Student, StudentFormData } from "@/types/student";
 import { PostgrestError } from "@supabase/supabase-js";
 
 export const getStudents = async (): Promise<Student[]> => {
-  console.log("Fetching all students...");
   const { data, error } = await supabase
     .from("students")
     .select("*, schools(name)")
@@ -15,8 +14,6 @@ export const getStudents = async (): Promise<Student[]> => {
     throw new Error(error.message);
   }
 
-  console.log(`Retrieved ${data?.length || 0} students`);
-  
   return (data || []).map(student => ({
     ...student,
     school_name: student.schools?.name,
@@ -24,7 +21,6 @@ export const getStudents = async (): Promise<Student[]> => {
 };
 
 export const getStudentsBySchool = async (schoolId: string): Promise<Student[]> => {
-  console.log(`Fetching students for school: ${schoolId}`);
   const { data, error } = await supabase
     .from("students")
     .select("*, schools(name)")
@@ -36,8 +32,6 @@ export const getStudentsBySchool = async (schoolId: string): Promise<Student[]> 
     throw new Error(error.message);
   }
 
-  console.log(`Retrieved ${data?.length || 0} students for school ${schoolId}`);
-  
   return (data || []).map(student => ({
     ...student,
     school_name: student.schools?.name,

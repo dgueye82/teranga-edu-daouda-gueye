@@ -1,10 +1,6 @@
 
 import { X } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import MobileUserInfo from "./mobile/MobileUserInfo";
-import MobileAuthMenu from "./mobile/MobileAuthMenu";
-import MobileUnauthMenu from "./mobile/MobileUnauthMenu";
-import MobileSignOut from "./mobile/MobileSignOut";
+import { Link } from "react-router-dom";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -12,38 +8,6 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const { 
-    user, 
-    signOut, 
-    isAdmin, 
-    userProfile, 
-    isTeacher, 
-    isDirector, 
-    isParent, 
-    isStudent, 
-    isSecretary, 
-    isInspector, 
-    isSchoolLife 
-  } = useAuth();
-
-  const handleSignOut = async () => {
-    await signOut();
-    onClose();
-  };
-
-  // Log user role information for debugging
-  console.log("MobileMenu - User roles:", { 
-    isAdmin, 
-    isTeacher, 
-    isDirector, 
-    isSecretary, 
-    isParent, 
-    isStudent, 
-    isInspector, 
-    isSchoolLife,
-    userProfile: userProfile?.role
-  });
-
   return (
     <div
       className={`fixed inset-0 lg:hidden bg-white z-40 transform transition-transform duration-300 ease-in-out ${
@@ -60,27 +24,30 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       </button>
       
       <div className="flex flex-col h-full pt-20 px-6 pb-6 space-y-6 overflow-y-auto">
-        {user && <MobileUserInfo userProfile={userProfile} user={user} />}
-        
-        {user ? (
-          <>
-            <MobileAuthMenu 
-              isAdmin={isAdmin}
-              isTeacher={isTeacher}
-              isDirector={isDirector}
-              isSecretary={isSecretary}
-              isParent={isParent}
-              isStudent={isStudent}
-              isInspector={isInspector}
-              isSchoolLife={isSchoolLife}
-              onItemClick={onClose}
-              user={user}
-            />
-            <MobileSignOut onSignOut={handleSignOut} />
-          </>
-        ) : (
-          <MobileUnauthMenu onItemClick={onClose} />
-        )}
+        <Link to="/" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Accueil
+        </Link>
+        <Link to="/about" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          À propos
+        </Link>
+        <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Gérer l'école
+        </Link>
+        <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Gérer le personnel
+        </Link>
+        <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Gérer l'élève
+        </Link>
+        <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Formation en ligne
+        </Link>
+        <Link to="/curriculum" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Programme d'études et évaluation
+        </Link>
+        <Link to="/parent-portal" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+          Portails parents
+        </Link>
       </div>
     </div>
   );

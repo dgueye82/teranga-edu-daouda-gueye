@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Users } from "lucide-react";
@@ -19,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import Navbar from "@/components/layout/Navbar";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 
 const SchoolManagement = () => {
   const { toast } = useToast();
@@ -27,22 +25,11 @@ const SchoolManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
 
-  const { data: schools = [], isLoading, refetch } = useQuery({
+  const { data: schools = [], isLoading } = useQuery({
     queryKey: ["schools"],
     queryFn: getSchools,
   });
-
-  // Force refetch when auth state changes
-  useEffect(() => {
-    console.log("Auth state changed in SchoolManagement, refetching schools...");
-    refetch();
-  }, [user, refetch]);
-
-  useEffect(() => {
-    console.log(`SchoolManagement rendered with ${schools.length} schools`);
-  }, [schools]);
 
   const createMutation = useMutation({
     mutationFn: createSchool,

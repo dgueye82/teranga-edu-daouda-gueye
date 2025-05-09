@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const UserMenuButton = () => {
   const { user, userProfile, signOut } = useAuth();
@@ -26,6 +27,25 @@ const UserMenuButton = () => {
     );
   }
 
+  // Display first letter of first name or email as fallback
+  const initials = userProfile?.first_name 
+    ? userProfile.first_name[0].toUpperCase() + (userProfile.last_name?.[0]?.toUpperCase() || '')
+    : user.email?.[0]?.toUpperCase() || 'U';
+    
+  const displayName = 
+    userProfile?.first_name && userProfile?.last_name
+      ? `${userProfile.first_name} ${userProfile.last_name}` 
+      : userProfile?.first_name || user.email || "Utilisateur";
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      console.log("User signed out successfully");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,20 +54,21 @@ const UserMenuButton = () => {
           className="h-10 px-4 py-2 rounded-full flex items-center gap-2 border border-gray-200 hover:bg-gray-100"
           aria-label="Menu utilisateur"
         >
-          <div className="h-6 w-6 rounded-full bg-teranga-blue flex items-center justify-center">
-            <span className="text-white font-bold text-xs">
-              {userProfile?.first_name?.[0] || userProfile?.email?.[0] || user.email?.[0] || "U"}
-            </span>
-          </div>
+          <Avatar className="h-6 w-6">
+            <AvatarFallback className="bg-teranga-blue text-white text-xs">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
           <span className="hidden md:inline text-sm font-medium">
-            {userProfile?.first_name || userProfile?.email || user.email || "Utilisateur"}
+            {displayName}
           </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 z-50 bg-white">
         <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+        <DropdownMenuLabel className="font-normal text-xs text-gray-500">{user.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer" onClick={() => signOut()}>
+        <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
           Déconnexion
         </DropdownMenuItem>
       </DropdownMenuContent>

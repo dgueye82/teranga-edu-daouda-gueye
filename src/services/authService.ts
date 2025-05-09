@@ -32,7 +32,9 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
 export const createUserProfile = async (
   userId: string, 
   email: string, 
-  role: UserRole = "teacher"
+  role: UserRole = "teacher",
+  firstName?: string,
+  lastName?: string
 ): Promise<UserProfile | null> => {
   try {
     console.log(`Creating new user profile for: ${userId} with role: ${role}`);
@@ -50,7 +52,11 @@ export const createUserProfile = async (
         console.log("Updating role for dagueye82@gmail.com to admin");
         const { data, error } = await supabase
           .from("user_profiles")
-          .update({ role: "admin" })
+          .update({ 
+            role: "admin",
+            first_name: firstName || existingProfile.first_name,
+            last_name: lastName || existingProfile.last_name
+          })
           .eq("id", userId)
           .select()
           .single();
@@ -72,7 +78,13 @@ export const createUserProfile = async (
     const { data, error } = await supabase
       .from("user_profiles")
       .insert([
-        { id: userId, email, role: assignedRole }
+        { 
+          id: userId, 
+          email, 
+          role: assignedRole,
+          first_name: firstName || null,
+          last_name: lastName || null
+        }
       ])
       .select()
       .single();
@@ -166,7 +178,7 @@ export const signUpWithEmailPassword = async (
     
     // Create user profile immediately after signup
     if (data.user) {
-      await createUserProfile(data.user.id, email, actualRole);
+      await createUserProfile(data.user.id, email, actualRole, firstName, lastName);
     }
     
     return data;

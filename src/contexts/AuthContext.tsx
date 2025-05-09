@@ -110,6 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      console.log("Initiating sign out process");
       await signOutUser();
       
       toast({
@@ -126,7 +127,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         title: "Erreur de déconnexion",
         description: error.message || "Une erreur est survenue lors de la déconnexion",
       });
-      throw error;
     }
   };
 
@@ -139,6 +139,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     email: user?.email,
     isLoading, 
     role: userProfile?.role,
+    first_name: userProfile?.first_name,
+    last_name: userProfile?.last_name,
     isAdmin,
     isTeacher 
   });

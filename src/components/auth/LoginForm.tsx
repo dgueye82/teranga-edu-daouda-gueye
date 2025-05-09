@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { signInWithEmailPassword } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +10,6 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ setAuthError }: LoginFormProps) => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -36,6 +34,8 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
         description: "Vous êtes maintenant connecté à Teranga EDU",
         variant: "default",
       });
+      
+      console.log("Authentication successful:", data);
       
       // Force reload to ensure all components get the updated state
       window.location.href = "/";

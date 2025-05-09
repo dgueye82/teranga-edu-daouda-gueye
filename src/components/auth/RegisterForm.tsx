@@ -4,8 +4,6 @@ import { signUpWithEmailPassword } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { UserRole } from "@/types/auth";
 
 interface RegisterFormProps {
   setAuthError: (error: string | null) => void;
@@ -18,31 +16,40 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [role, setRole] = useState<UserRole>("teacher");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (loading) return;
+    
     try {
       setLoading(true);
       setAuthError(null);
       
-      console.log("Attempting to register with:", email, firstName, lastName, role);
+      console.log("Attempting sign up for:", email);
       
-      const data = await signUpWithEmailPassword(email, password, firstName, lastName, role);
-      
-      console.log("Registration result:", data);
+      await signUpWithEmailPassword(email, password, firstName, lastName);
       
       toast({
         title: "Inscription réussie",
-        description: "Veuillez vérifier votre email pour confirmer votre compte",
+        description: "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
       });
-    } catch (error: any) {
-      console.error("Registration error:", error);
       
-      let errorMessage = "Erreur d'inscription";
+      // Redirect to sign-in tab or automatically sign in
+      // For now, we're just clearing the form
+      setEmail("");
+      setPassword("");
+      setFirstName("");
+      setLastName("");
+      
+    } catch (error: any) {
+      console.error("Sign up error:", error);
+      
+      let errorMessage = "Erreur lors de l'inscription.";
+      
       if (error.message) {
         if (error.message.includes("User already registered")) {
-          errorMessage = "Cet email est déjà utilisé. Veuillez vous connecter ou utiliser un autre email.";
+          errorMessage = "Cet email est déjà utilisé. Essayez de vous connecter.";
         } else {
           errorMessage = error.message;
         }
@@ -62,8 +69,8 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
             Prénom
           </label>
@@ -74,10 +81,11 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
         
-        <div>
+        <div className="flex-1">
           <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
             Nom
           </label>
@@ -88,69 +96,56 @@ const RegisterForm = ({ setAuthError }: RegisterFormProps) => {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
       </div>
       
       <div>
-        <label htmlFor="signupEmail" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 mb-1">
           Email
         </label>
         <Input
-          id="signupEmail"
+          id="signup-email"
           type="email"
           placeholder="votreemail@exemple.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
+          autoComplete="email"
         />
       </div>
       
       <div>
-        <label htmlFor="signupPassword" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">
           Mot de passe
         </label>
         <Input
-          id="signupPassword"
+          id="signup-password"
           type="password"
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          minLength={6}
           required
+          disabled={loading}
+          autoComplete="new-password"
+          minLength={6}
         />
+        <p className="text-xs text-gray-500 mt-1">Le mot de passe doit contenir au moins 6 caractères</p>
       </div>
       
-      <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-          Rôle
-        </label>
-        <Select
-          value={role}
-          onValueChange={(value) => setRole(value as UserRole)}
-        >
-          <SelectTrigger id="role" className="w-full">
-            <SelectValue placeholder="Sélectionnez un rôle" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="admin">Administrateur</SelectItem>
-            <SelectItem value="teacher">Professeur</SelectItem>
-            <SelectItem value="student">Élève</SelectItem>
-            <SelectItem value="parent">Parent</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-gray-500 mt-1">
-          Note: L'email dagueye82@gmail.com est automatiquement assigné le rôle "admin".
-        </p>
-      </div>
-      
-      <Button type="submit" className="w-full bg-teranga-blue" disabled={loading}>
-        {loading ? (
+      <Button 
+        type="submit" 
+        className="w-full bg-teranga-blue" 
+        disabled={loading}
+      >
+        {loading ? 
           <div className="flex items-center justify-center">
             <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
             <span>Inscription en cours...</span>
-          </div>
-        ) : "S'inscrire"}
+          </div> 
+        : "S'inscrire"}
       </Button>
     </form>
   );

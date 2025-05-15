@@ -12,9 +12,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useEffect } from "react";
 
 const UserMenuButton = () => {
-  const { user, userProfile, signOut } = useAuth();
+  const { user, userProfile, signOut, createUserProfileIfMissing } = useAuth();
+  
+  // Try to create profile if missing whenever the component mounts and a user is logged in
+  useEffect(() => {
+    if (user && !userProfile) {
+      console.log("User logged in but no profile, attempting to create one");
+      createUserProfileIfMissing();
+    }
+  }, [user, userProfile, createUserProfileIfMissing]);
   
   if (!user) {
     return (
@@ -68,6 +77,11 @@ const UserMenuButton = () => {
         <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
         <DropdownMenuLabel className="font-normal text-xs text-gray-500">{user.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/profile" className="cursor-pointer w-full">
+            Profil
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
           Déconnexion
         </DropdownMenuItem>

@@ -42,8 +42,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               title: "Rôle mis à jour",
               description: "Votre rôle a été mis à jour en admin.",
             });
-            // Force reload
-            window.location.reload();
           }
         }
         return;
@@ -66,8 +64,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               title: "Rôle mis à jour",
               description: "Votre rôle a été mis à jour en admin.",
             });
-            // Force reload
-            window.location.reload();
             return;
           }
         }
@@ -88,9 +84,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           title: "Profil créé",
           description: "Votre profil utilisateur a été créé avec succès.",
         });
-        
-        // Force reload to ensure all components get updated
-        window.location.reload();
       } else {
         toast({
           variant: "destructive",
@@ -117,9 +110,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         title: "Déconnexion réussie",
         description: "À bientôt sur Teranga EDU !",
       });
-      
-      // Force page reload to clear all states
-      window.location.href = "/";
     } catch (error: any) {
       console.error("Error during sign out:", error);
       toast({

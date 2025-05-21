@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthState } from "@/hooks/useAuthState";
 import { createUserProfile, fetchUserProfile, signOutUser } from "@/services/authService";
 import type { AuthContextProps } from "@/types/auth";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext<AuthContextProps>({
   user: null,
@@ -21,6 +22,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user, session, userProfile, isLoading, setUserProfile } = useAuthState();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const createUserProfileIfMissing = useCallback(async (): Promise<void> => {
     if (!user) {
@@ -110,6 +112,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         title: "Déconnexion réussie",
         description: "À bientôt sur Teranga EDU !",
       });
+      
+      // After successful sign out, redirect to home page
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Error during sign out:", error);
       toast({

@@ -38,7 +38,10 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       console.log("Authentication successful:", data);
       
       // Force reload to ensure all components get the updated state
-      window.location.href = "/";
+      // Add a small delay to allow the toast to be shown
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500);
     } catch (error: any) {
       console.error("Error during sign in:", error);
       

@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { UserProfile, UserRole } from "@/types/auth";
 
@@ -102,7 +103,7 @@ export const createUserProfile = async (
 };
 
 export const signOutUser = async (): Promise<void> => {
-  console.log("Attempting to sign out");
+  console.log("Executing sign out operation");
   
   try {
     const { error } = await supabase.auth.signOut();
@@ -112,7 +113,7 @@ export const signOutUser = async (): Promise<void> => {
       throw error;
     }
     
-    console.log("Sign out successful");
+    console.log("Sign out successful at service level");
   } catch (error) {
     console.error("Critical error during sign out:", error);
     throw error;

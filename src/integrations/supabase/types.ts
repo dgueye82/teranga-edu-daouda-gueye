@@ -14,16 +14,304 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      schools: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          principal_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          principal_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          principal_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      staff: {
+        Row: {
+          created_at: string
+          department: string | null
+          email: string | null
+          first_name: string
+          hire_date: string | null
+          id: string
+          last_name: string
+          phone: string | null
+          position: string | null
+          school_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          first_name: string
+          hire_date?: string | null
+          id?: string
+          last_name: string
+          phone?: string | null
+          position?: string | null
+          school_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          first_name?: string
+          hire_date?: string | null
+          id?: string
+          last_name?: string
+          phone?: string | null
+          position?: string | null
+          school_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_attendance: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          status: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          notes?: string | null
+          status: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_attendance_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_performances: {
+        Row: {
+          created_at: string
+          exam_date: string | null
+          grade: number | null
+          id: string
+          max_grade: number | null
+          notes: string | null
+          student_id: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          exam_date?: string | null
+          grade?: number | null
+          id?: string
+          max_grade?: number | null
+          notes?: string | null
+          student_id: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          exam_date?: string | null
+          grade?: number | null
+          id?: string
+          max_grade?: number | null
+          notes?: string | null
+          student_id?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_performances_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          address: string | null
+          class_name: string | null
+          created_at: string
+          date_of_birth: string | null
+          enrollment_date: string | null
+          first_name: string
+          gender: string | null
+          id: string
+          last_name: string
+          parent_email: string | null
+          parent_name: string | null
+          parent_phone: string | null
+          photo_url: string | null
+          school_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          class_name?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          enrollment_date?: string | null
+          first_name: string
+          gender?: string | null
+          id?: string
+          last_name: string
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          photo_url?: string | null
+          school_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          class_name?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          enrollment_date?: string | null
+          first_name?: string
+          gender?: string | null
+          id?: string
+          last_name?: string
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          photo_url?: string | null
+          school_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "teacher" | "student" | "parent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +438,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "teacher", "student", "parent"],
+    },
   },
 } as const

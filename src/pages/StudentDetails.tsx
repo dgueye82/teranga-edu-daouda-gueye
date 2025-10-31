@@ -454,7 +454,6 @@ const StudentDetails = () => {
                         <thead>
                           <tr className="border-b">
                             <th className="text-left py-3 px-4">Matière</th>
-                            <th className="text-left py-3 px-4">Type</th>
                             <th className="text-left py-3 px-4">Date</th>
                             <th className="text-left py-3 px-4">Note</th>
                             <th className="text-left py-3 px-4">Notes</th>
@@ -465,23 +464,15 @@ const StudentDetails = () => {
                             <tr key={record.id} className="border-b hover:bg-gray-50">
                               <td className="py-4 px-4">{record.subject}</td>
                               <td className="py-4 px-4">
-                                <Badge className="bg-gray-100 text-gray-800">
-                                  {record.evaluation_type === "exam" && "Examen"}
-                                  {record.evaluation_type === "quiz" && "Quiz"}
-                                  {record.evaluation_type === "homework" && "Devoir"}
-                                  {record.evaluation_type === "project" && "Projet"}
-                                </Badge>
-                              </td>
-                              <td className="py-4 px-4">
-                                {new Date(record.evaluation_date).toLocaleDateString()}
+                                {record.exam_date ? new Date(record.exam_date).toLocaleDateString() : '-'}
                               </td>
                               <td className="py-4 px-4">
                                 <span className={`font-semibold ${
-                                  (record.grade / record.max_grade) >= 0.7 ? 'text-green-600' : 
-                                  (record.grade / record.max_grade) >= 0.5 ? 'text-yellow-600' : 
+                                  ((record.grade || 0) / (record.max_grade || 20)) >= 0.7 ? 'text-green-600' : 
+                                  ((record.grade || 0) / (record.max_grade || 20)) >= 0.5 ? 'text-yellow-600' : 
                                   'text-red-600'
                                 }`}>
-                                  {record.grade} / {record.max_grade}
+                                  {record.grade || 0} / {record.max_grade || 20}
                                 </span>
                               </td>
                               <td className="py-4 px-4">{record.notes || "-"}</td>

@@ -28,19 +28,17 @@ export const usePerformanceForm = ({
       ? {
           student_id: initialData.student_id,
           subject: initialData.subject,
-          evaluation_date: initialData.evaluation_date,
-          grade: initialData.grade,
-          max_grade: initialData.max_grade,
-          evaluation_type: initialData.evaluation_type,
+          exam_date: initialData.exam_date || undefined,
+          grade: initialData.grade || undefined,
+          max_grade: initialData.max_grade || undefined,
           notes: initialData.notes || "",
         }
       : {
           student_id: studentId,
           subject: "",
-          evaluation_date: new Date().toISOString().split("T")[0],
+          exam_date: new Date().toISOString().split("T")[0],
           grade: 0,
           max_grade: 20,
-          evaluation_type: "exam",
           notes: "",
         },
   });
@@ -51,20 +49,18 @@ export const usePerformanceForm = ({
       form.reset({
         student_id: initialData.student_id,
         subject: initialData.subject,
-        evaluation_date: initialData.evaluation_date,
-        grade: initialData.grade,
-        max_grade: initialData.max_grade,
-        evaluation_type: initialData.evaluation_type,
+        exam_date: initialData.exam_date || undefined,
+        grade: initialData.grade || undefined,
+        max_grade: initialData.max_grade || undefined,
         notes: initialData.notes || "",
       });
     } else {
       form.reset({
         student_id: studentId,
         subject: "",
-        evaluation_date: new Date().toISOString().split("T")[0],
+        exam_date: new Date().toISOString().split("T")[0],
         grade: 0,
         max_grade: 20,
-        evaluation_type: "exam",
         notes: "",
       });
     }

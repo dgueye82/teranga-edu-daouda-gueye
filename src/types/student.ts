@@ -60,11 +60,10 @@ export interface StudentPerformance {
   id: string;
   student_id: string;
   subject: string;
-  evaluation_date: string;
-  grade: number;
-  max_grade: number;
-  evaluation_type: 'exam' | 'quiz' | 'homework' | 'project';
-  notes?: string;
+  exam_date: string | null;
+  grade: number | null;
+  max_grade: number | null;
+  notes?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -72,9 +71,8 @@ export interface StudentPerformance {
 export interface StudentPerformanceFormData {
   student_id: string;
   subject: string;
-  evaluation_date: string;
-  grade: number;
-  max_grade: number;
-  evaluation_type: 'exam' | 'quiz' | 'homework' | 'project';
+  exam_date?: string;
+  grade?: number;
+  max_grade?: number;
   notes?: string;
 }

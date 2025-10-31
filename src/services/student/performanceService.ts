@@ -7,18 +7,14 @@ export const getStudentPerformances = async (studentId: string): Promise<Student
     .from("student_performances")
     .select("*")
     .eq("student_id", studentId)
-    .order("evaluation_date", { ascending: false });
+    .order("exam_date", { ascending: false });
 
   if (error) {
     console.error("Error fetching student performances:", error);
     throw new Error(error.message);
   }
 
-  // Ensure evaluation_type matches the expected type
-  return (data || []).map(item => ({
-    ...item,
-    evaluation_type: item.evaluation_type as "exam" | "quiz" | "homework" | "project"
-  }));
+  return data || [];
 };
 
 export const createStudentPerformance = async (performance: StudentPerformanceFormData): Promise<StudentPerformance> => {
@@ -33,10 +29,7 @@ export const createStudentPerformance = async (performance: StudentPerformanceFo
     throw new Error(error.message);
   }
 
-  return {
-    ...data,
-    evaluation_type: data.evaluation_type as "exam" | "quiz" | "homework" | "project"
-  };
+  return data;
 };
 
 export const updateStudentPerformance = async (id: string, performance: Partial<StudentPerformanceFormData>): Promise<StudentPerformance> => {
@@ -52,10 +45,7 @@ export const updateStudentPerformance = async (id: string, performance: Partial<
     throw new Error(error.message);
   }
 
-  return {
-    ...data,
-    evaluation_type: data.evaluation_type as "exam" | "quiz" | "homework" | "project"
-  };
+  return data;
 };
 
 export const deleteStudentPerformance = async (id: string): Promise<void> => {
@@ -96,18 +86,18 @@ export const calculateStudentAverage = async (studentId: string): Promise<{
   }
   
   // Calculate the overall average
-  const totalGrade = performances.reduce((sum, perf) => sum + perf.grade, 0);
-  const totalMaxGrade = performances.reduce((sum, perf) => sum + perf.max_grade, 0);
+  const totalGrade = performances.reduce((sum, perf) => sum + (perf.grade || 0), 0);
+  const totalMaxGrade = performances.reduce((sum, perf) => sum + (perf.max_grade || 20), 0);
   const overallAverage = totalGrade / performances.length;
-  const percentage = (totalGrade / totalMaxGrade) * 100;
+  const percentage = totalMaxGrade > 0 ? (totalGrade / totalMaxGrade) * 100 : 0;
   
   // Calculate averages by subject
   const subjectMap = new Map<string, { totalGrade: number; totalMaxGrade: number; count: number }>();
   
   performances.forEach((performance) => {
     const subject = performance.subject;
-    const grade = performance.grade;
-    const maxGrade = performance.max_grade;
+    const grade = performance.grade || 0;
+    const maxGrade = performance.max_grade || 20;
     
     if (!subjectMap.has(subject)) {
       subjectMap.set(subject, { totalGrade: 0, totalMaxGrade: 0, count: 0 });
@@ -124,7 +114,7 @@ export const calculateStudentAverage = async (studentId: string): Promise<{
   const subjectAverages = Array.from(subjectMap.entries()).map(([subject, data]) => {
     const average = data.totalGrade / data.count;
     const maxGrade = data.totalMaxGrade / data.count;
-    const subjectPercentage = (data.totalGrade / data.totalMaxGrade) * 100;
+    const subjectPercentage = data.totalMaxGrade > 0 ? (data.totalGrade / data.totalMaxGrade) * 100 : 0;
     
     return {
       subject,

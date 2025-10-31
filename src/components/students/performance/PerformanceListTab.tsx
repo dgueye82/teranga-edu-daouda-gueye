@@ -71,7 +71,6 @@ const PerformanceListTab: React.FC<PerformanceListTabProps> = ({
                 <tr className="border-b">
                   <th className="px-4 py-2 text-left font-medium text-gray-500">Date</th>
                   <th className="px-4 py-2 text-left font-medium text-gray-500">Matière</th>
-                  <th className="px-4 py-2 text-left font-medium text-gray-500">Type</th>
                   <th className="px-4 py-2 text-left font-medium text-gray-500">Note</th>
                   <th className="px-4 py-2 text-left font-medium text-gray-500">Actions</th>
                 </tr>
@@ -79,19 +78,11 @@ const PerformanceListTab: React.FC<PerformanceListTabProps> = ({
               <tbody>
                 {performances.map((performance) => (
                   <tr key={performance.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3">{new Date(performance.evaluation_date).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">{performance.exam_date ? new Date(performance.exam_date).toLocaleDateString() : '-'}</td>
                     <td className="px-4 py-3">{performance.subject}</td>
                     <td className="px-4 py-3">
-                      <Badge variant="outline">
-                        {performance.evaluation_type === "exam" && "Examen"}
-                        {performance.evaluation_type === "quiz" && "Quiz"}
-                        {performance.evaluation_type === "homework" && "Devoir"}
-                        {performance.evaluation_type === "project" && "Projet"}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={getPerformanceColor(performance.grade, performance.max_grade)}>
-                        {performance.grade} / {performance.max_grade}
+                      <span className={getPerformanceColor(performance.grade || 0, performance.max_grade || 20)}>
+                        {performance.grade || 0} / {performance.max_grade || 20}
                       </span>
                     </td>
                     <td className="px-4 py-3">

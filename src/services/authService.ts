@@ -6,20 +6,37 @@ export const fetchUserProfile = async (userId: string): Promise<UserProfile | nu
   try {
     console.log("Fetching user profile for:", userId);
     
-    const { data, error } = await supabase
+    // Fetch profile
+    const { data: profileData, error: profileError } = await supabase
       .from("user_profiles")
       .select("*")
       .eq("id", userId)
       .single();
 
-    if (error) {
-      console.error("Error fetching user profile:", error);
+    if (profileError) {
+      console.error("Error fetching user profile:", profileError);
       return null;
     }
 
-    if (data) {
-      console.log("User profile retrieved:", data);
-      return data as UserProfile;
+    // Fetch role from user_roles table
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .single();
+
+    if (roleError) {
+      console.error("Error fetching user role:", roleError);
+      return null;
+    }
+
+    if (profileData && roleData) {
+      const userProfile = {
+        ...profileData,
+        role: roleData.role as UserRole
+      };
+      console.log("User profile retrieved:", userProfile);
+      return userProfile;
     }
     
     return null;
@@ -39,63 +56,17 @@ export const createUserProfile = async (
   try {
     console.log(`Creating new user profile for: ${userId} with role: ${role}`);
     
-    // Force dagueye82@gmail.com to be admin
-    const assignedRole = email === "dagueye82@gmail.com" ? "admin" : role;
-    
     // Check if profile already exists
     const existingProfile = await fetchUserProfile(userId);
     if (existingProfile) {
       console.log("User profile already exists:", existingProfile);
-      
-      // If the user should be admin but isn't, update the role
-      if (email === "dagueye82@gmail.com" && existingProfile.role !== "admin") {
-        console.log("Updating role for dagueye82@gmail.com to admin");
-        const { data, error } = await supabase
-          .from("user_profiles")
-          .update({ 
-            role: "admin",
-            first_name: firstName || existingProfile.first_name,
-            last_name: lastName || existingProfile.last_name
-          })
-          .eq("id", userId)
-          .select()
-          .single();
-        
-        if (error) {
-          console.error("Error updating role:", error);
-          return existingProfile;
-        }
-        
-        if (data) {
-          console.log("Profile updated with admin role:", data);
-          return data as UserProfile;
-        }
-      }
-      
       return existingProfile;
     }
-    
-    const { data, error } = await supabase
-      .from("user_profiles")
-      .insert([
-        { 
-          id: userId, 
-          email, 
-          role: assignedRole,
-          first_name: firstName || null,
-          last_name: lastName || null
-        }
-      ])
-      .select()
-      .single();
 
-    if (error) {
-      console.error("Error creating user profile:", error);
-      return null;
-    }
-
-    console.log("New user profile created:", data);
-    return data as UserProfile;
+    // The trigger handle_new_user() should have created both profile and role
+    // But if not, we'll fetch what exists
+    console.log("Profile not found, it should have been created by trigger");
+    return null;
   } catch (error) {
     console.error("Unexpected error creating user profile:", error);
     return null;

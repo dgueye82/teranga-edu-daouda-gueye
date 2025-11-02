@@ -17,13 +17,14 @@ import { useEffect } from "react";
 const UserMenuButton = () => {
   const { user, userProfile, signOut, createUserProfileIfMissing } = useAuth();
   
-  // Try to create profile if missing whenever the component mounts and a user is logged in
+  // Try to create profile if missing only once when user logs in
   useEffect(() => {
     if (user && !userProfile) {
       console.log("User logged in but no profile, attempting to create one");
       createUserProfileIfMissing();
     }
-  }, [user, userProfile, createUserProfileIfMissing]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, userProfile?.id]);
   
   if (!user) {
     return (

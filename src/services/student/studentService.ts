@@ -69,7 +69,7 @@ export const createStudent = async (student: StudentFormData): Promise<Student> 
 
   const { data, error } = await supabase
     .from("students")
-    .insert([student])
+    .insert([student as any])
     .select("*, schools(name)")
     .single() as { data: (Student & { schools: { name: string } }) | null; error: PostgrestError | null };
 
@@ -92,7 +92,7 @@ export const updateStudent = async (id: string, student: StudentFormData): Promi
   
   const { data, error } = await supabase
     .from("students")
-    .update(student)
+    .update(student as any)
     .eq("id", id)
     .select("*, schools(name)")
     .single() as { data: (Student & { schools: { name: string } }) | null; error: PostgrestError | null };

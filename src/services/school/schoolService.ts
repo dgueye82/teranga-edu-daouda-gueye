@@ -38,7 +38,7 @@ export const getSchoolById = async (id: string): Promise<School | null> => {
 export const createSchool = async (school: SchoolFormData): Promise<School> => {
   const { data, error } = await supabase
     .from("schools")
-    .insert([school])
+    .insert([school as any])
     .select()
     .single() as { data: School | null; error: PostgrestError | null };
 
@@ -53,7 +53,7 @@ export const createSchool = async (school: SchoolFormData): Promise<School> => {
 export const updateSchool = async (id: string, school: SchoolFormData): Promise<School> => {
   const { data, error } = await supabase
     .from("schools")
-    .update(school)
+    .update(school as any)
     .eq("id", id)
     .select()
     .single() as { data: School | null; error: PostgrestError | null };

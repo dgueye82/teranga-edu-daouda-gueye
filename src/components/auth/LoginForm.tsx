@@ -38,9 +38,11 @@ const LoginForm = ({ setAuthError }: LoginFormProps) => {
       console.log("Authentication successful:", data);
       
       // Force reload to ensure all components get the updated state
-      // Add a small delay to allow the toast to be shown
+      // Preserve ?next= (used by the OAuth consent flow)
+      const nextParam = new URLSearchParams(window.location.search).get("next");
+      const safeNext = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/";
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = safeNext;
       }, 500);
     } catch (error: any) {
       console.error("Error during sign in:", error);

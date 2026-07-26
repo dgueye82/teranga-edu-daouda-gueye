@@ -23,11 +23,13 @@ const Auth = () => {
         title: "Déjà connecté",
         description: "Vous êtes déjà connecté à Teranga EDU",
       });
-      
-      const from = location.state?.from?.pathname || "/";
+
+      const nextParam = new URLSearchParams(location.search).get("next");
+      const safeNext = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : null;
+      const from = safeNext ?? location.state?.from?.pathname ?? "/";
       navigate(from, { replace: true });
     }
-  }, [user, isLoading, navigate, location.state, toast]);
+  }, [user, isLoading, navigate, location.state, location.search, toast]);
 
   return (
     <AuthLayout authError={authError}>

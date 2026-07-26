@@ -15,6 +15,7 @@ import Curriculum from '@/pages/Curriculum';
 import NotFound from '@/pages/NotFound';
 import Auth from '@/pages/Auth';
 import Unauthorized from '@/pages/Unauthorized';
+import OAuthConsent from '@/pages/OAuthConsent';
 
 // Management pages
 import SchoolManagement from '@/pages/SchoolManagement';
@@ -58,6 +59,8 @@ function App() {
                 <Route path="/curriculum" element={<Curriculum />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
+                
                 
                 {/* Management routes - now accessible to everyone */}
                 <Route path="/school-management" element={<SchoolManagement />} />

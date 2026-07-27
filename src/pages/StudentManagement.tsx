@@ -15,6 +15,7 @@ import { confirm } from "@/components/ui/confirm";
 // Ajouter l'import pour le nouveau composant
 import { PlusCircle, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
+import StudentOverviewDashboard from "@/components/students/StudentOverviewDashboard";
 
 const StudentManagement = () => {
   const { toast } = useToast();
@@ -100,12 +101,17 @@ const StudentManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-8 mt-16">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <h1 className="text-2xl font-bold mb-4 md:mb-0">Gestion des élèves</h1>
-          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+      <div className="container mx-auto px-4 py-8 mt-16 space-y-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Tableau de bord des élèves</h1>
+            <p className="text-muted-foreground mt-1">
+              Suivi des paiements, retards et absences
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-4 md:mt-0">
             <Link to="/bulk-performance">
               <Button variant="outline" className="w-full sm:w-auto">
                 <FileText className="mr-2 h-4 w-4" />
@@ -114,13 +120,15 @@ const StudentManagement = () => {
             </Link>
             <Button
               onClick={() => setIsAddStudentOpen(true)}
-              className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600"
+              className="w-full sm:w-auto"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Ajouter un élève
             </Button>
           </div>
         </div>
+
+        <StudentOverviewDashboard />
 
         <StudentTable
           students={students}

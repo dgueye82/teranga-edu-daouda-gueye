@@ -3,6 +3,7 @@ export interface Student {
   id: string;
   first_name: string;
   last_name: string;
+  class_name?: string;
   birth_date?: string;
   gender?: string;
   address?: string;

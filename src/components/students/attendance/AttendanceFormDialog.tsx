@@ -17,6 +17,7 @@ const attendanceSchema = z.object({
   status: z.enum(["present", "absent", "late", "excused"], {
     required_error: "Le statut est obligatoire",
   }),
+  reason: z.enum(["maladie", "familial", "non_justifie", "transport", "autre"]).optional(),
   notes: z.string().optional(),
 });
 
@@ -41,6 +42,7 @@ const AttendanceFormDialog = ({
       student_id: studentId,
       date: selectedAttendance?.date || new Date().toISOString().split("T")[0],
       status: selectedAttendance?.status || "present",
+      reason: (selectedAttendance?.reason as any) || undefined,
       notes: selectedAttendance?.notes || "",
     },
   });
@@ -94,6 +96,31 @@ const AttendanceFormDialog = ({
                       <SelectItem value="absent">Absent</SelectItem>
                       <SelectItem value="late">En retard</SelectItem>
                       <SelectItem value="excused">Excusé</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="reason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Motif (pour absence / retard)</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un motif" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="maladie">Maladie</SelectItem>
+                      <SelectItem value="familial">Raison familiale</SelectItem>
+                      <SelectItem value="transport">Transport</SelectItem>
+                      <SelectItem value="non_justifie">Non justifié</SelectItem>
+                      <SelectItem value="autre">Autre</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

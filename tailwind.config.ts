@@ -138,10 +138,6 @@ export default {
 				'slide-in-left': 'slide-in-left 0.6s ease-out forwards',
 				'float': 'float 6s ease-in-out infinite'
 			},
-			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
-				heading: ['Poppins', 'sans-serif']
-			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 				'hero-pattern': 'linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(235, 247, 253, 0.8))'

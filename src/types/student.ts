@@ -3,6 +3,7 @@ export interface Student {
   id: string;
   first_name: string;
   last_name: string;
+  class_name?: string;
   birth_date?: string;
   gender?: string;
   address?: string;
@@ -17,6 +18,7 @@ export interface Student {
   school_name?: string; // Pour l'affichage
   photo_url?: string;
   notes?: string;
+  monthly_fee?: number;
   created_at: string;
   updated_at: string;
 }
@@ -37,13 +39,22 @@ export interface StudentFormData {
   school_id?: string;
   photo_url?: string;
   notes?: string;
+  monthly_fee?: number;
 }
+
+export type AttendanceReason =
+  | 'maladie'
+  | 'familial'
+  | 'non_justifie'
+  | 'transport'
+  | 'autre';
 
 export interface StudentAttendance {
   id: string;
   student_id: string;
   date: string;
   status: 'present' | 'absent' | 'late' | 'excused';
+  reason?: AttendanceReason | null;
   notes?: string;
   created_at: string;
   updated_at: string;
@@ -53,6 +64,7 @@ export interface StudentAttendanceFormData {
   student_id: string;
   date: string;
   status: 'present' | 'absent' | 'late' | 'excused';
+  reason?: AttendanceReason;
   notes?: string;
 }
 

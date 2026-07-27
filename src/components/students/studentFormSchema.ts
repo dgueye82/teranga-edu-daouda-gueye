@@ -17,6 +17,7 @@ export const studentSchema = z.object({
   school_id: z.string().optional(),
   photo_url: z.string().optional(),
   notes: z.string().optional(),
+  monthly_fee: z.coerce.number().min(0, "Le montant doit être positif").optional(),
 });
 
 export type StudentFormSchema = z.infer<typeof studentSchema>;

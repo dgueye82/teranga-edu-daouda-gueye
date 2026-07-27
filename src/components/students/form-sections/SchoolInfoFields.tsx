@@ -83,6 +83,27 @@ const SchoolInfoFields: React.FC<SchoolInfoFieldsProps> = ({ form, schools }) =>
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="monthly_fee"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Frais mensuels (FCFA)</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min={0}
+                step="1"
+                placeholder="Ex: 15000"
+                {...field}
+                value={field.value ?? ""}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

@@ -103,6 +103,7 @@ export type Database = {
           date: string
           id: string
           notes: string | null
+          reason: string | null
           status: string
           student_id: string
           updated_at: string
@@ -112,6 +113,7 @@ export type Database = {
           date: string
           id?: string
           notes?: string | null
+          reason?: string | null
           status: string
           student_id: string
           updated_at?: string
@@ -121,6 +123,7 @@ export type Database = {
           date?: string
           id?: string
           notes?: string | null
+          reason?: string | null
           status?: string
           student_id?: string
           updated_at?: string
@@ -128,6 +131,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "student_attendance_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          method: string | null
+          month: number
+          notes: string | null
+          payment_date: string
+          student_id: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          method?: string | null
+          month: number
+          notes?: string | null
+          payment_date?: string
+          student_id: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          method?: string | null
+          month?: number
+          notes?: string | null
+          payment_date?: string
+          student_id?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_payments_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "students"
@@ -190,6 +240,7 @@ export type Database = {
           gender: string | null
           id: string
           last_name: string
+          monthly_fee: number
           parent_email: string | null
           parent_name: string | null
           parent_phone: string | null
@@ -207,6 +258,7 @@ export type Database = {
           gender?: string | null
           id?: string
           last_name: string
+          monthly_fee?: number
           parent_email?: string | null
           parent_name?: string | null
           parent_phone?: string | null
@@ -224,6 +276,7 @@ export type Database = {
           gender?: string | null
           id?: string
           last_name?: string
+          monthly_fee?: number
           parent_email?: string | null
           parent_name?: string | null
           parent_phone?: string | null

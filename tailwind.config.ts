@@ -63,13 +63,25 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
 				teranga: {
-					blue: '#29ABE2',
-					lightBlue: '#A5D6F7',
-					skyBlue: '#D4EBF9',
-					darkBlue: '#0077B6',
-					background: '#EBF7FD'
+					blue: '#13315C',
+					lightBlue: '#8DA9C4',
+					skyBlue: '#EEF4ED',
+					darkBlue: '#0B2545',
+					background: '#EEF4ED'
 				}
+			},
+			fontFamily: {
+				sans: ['Inter', 'sans-serif'],
+				heading: ['Poppins', 'sans-serif']
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

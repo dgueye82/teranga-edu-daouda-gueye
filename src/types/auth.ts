@@ -1,7 +1,15 @@
 
 import type { User, Session } from "@supabase/supabase-js";
 
-export type UserRole = "admin" | "teacher" | "student" | "parent";
+export type UserRole =
+  | "admin"
+  | "director"
+  | "secretary"
+  | "teacher"
+  | "inspector"
+  | "school_life"
+  | "student"
+  | "parent";
 
 export interface UserProfile {
   id: string;

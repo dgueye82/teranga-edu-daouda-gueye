@@ -3,6 +3,7 @@ import { createContext, useContext, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthState } from "@/hooks/useAuthState";
 import { createUserProfile, fetchUserProfile, signOutUser } from "@/services/authService";
+import { can, type Permission } from "@/lib/permissions";
 import type { AuthContextProps } from "@/types/auth";
 
 const AuthContext = createContext<AuthContextProps>({
@@ -13,6 +14,7 @@ const AuthContext = createContext<AuthContextProps>({
   signOut: async () => {},
   isAdmin: false,
   isTeacher: false,
+  hasPermission: () => false,
   createUserProfileIfMissing: async () => {},
 });
 
@@ -129,6 +131,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Helper properties to check user roles - guaranteed to be accurate
   const isAdmin = userProfile?.role === "admin";
   const isTeacher = userProfile?.role === "teacher";
+  const hasPermission = useCallback(
+    (permission: Permission) => can(userProfile?.role, permission),
+    [userProfile?.role]
+  );
 
   console.log("Current auth context state:", { 
     userId: user?.id, 
@@ -150,6 +156,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       signOut,
       isAdmin,
       isTeacher,
+      hasPermission,
       createUserProfileIfMissing
     }}>
       {children}

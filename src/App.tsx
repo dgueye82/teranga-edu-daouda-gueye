@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // Pages
 import Index from '@/pages/Index';
@@ -62,18 +63,33 @@ function App() {
                 <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
                 
                 
-                {/* Management routes - now accessible to everyone */}
-                <Route path="/school-management" element={<SchoolManagement />} />
-                <Route path="/staff-management" element={<StaffManagement />} />
-                <Route path="/school/:id/students" element={<SchoolStudents />} />
-                <Route path="/student-management" element={<StudentManagement />} />
-                <Route path="/student/:id" element={<StudentDetails />} />
-                <Route path="/student/:id/attendance" element={<StudentAttendance />} />
-                <Route path="/student/:id/performance" element={<StudentPerformance />} />
-                <Route path="/student/:id/report-card" element={<StudentReportCard />} />
-                <Route path="/staff-dashboard" element={<StaffDashboard />} />
-                <Route path="/staff-list" element={<StaffList />} />
-                <Route path="/school-students" element={<SchoolStudents />} />
+                {/* Management routes - access controlled by role permissions */}
+                <Route element={<ProtectedRoute permission="schools.view" />}>
+                  <Route path="/school-management" element={<SchoolManagement />} />
+                  <Route path="/school/:id/students" element={<SchoolStudents />} />
+                  <Route path="/school-students" element={<SchoolStudents />} />
+                </Route>
+
+                <Route element={<ProtectedRoute permission="staff.view" />}>
+                  <Route path="/staff-management" element={<StaffManagement />} />
+                  <Route path="/staff-dashboard" element={<StaffDashboard />} />
+                  <Route path="/staff-list" element={<StaffList />} />
+                </Route>
+
+                <Route element={<ProtectedRoute permission="students.view" />}>
+                  <Route path="/student-management" element={<StudentManagement />} />
+                  <Route path="/student/:id" element={<StudentDetails />} />
+                </Route>
+
+                <Route element={<ProtectedRoute permission="attendance.view" />}>
+                  <Route path="/student/:id/attendance" element={<StudentAttendance />} />
+                </Route>
+
+                <Route element={<ProtectedRoute permission="grades.view" />}>
+                  <Route path="/student/:id/performance" element={<StudentPerformance />} />
+                  <Route path="/student/:id/report-card" element={<StudentReportCard />} />
+                </Route>
+
                 
                 {/* Catch all route */}
                 <Route path="*" element={<NotFound />} />

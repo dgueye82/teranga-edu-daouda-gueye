@@ -1,6 +1,7 @@
 
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -8,6 +9,8 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  const { hasPermission } = useAuth();
+
   return (
     <div
       className={`fixed inset-0 lg:hidden bg-white z-40 transform transition-transform duration-300 ease-in-out ${
@@ -30,15 +33,21 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <Link to="/about" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           À propos
         </Link>
-        <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer l'école
-        </Link>
-        <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer le personnel
-        </Link>
-        <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
-          Gérer l'élève
-        </Link>
+        {hasPermission("schools.view") && (
+          <Link to="/school-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+            Gérer l'école
+          </Link>
+        )}
+        {hasPermission("staff.view") && (
+          <Link to="/staff-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+            Gérer le personnel
+          </Link>
+        )}
+        {hasPermission("students.view") && (
+          <Link to="/student-management" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
+            Gérer l'élève
+          </Link>
+        )}
         <Link to="/online-training" className="py-2 text-lg font-medium border-b border-gray-100 text-gray-700" onClick={onClose}>
           Formation en ligne
         </Link>

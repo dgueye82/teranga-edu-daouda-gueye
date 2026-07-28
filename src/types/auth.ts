@@ -1,7 +1,15 @@
 
 import type { User, Session } from "@supabase/supabase-js";
 
-export type UserRole = "admin" | "teacher" | "student" | "parent";
+export type UserRole =
+  | "admin"
+  | "director"
+  | "secretary"
+  | "teacher"
+  | "inspector"
+  | "school_life"
+  | "student"
+  | "parent";
 
 export interface UserProfile {
   id: string;
@@ -21,5 +29,6 @@ export interface AuthContextProps {
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isTeacher: boolean;
+  hasPermission: (permission: import("@/lib/permissions").Permission) => boolean;
   createUserProfileIfMissing: () => Promise<void>;
 }

@@ -1,30 +1,39 @@
-
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import type { Permission } from "@/lib/permissions";
+
+interface NavItem {
+  to: string;
+  label: string;
+  permission?: Permission;
+}
+
+const items: NavItem[] = [
+  { to: "/about", label: "À propos" },
+  { to: "/school-management", label: "Gérer l'école", permission: "schools.view" },
+  { to: "/staff-management", label: "Gérer le personnel", permission: "staff.view" },
+  { to: "/student-management", label: "Gérer l'élève", permission: "students.view" },
+  { to: "/online-training", label: "Formation en ligne" },
+  { to: "/curriculum", label: "Programme d'études et évaluation" },
+  { to: "/parent-portal", label: "Portails parents" },
+];
 
 const DesktopNavigation = () => {
+  const { hasPermission } = useAuth();
+
   return (
     <nav className="hidden lg:flex items-center space-x-6">
-      <Link to="/about" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-        À propos
-      </Link>
-      <Link to="/school-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-        Gérer l'école
-      </Link>
-      <Link to="/staff-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-        Gérer le personnel
-      </Link>
-      <Link to="/student-management" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-        Gérer l'élève
-      </Link>
-      <Link to="/online-training" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-        Formation en ligne
-      </Link>
-      <Link to="/curriculum" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-        Programme d'études et évaluation
-      </Link>
-      <Link to="/parent-portal" className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700">
-        Portails parents
-      </Link>
+      {items
+        .filter((item) => !item.permission || hasPermission(item.permission))
+        .map((item) => (
+          <Link
+            key={item.to}
+            to={item.to}
+            className="text-sm font-medium transition-colors hover:text-teranga-blue text-gray-700"
+          >
+            {item.label}
+          </Link>
+        ))}
     </nav>
   );
 };

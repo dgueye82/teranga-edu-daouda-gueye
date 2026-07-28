@@ -29,5 +29,6 @@ export interface AuthContextProps {
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isTeacher: boolean;
+  hasPermission: (permission: import("@/lib/permissions").Permission) => boolean;
   createUserProfileIfMissing: () => Promise<void>;
 }

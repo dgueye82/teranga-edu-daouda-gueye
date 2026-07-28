@@ -156,6 +156,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       signOut,
       isAdmin,
       isTeacher,
+      hasPermission,
       createUserProfileIfMissing
     }}>
       {children}

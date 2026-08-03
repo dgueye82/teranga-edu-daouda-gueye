@@ -150,7 +150,21 @@ const StudentOverviewDashboard: React.FC = () => {
     return { totalExpected, totalPaid, totalRemaining, unpaidCount, totalAbsences, totalLates };
   }, [rows]);
 
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("students").update({ status } as any).eq("id", id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({ title: "Statut mis à jour", description: "Le statut de l'élève a été modifié." });
+    },
+    onError: (e: Error) =>
+      toast({ title: "Erreur", description: e.message, variant: "destructive" }),
+  });
+
   const openPayment = (id: string, name: string) => {
+
     const target = rows.find((r) => r.student.id === id);
     setForm({
       month: currentMonth,
@@ -276,7 +290,10 @@ const StudentOverviewDashboard: React.FC = () => {
               <TableRow>
                 <TableHead>Élève</TableHead>
                 <TableHead>Classe / École</TableHead>
+                <TableHead>Statut élève</TableHead>
                 <TableHead>Statut paiement</TableHead>
+
+
                 <TableHead className="text-right">Payé</TableHead>
                 <TableHead className="text-right">Restant</TableHead>
                 <TableHead className="text-center">Retards</TableHead>
@@ -288,7 +305,7 @@ const StudentOverviewDashboard: React.FC = () => {
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
                     Aucun élève correspondant.
                   </TableCell>
                 </TableRow>
@@ -302,6 +319,31 @@ const StudentOverviewDashboard: React.FC = () => {
                     {r.student.class_name || "—"}
                     {r.student.school_name ? ` · ${r.student.school_name}` : ""}
                   </TableCell>
+                  <TableCell>
+                    <Select
+                      value={r.student.status || "active"}
+                      onValueChange={(v) =>
+                        updateStatusMutation.mutate({ id: r.student.id, status: v })
+                      }
+                    >
+                      <SelectTrigger
+                        className={`w-[140px] h-8 ${
+                          (r.student.status || "active") === "suspended"
+                            ? "border-destructive text-destructive"
+                            : ""
+                        }`}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Actif</SelectItem>
+                        <SelectItem value="inactive">Inactif</SelectItem>
+                        <SelectItem value="graduated">Diplômé</SelectItem>
+                        <SelectItem value="suspended">Suspendu</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+
                   <TableCell>
                     {r.payStatus === "paid" && (
                       <Badge className="bg-success text-success-foreground hover:bg-success">À jour</Badge>

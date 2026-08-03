@@ -159,6 +159,14 @@ const StaffListTab = () => {
         onSubmit={handleSubmitStaff}
         staffMember={selectedStaff}
       />
+
+      <StaffDetailsDialog
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        staffMember={selectedStaff}
+        onEdit={handleEditFromDetails}
+      />
+
     </div>
   );
 };

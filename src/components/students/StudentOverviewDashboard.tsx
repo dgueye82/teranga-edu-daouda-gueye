@@ -320,6 +320,31 @@ const StudentOverviewDashboard: React.FC = () => {
                     {r.student.school_name ? ` · ${r.student.school_name}` : ""}
                   </TableCell>
                   <TableCell>
+                    <Select
+                      value={r.student.status || "active"}
+                      onValueChange={(v) =>
+                        updateStatusMutation.mutate({ id: r.student.id, status: v })
+                      }
+                    >
+                      <SelectTrigger
+                        className={`w-[140px] h-8 ${
+                          (r.student.status || "active") === "suspended"
+                            ? "border-destructive text-destructive"
+                            : ""
+                        }`}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Actif</SelectItem>
+                        <SelectItem value="inactive">Inactif</SelectItem>
+                        <SelectItem value="graduated">Diplômé</SelectItem>
+                        <SelectItem value="suspended">Suspendu</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+
+                  <TableCell>
                     {r.payStatus === "paid" && (
                       <Badge className="bg-success text-success-foreground hover:bg-success">À jour</Badge>
                     )}

@@ -246,6 +246,7 @@ export type Database = {
           parent_phone: string | null
           photo_url: string | null
           school_id: string | null
+          status: string
           updated_at: string
         }
         Insert: {
@@ -264,6 +265,7 @@ export type Database = {
           parent_phone?: string | null
           photo_url?: string | null
           school_id?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
@@ -282,6 +284,7 @@ export type Database = {
           parent_phone?: string | null
           photo_url?: string | null
           school_id?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: [

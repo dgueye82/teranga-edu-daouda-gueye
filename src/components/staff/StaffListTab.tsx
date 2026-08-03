@@ -6,6 +6,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { LayoutGrid, LayoutList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StaffForm from "./StaffForm";
+import StaffDetailsDialog from "./StaffDetailsDialog";
+
 import StaffFilters from "./StaffFilters";
 import StaffActionBar from "./StaffActionBar";
 import StaffTable from "./StaffTable";

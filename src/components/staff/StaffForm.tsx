@@ -34,6 +34,13 @@ const StaffForm: React.FC<StaffFormProps> = ({ isOpen, onClose, onSubmit, staffM
     defaultValues: getDefaultValues(staffMember)
   });
 
+  React.useEffect(() => {
+    if (isOpen) {
+      form.reset(getDefaultValues(staffMember));
+    }
+  }, [isOpen, staffMember, form]);
+
+
   const handleSubmit = (data: StaffFormValues) => {
     onSubmit(data);
     onClose();

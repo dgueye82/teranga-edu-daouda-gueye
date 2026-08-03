@@ -6,6 +6,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { LayoutGrid, LayoutList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StaffForm from "./StaffForm";
+import StaffDetailsDialog from "./StaffDetailsDialog";
+
 import StaffFilters from "./StaffFilters";
 import StaffActionBar from "./StaffActionBar";
 import StaffTable from "./StaffTable";
@@ -20,6 +22,8 @@ const StaffListTab = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [staffData, setStaffData] = useState<{ data: Staff[], total: number }>({ data: [], total: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
   const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5);
@@ -52,8 +56,15 @@ const StaffListTab = () => {
 
   const handleViewStaff = (staff: Staff) => {
     setSelectedStaff(staff);
+    setIsDetailsOpen(true);
+  };
+
+  const handleEditFromDetails = (staff: Staff) => {
+    setIsDetailsOpen(false);
+    setSelectedStaff(staff);
     setIsFormOpen(true);
   };
+
 
   const handleSubmitStaff = (data: StaffFormData) => {
     if (selectedStaff) {
@@ -150,6 +161,14 @@ const StaffListTab = () => {
         onSubmit={handleSubmitStaff}
         staffMember={selectedStaff}
       />
+
+      <StaffDetailsDialog
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        staffMember={selectedStaff}
+        onEdit={handleEditFromDetails}
+      />
+
     </div>
   );
 };

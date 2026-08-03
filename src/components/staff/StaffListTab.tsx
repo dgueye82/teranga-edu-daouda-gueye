@@ -52,8 +52,15 @@ const StaffListTab = () => {
 
   const handleViewStaff = (staff: Staff) => {
     setSelectedStaff(staff);
+    setIsDetailsOpen(true);
+  };
+
+  const handleEditFromDetails = (staff: Staff) => {
+    setIsDetailsOpen(false);
+    setSelectedStaff(staff);
     setIsFormOpen(true);
   };
+
 
   const handleSubmitStaff = (data: StaffFormData) => {
     if (selectedStaff) {

@@ -150,7 +150,21 @@ const StudentOverviewDashboard: React.FC = () => {
     return { totalExpected, totalPaid, totalRemaining, unpaidCount, totalAbsences, totalLates };
   }, [rows]);
 
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("students").update({ status } as any).eq("id", id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["students"] });
+      toast({ title: "Statut mis à jour", description: "Le statut de l'élève a été modifié." });
+    },
+    onError: (e: Error) =>
+      toast({ title: "Erreur", description: e.message, variant: "destructive" }),
+  });
+
   const openPayment = (id: string, name: string) => {
+
     const target = rows.find((r) => r.student.id === id);
     setForm({
       month: currentMonth,

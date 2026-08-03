@@ -290,7 +290,9 @@ const StudentOverviewDashboard: React.FC = () => {
               <TableRow>
                 <TableHead>Élève</TableHead>
                 <TableHead>Classe / École</TableHead>
+                <TableHead>Statut élève</TableHead>
                 <TableHead>Statut paiement</TableHead>
+
                 <TableHead className="text-right">Payé</TableHead>
                 <TableHead className="text-right">Restant</TableHead>
                 <TableHead className="text-center">Retards</TableHead>

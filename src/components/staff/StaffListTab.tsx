@@ -20,6 +20,8 @@ const StaffListTab = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [staffData, setStaffData] = useState<{ data: Staff[], total: number }>({ data: [], total: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
   const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5);

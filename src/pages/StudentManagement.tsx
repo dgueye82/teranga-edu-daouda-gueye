@@ -23,14 +23,16 @@ const StudentManagement = () => {
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [studentToEdit, setStudentToEdit] = useState<StudentType | null>(null);
 
+  const { activeSchoolId } = useSchoolScope();
+
   const {
     data: students = [],
     isLoading,
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["students"],
-    queryFn: getStudents,
+    queryKey: ["students", activeSchoolId],
+    queryFn: () => (activeSchoolId ? getStudentsBySchool(activeSchoolId) : getStudents()),
   });
 
   const { data: schools = [] as School[] } = useQuery({

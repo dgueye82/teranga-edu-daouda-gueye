@@ -162,6 +162,12 @@ const SchoolManagement = () => {
             onDelete={handleDelete}
           />
         )}
+
+        {isAdmin && (
+          <div className="mt-10">
+            <UserSchoolAssignment schools={schools} />
+          </div>
+        )}
       </div>
     </div>
   );

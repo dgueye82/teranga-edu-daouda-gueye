@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SchoolProvider } from '@/contexts/SchoolContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // Pages

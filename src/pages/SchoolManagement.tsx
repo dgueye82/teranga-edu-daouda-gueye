@@ -27,6 +27,7 @@ const SchoolManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   const { data: schools = [], isLoading } = useQuery({
     queryKey: ["schools"],

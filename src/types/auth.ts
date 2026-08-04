@@ -17,6 +17,8 @@ export interface UserProfile {
   email: string;
   first_name?: string;
   last_name?: string;
+  /** École de rattachement de l'utilisateur (null pour l'admin plateforme) */
+  school_id?: string | null;
   created_at?: string;
   updated_at?: string;
 }

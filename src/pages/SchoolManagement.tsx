@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import Navbar from "@/components/layout/Navbar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import UserSchoolAssignment from "@/components/schools/UserSchoolAssignment";
 
 const SchoolManagement = () => {
   const { toast } = useToast();

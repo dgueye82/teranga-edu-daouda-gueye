@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/student";
+import { getStudentsBySchool } from "@/services/student/studentService";
+import { useSchoolScope } from "@/contexts/SchoolContext";
 import { getSchools } from "@/services/school";
 import { Student as StudentType, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";

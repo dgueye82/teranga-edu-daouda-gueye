@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { getStudents } from "@/services/student/studentService";
+import { getStudents, getStudentsBySchool } from "@/services/student/studentService";
+import { useSchoolScope } from "@/contexts/SchoolContext";
 import { getPaymentsForYear, createPayment } from "@/services/student/paymentService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

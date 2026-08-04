@@ -46,7 +46,8 @@ const Navbar = () => {
         <DesktopNavigation />
 
         {/* User Menu Button */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex items-center gap-4">
+          <SchoolSelector />
           <UserMenuButton />
         </div>
 

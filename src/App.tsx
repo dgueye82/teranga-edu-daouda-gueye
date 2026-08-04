@@ -98,6 +98,7 @@ function App() {
               </Routes>
             </Router>
           </Suspense>
+          </SchoolProvider>
         </AuthProvider>
       </QueryClientProvider>
     </React.StrictMode>

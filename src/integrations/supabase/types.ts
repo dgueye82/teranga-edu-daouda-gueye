@@ -304,6 +304,7 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          school_id: string | null
           updated_at: string
         }
         Insert: {
@@ -312,6 +313,7 @@ export type Database = {
           first_name?: string | null
           id: string
           last_name?: string | null
+          school_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -320,9 +322,18 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          school_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -358,6 +369,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_school: { Args: { _school_id: string }; Returns: boolean }
+      can_access_student: { Args: { _student_id: string }; Returns: boolean }
+      current_school_id: { Args: never; Returns: string }
       has_any_role: {
         Args: { _roles: string[]; _user_id: string }
         Returns: boolean
@@ -369,6 +383,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_platform_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role:

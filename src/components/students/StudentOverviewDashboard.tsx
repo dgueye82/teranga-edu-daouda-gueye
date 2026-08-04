@@ -59,9 +59,11 @@ const StudentOverviewDashboard: React.FC = () => {
     method: "espèces",
   });
 
+  const { activeSchoolId } = useSchoolScope();
+
   const { data: students = [] } = useQuery({
-    queryKey: ["students"],
-    queryFn: getStudents,
+    queryKey: ["students", activeSchoolId],
+    queryFn: () => (activeSchoolId ? getStudentsBySchool(activeSchoolId) : getStudents()),
   });
 
   const { data: payments = [] } = useQuery({

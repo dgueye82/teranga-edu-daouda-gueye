@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getStudents, createStudent, updateStudent, deleteStudent } from "@/services/student";
+import { getStudentsBySchool } from "@/services/student/studentService";
+import { useSchoolScope } from "@/contexts/SchoolContext";
 import { getSchools } from "@/services/school";
 import { Student as StudentType, StudentFormData } from "@/types/student";
 import { School } from "@/types/school";
@@ -23,14 +25,16 @@ const StudentManagement = () => {
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
   const [studentToEdit, setStudentToEdit] = useState<StudentType | null>(null);
 
+  const { activeSchoolId } = useSchoolScope();
+
   const {
     data: students = [],
     isLoading,
     isError,
     refetch,
   } = useQuery({
-    queryKey: ["students"],
-    queryFn: getStudents,
+    queryKey: ["students", activeSchoolId],
+    queryFn: () => (activeSchoolId ? getStudentsBySchool(activeSchoolId) : getStudents()),
   });
 
   const { data: schools = [] as School[] } = useQuery({

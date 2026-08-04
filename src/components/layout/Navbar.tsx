@@ -5,6 +5,7 @@ import DesktopNavigation from "./navigation/DesktopNavigation";
 import MobileMenuToggle from "./navigation/MobileMenuToggle";
 import MobileMenu from "./navigation/MobileMenu";
 import UserMenuButton from "./UserMenuButton";
+import SchoolSelector from "./SchoolSelector";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,7 +47,8 @@ const Navbar = () => {
         <DesktopNavigation />
 
         {/* User Menu Button */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex items-center gap-4">
+          <SchoolSelector />
           <UserMenuButton />
         </div>
 

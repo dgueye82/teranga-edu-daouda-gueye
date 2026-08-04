@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import Navbar from "@/components/layout/Navbar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import UserSchoolAssignment from "@/components/schools/UserSchoolAssignment";
 
 const SchoolManagement = () => {
   const { toast } = useToast();
@@ -25,6 +27,7 @@ const SchoolManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   const { data: schools = [], isLoading } = useQuery({
     queryKey: ["schools"],
@@ -161,6 +164,12 @@ const SchoolManagement = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
+        )}
+
+        {isAdmin && (
+          <div className="mt-10">
+            <UserSchoolAssignment schools={schools} />
+          </div>
         )}
       </div>
     </div>

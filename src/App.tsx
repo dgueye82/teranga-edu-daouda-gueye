@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SchoolProvider } from '@/contexts/SchoolContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 // Pages
@@ -44,6 +45,7 @@ function App() {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <SchoolProvider>
           <Suspense fallback={
             <div className="flex items-center justify-center h-screen">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teranga-blue"></div>
@@ -96,6 +98,7 @@ function App() {
               </Routes>
             </Router>
           </Suspense>
+          </SchoolProvider>
         </AuthProvider>
       </QueryClientProvider>
     </React.StrictMode>

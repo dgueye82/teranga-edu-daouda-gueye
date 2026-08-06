@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StaffListTab from "@/components/staff/StaffListTab";
+import StaffDashboardTab from "@/components/staff/StaffDashboardTab";
 
 const StaffManagement = () => {
   const navigate = useNavigate();
@@ -34,14 +35,7 @@ const StaffManagement = () => {
             </TabsContent>
             
             <TabsContent value="dashboard">
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h2 className="text-xl font-semibold mb-4">Tableau de bord du personnel</h2>
-                <p className="text-gray-600">
-                  Fonctionnalité en cours de développement. Consultez les statistiques, 
-                  les indicateurs de performance et les fonctionnalités clés pour une gestion 
-                  efficace des ressources humaines.
-                </p>
-              </div>
+              <StaffDashboardTab />
             </TabsContent>
             
             <TabsContent value="cards">

@@ -192,7 +192,7 @@ const StaffListTab = () => {
       <StaffForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        onSubmit={(data) => saveMutation.mutate(data)}
+        onSubmit={(data) => saveMutation.mutate(data as StaffFormData)}
         staffMember={selectedStaff}
       />
 

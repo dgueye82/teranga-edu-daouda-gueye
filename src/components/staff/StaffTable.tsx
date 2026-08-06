@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit, Eye } from "lucide-react";
+import { Edit, Eye, Trash2 } from "lucide-react";
 import { Staff } from "@/types/staff";
 import StaffPagination from "./StaffPagination";
 
@@ -10,6 +10,8 @@ interface StaffTableProps {
   filteredStaff: Staff[];
   onViewStaff: (staff: Staff) => void;
   onEditStaff: (staff: Staff) => void;
+  onDeleteStaff?: (staff: Staff) => void;
+  canManage?: boolean;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -19,6 +21,8 @@ const StaffTable: React.FC<StaffTableProps> = ({
   filteredStaff,
   onViewStaff,
   onEditStaff,
+  onDeleteStaff,
+  canManage = true,
   currentPage,
   totalPages,
   onPageChange
@@ -70,10 +74,23 @@ const StaffTable: React.FC<StaffTableProps> = ({
                     <Eye className="h-4 w-4 mr-1" />
                     Voir
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => onEditStaff(staff)}>
-                    <Edit className="h-4 w-4 mr-1" />
-                    Modifier
-                  </Button>
+                  {canManage && (
+                    <Button variant="ghost" size="sm" onClick={() => onEditStaff(staff)}>
+                      <Edit className="h-4 w-4 mr-1" />
+                      Modifier
+                    </Button>
+                  )}
+                  {canManage && onDeleteStaff && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => onDeleteStaff(staff)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Supprimer
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

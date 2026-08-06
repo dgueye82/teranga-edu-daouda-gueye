@@ -8,6 +8,7 @@ interface StaffCardViewProps {
   filteredStaff: Staff[];
   onViewStaff: (staff: Staff) => void;
   onEditStaff: (staff: Staff) => void;
+  canManage?: boolean;
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
@@ -17,6 +18,7 @@ const StaffCardView: React.FC<StaffCardViewProps> = ({
   filteredStaff,
   onViewStaff,
   onEditStaff,
+  canManage = true,
   currentPage,
   totalPages,
   onPageChange
@@ -31,6 +33,7 @@ const StaffCardView: React.FC<StaffCardViewProps> = ({
               staff={staff}
               onViewStaff={onViewStaff}
               onEditStaff={onEditStaff}
+              canManage={canManage}
             />
           ))}
         </div>

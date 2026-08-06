@@ -9,12 +9,14 @@ interface StaffCardProps {
   staff: Staff;
   onViewStaff: (staff: Staff) => void;
   onEditStaff: (staff: Staff) => void;
+  canManage?: boolean;
 }
 
 const StaffCard: React.FC<StaffCardProps> = ({ 
   staff,
   onViewStaff,
-  onEditStaff
+  onEditStaff,
+  canManage = true
 }) => {
   return (
     <Card className="h-full">
@@ -72,10 +74,12 @@ const StaffCard: React.FC<StaffCardProps> = ({
           <Eye className="h-4 w-4 mr-1" />
           Voir
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => onEditStaff(staff)}>
-          <Edit className="h-4 w-4 mr-1" />
-          Modifier
-        </Button>
+        {canManage && (
+          <Button variant="ghost" size="sm" onClick={() => onEditStaff(staff)}>
+            <Edit className="h-4 w-4 mr-1" />
+            Modifier
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

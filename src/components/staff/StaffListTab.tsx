@@ -1,9 +1,9 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
-import { LayoutGrid, LayoutList } from "lucide-react";
+import { LayoutGrid, LayoutList, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StaffForm from "./StaffForm";
 import StaffDetailsDialog from "./StaffDetailsDialog";
@@ -13,112 +13,139 @@ import StaffActionBar from "./StaffActionBar";
 import StaffTable from "./StaffTable";
 import StaffCardView from "./StaffCardView";
 import { Staff, StaffFormData } from "@/types/staff";
-import { getPaginatedStaffMembers, addStaffMember, updateStaffMember } from "@/services/staff";
+import {
+  getStaffMembers,
+  filterStaff,
+  addStaffMember,
+  updateStaffMember,
+  deleteStaffMember,
+} from "@/services/staff";
+import { useSchoolScope } from "@/contexts/SchoolContext";
+import { useAuth } from "@/contexts/AuthContext";
+
+const PAGE_SIZE = 5;
 
 const StaffListTab = () => {
   const [searchParams] = useSearchParams();
   const departmentFilter = searchParams.get("department");
-  
-  const [searchTerm, setSearchTerm] = useState("");
-  const [staffData, setStaffData] = useState<{ data: Staff[], total: number }>({ data: [], total: 0 });
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-
-  const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(undefined);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(5);
-  const [viewMode, setViewMode] = useState<"table" | "card">("table");
+  const { activeSchoolId } = useSchoolScope();
+  const { hasPermission } = useAuth();
+  const canManage = hasPermission("staff.manage");
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Calculate total pages
-  const totalPages = Math.ceil(staffData.total / pageSize);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState<Staff | undefined>(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"table" | "card">("table");
 
-  // Load staff data with pagination
-  useEffect(() => {
-    const result = getPaginatedStaffMembers(currentPage, pageSize, searchTerm, departmentFilter || undefined);
-    setStaffData(result);
-  }, [currentPage, pageSize, searchTerm, departmentFilter]);
+  const { data: staff = [], isLoading } = useQuery({
+    queryKey: ["staff", activeSchoolId],
+    queryFn: () => getStaffMembers(activeSchoolId),
+  });
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, departmentFilter]);
+  const filtered = useMemo(
+    () => filterStaff(staff, searchTerm, departmentFilter || undefined),
+    [staff, searchTerm, departmentFilter]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const page = Math.min(currentPage, totalPages);
+  const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["staff"] });
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: StaffFormData) =>
+      selectedStaff
+        ? updateStaffMember(selectedStaff.id, data)
+        : addStaffMember(data, activeSchoolId),
+    onSuccess: (_res, data) => {
+      invalidate();
+      toast({
+        title: selectedStaff ? "Membre mis à jour" : "Membre ajouté",
+        description: `${data.name} a été enregistré avec succès.`,
+      });
+      setIsFormOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error?.message || "Enregistrement impossible.",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteStaffMember(id),
+    onSuccess: () => {
+      invalidate();
+      toast({ title: "Membre supprimé" });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: error?.message || "Suppression impossible.",
+      });
+    },
+  });
 
   const handleAddStaff = () => {
     setSelectedStaff(undefined);
     setIsFormOpen(true);
   };
 
-  const handleEditStaff = (staff: Staff) => {
-    setSelectedStaff(staff);
+  const handleEditStaff = (member: Staff) => {
+    setSelectedStaff(member);
     setIsFormOpen(true);
   };
 
-  const handleViewStaff = (staff: Staff) => {
-    setSelectedStaff(staff);
+  const handleViewStaff = (member: Staff) => {
+    setSelectedStaff(member);
     setIsDetailsOpen(true);
   };
 
-  const handleEditFromDetails = (staff: Staff) => {
+  const handleEditFromDetails = (member: Staff) => {
     setIsDetailsOpen(false);
-    setSelectedStaff(staff);
+    setSelectedStaff(member);
     setIsFormOpen(true);
   };
 
-
-  const handleSubmitStaff = (data: StaffFormData) => {
-    if (selectedStaff) {
-      // Edit existing staff
-      updateStaffMember(selectedStaff.id, data);
-      toast({
-        title: "Membre du personnel mis à jour",
-        description: `${data.name} a été mis à jour avec succès.`
-      });
-    } else {
-      // Add new staff
-      addStaffMember(data);
-      toast({
-        title: "Membre du personnel ajouté",
-        description: `${data.name} a été ajouté avec succès.`
-      });
+  const handleDeleteStaff = (member: Staff) => {
+    if (window.confirm(`Supprimer ${member.name} ?`)) {
+      deleteMutation.mutate(member.id);
     }
-    
-    // Refresh data
-    const result = getPaginatedStaffMembers(currentPage, pageSize, searchTerm, departmentFilter || undefined);
-    setStaffData(result);
-    
-    // Close form
-    setIsFormOpen(false);
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handlePageChange = (next: number) => {
+    setCurrentPage(next);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const toggleViewMode = () => {
-    setViewMode(viewMode === "table" ? "card" : "table");
-  };
+  const toggleViewMode = () => setViewMode(viewMode === "table" ? "card" : "table");
 
   return (
     <div className="space-y-6">
       <StaffFilters />
-      
+
       <div className="flex justify-between items-center">
         <div className="flex-1">
-          <StaffActionBar 
+          <StaffActionBar
             searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+            onSearchChange={(value) => {
+              setSearchTerm(value);
+              setCurrentPage(1);
+            }}
             onAddStaff={handleAddStaff}
+            canManage={canManage}
           />
         </div>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={toggleViewMode}
-          className="ml-2"
-        >
+
+        <Button variant="outline" size="sm" onClick={toggleViewMode} className="ml-2">
           {viewMode === "table" ? (
             <>
               <LayoutGrid className="h-4 w-4 mr-2" />
@@ -132,33 +159,40 @@ const StaffListTab = () => {
           )}
         </Button>
       </div>
-      
+
       <Separator className="my-6" />
-      
-      {viewMode === "table" ? (
-        <StaffTable 
-          filteredStaff={staffData.data}
+
+      {isLoading ? (
+        <div className="flex justify-center py-12 text-muted-foreground">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </div>
+      ) : viewMode === "table" ? (
+        <StaffTable
+          filteredStaff={pageData}
           onViewStaff={handleViewStaff}
           onEditStaff={handleEditStaff}
-          currentPage={currentPage}
+          onDeleteStaff={canManage ? handleDeleteStaff : undefined}
+          canManage={canManage}
+          currentPage={page}
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />
       ) : (
         <StaffCardView
-          filteredStaff={staffData.data}
+          filteredStaff={pageData}
           onViewStaff={handleViewStaff}
           onEditStaff={handleEditStaff}
-          currentPage={currentPage}
+          canManage={canManage}
+          currentPage={page}
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />
       )}
 
-      <StaffForm 
+      <StaffForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        onSubmit={handleSubmitStaff}
+        onSubmit={(data) => saveMutation.mutate(data as StaffFormData)}
         staffMember={selectedStaff}
       />
 
@@ -166,9 +200,8 @@ const StaffListTab = () => {
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
         staffMember={selectedStaff}
-        onEdit={handleEditFromDetails}
+        onEdit={canManage ? handleEditFromDetails : undefined}
       />
-
     </div>
   );
 };

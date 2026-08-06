@@ -49,6 +49,7 @@ export type Database = {
       }
       staff: {
         Row: {
+          address: string | null
           created_at: string
           department: string | null
           email: string | null
@@ -59,9 +60,11 @@ export type Database = {
           phone: string | null
           position: string | null
           school_id: string | null
+          status: string
           updated_at: string
         }
         Insert: {
+          address?: string | null
           created_at?: string
           department?: string | null
           email?: string | null
@@ -72,9 +75,11 @@ export type Database = {
           phone?: string | null
           position?: string | null
           school_id?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
+          address?: string | null
           created_at?: string
           department?: string | null
           email?: string | null
@@ -85,6 +90,7 @@ export type Database = {
           phone?: string | null
           position?: string | null
           school_id?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: [
